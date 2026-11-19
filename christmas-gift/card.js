@@ -243,7 +243,7 @@
      [7, '#F2C14E', 130, -170, 1.2, 1.18], [5, '#CBA84C', -70, -120, 1.15, 1.25], [5, '#CBA84C', 80, -110, 1.15, 1.22]].forEach(function (s) {
       el('div', null, 'position:absolute;width:' + s[0] + 'px;height:' + s[0] + 'px;border-radius:50%;background:' + s[1] + ';--dx:' + (s[2] * Math.max(k, .6)) + 'px;--dy:' + s[3] + 'px;animation:spark ' + s[4] + 's ease-out ' + s[5] + 's forwards;opacity:0', sp);
     });
-    // sleigh silhouette crossing the sky
+    // sleigh silhouette crossing the room above the mantel (gift: 0.311 H higher than the Christmas card)
     var sl = el('div', null, 'position:absolute;left:0;top:0;width:360px;height:120px;opacity:0', fxb);
     svg('<path d="M100 58 Q170 40 308 46" stroke="#C99B4A" stroke-width="2" opacity="0.8"/><line x1="8" y1="84" x2="100" y2="84" stroke="#3A2515" stroke-width="3" stroke-linecap="round"/><path d="M100 84 q12 0 12 -10" stroke="#3A2515" stroke-width="3" stroke-linecap="round"/><line x1="24" y1="78" x2="24" y2="84" stroke="#3A2515" stroke-width="3"/><line x1="80" y1="78" x2="80" y2="84" stroke="#3A2515" stroke-width="3"/><rect x="12" y="58" width="84" height="20" rx="8" fill="#2A1712"/><path d="M96 66 q14 -2 12 -16" stroke="#2A1712" stroke-width="6" stroke-linecap="round"/><circle cx="22" cy="50" r="11" fill="#241410"/><rect x="30" y="36" width="26" height="24" rx="8" fill="#2A1712"/><circle cx="52" cy="36" r="7" fill="#2A1712"/><path d="M45 31 L60 26 L52 18 Z" fill="#2A1712"/>' +
       [140, 215, 290].map(function (x, i) { var y = 62 - i * 2; return '<g><ellipse cx="' + x + '" cy="' + y + '" rx="15" ry="9" fill="#241410"/><circle cx="' + (x + 18) + '" cy="' + (y - 14) + '" r="6.5" fill="#241410"/><path d="M' + (x - 8) + ' ' + (y + 8) + ' l-6 12 M' + (x - 2) + ' ' + (y + 8) + ' l-2 14 M' + (x + 6) + ' ' + (y + 8) + ' l4 12 M' + (x + 11) + ' ' + (y + 6) + ' l6 12" stroke="#241410" stroke-width="3" stroke-linecap="round"/><circle cx="' + (x - 16) + '" cy="' + (y - 2) + '" r="2.5" fill="#F2C14E"/></g>'; }).join('') +
@@ -251,16 +251,16 @@
     var sk = L === LAYOUTS.port ? 0.7 : 1;
     if (sl.animate) {
       sl.animate([
-        { transform: 'translate(' + (-0.3 * W) + 'px,' + (0.9 * H) + 'px) scale(' + (0.9 * sk) + ') rotate(-16deg)', opacity: 0 },
+        { transform: 'translate(' + (-0.3 * W) + 'px,' + (0.589 * H) + 'px) scale(' + (0.9 * sk) + ') rotate(-16deg)', opacity: 0 },
         { offset: 0.08, opacity: 1 },
-        { offset: 0.52, transform: 'translate(' + (0.3 * W) + 'px,' + (0.367 * H) + 'px) scale(' + (1.25 * sk) + ') rotate(-15deg)', opacity: 1 },
+        { offset: 0.52, transform: 'translate(' + (0.3 * W) + 'px,' + (0.056 * H) + 'px) scale(' + (1.25 * sk) + ') rotate(-15deg)', opacity: 1 },
         { offset: 0.92, opacity: 1 },
-        { transform: 'translate(' + (1.05 * W) + 'px,' + (-0.167 * H) + 'px) scale(' + (1.45 * sk) + ') rotate(-13deg)', opacity: 0 }
+        { transform: 'translate(' + (1.05 * W) + 'px,' + (-0.478 * H) + 'px) scale(' + (1.45 * sk) + ') rotate(-13deg)', opacity: 0 }
       ], { duration: 4600, delay: 1150, easing: 'ease-in-out', fill: 'forwards' });
     }
     // gold dust trail following the sleigh
     var dust = el('div', null, 'position:absolute;inset:0', fxb);
-    var x0 = 0.1 * W, y0 = 0.818 * H, x1 = 0.933 * W, y1 = 0.051 * H;
+    var x0 = 0.1 * W, y0 = 0.507 * H, x1 = 0.933 * W, y1 = -0.26 * H;   // gift: path 0.311 H higher than Christmas (over the mantel, not the table)
     for (var i = 0; i < 20; i++) {
       var t = i / 19, sz = [8, 6, 9, 5, 8, 6, 9, 5, 8, 6, 10, 5, 8, 6, 9, 5, 8, 6, 7, 6][i];
       var col = ['#F7D98C', '#FFF6DF', '#F2C14E'][i % 3];
