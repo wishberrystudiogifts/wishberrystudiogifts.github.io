@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Make your Christmas gift card</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:#FBF7EE;color:#2A2620;font:18px/1.5 'Segoe UI',Roboto,Helvetica,Arial,sans-serif}
+.top{background:#3A0D12;color:#F4ECDD;padding:14px 20px;text-align:center;font-family:'Fraunces',Georgia,serif;letter-spacing:.2em;text-transform:uppercase;font-size:14px}
+main{max-width:1040px;margin:0 auto;padding:24px 18px 40px}
+h1{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:34px;line-height:1.15;margin:4px 0 6px;color:#3A0D12;text-align:center}
+.lead{text-align:center;margin:0 0 22px;color:#5B5248;font-size:19px}
+.grid{display:grid;grid-template-columns:1fr;gap:22px}
+@media (min-width:860px){.grid{grid-template-columns:380px 1fr;gap:40px;align-items:start}.pv{position:sticky;top:20px}}
+.pv{display:flex;flex-direction:column;align-items:center;gap:12px}
+.pvcard{width:100%;max-width:300px;aspect-ratio:480/672;border-radius:6px;overflow:hidden;box-shadow:0 14px 34px rgba(58,13,18,.18);background:#FBF7EE}
+@media (min-width:860px){.pvcard{max-width:380px}}
+.pvcard iframe{width:100%;height:100%;border:0;display:block;background:transparent}
+.step{display:flex;gap:14px;background:#fff;border:2px solid #EADFCB;border-radius:16px;padding:18px 18px 16px;margin-bottom:14px}
+.num{flex:none;width:40px;height:40px;border-radius:50%;background:#3A0D12;color:#F4ECDD;font:700 20px/40px 'Fraunces',Georgia,serif;text-align:center}
+.body{flex:1;min-width:0}
+label{display:block;font-weight:700;font-size:20px;margin:4px 0 8px;color:#2A2620}
+input,textarea{width:100%;font:inherit;font-size:19px;color:#2A2620;background:#FFFDF8;border:2px solid #CDBFA6;border-radius:12px;padding:13px 14px;outline:none}
+input:focus,textarea:focus{border-color:#7A1F2B;box-shadow:0 0 0 4px rgba(122,31,43,.15)}
+textarea{min-height:150px;resize:vertical;line-height:1.45}
+.help{margin:8px 0 0;font-size:16px;color:#6B6157}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:8px}
+.count{font-size:15px;color:#6B6157;white-space:nowrap}
+.chips{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.chip{text-align:left;font:inherit;font-size:16px;background:#F6EEDF;border:2px solid #E5D6BC;border-radius:12px;padding:10px 12px;cursor:pointer;color:#3A2E25}
+.chip:hover,.chip:focus{border-color:#B8893B}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font:700 19px/1.2 'Segoe UI',Roboto,Arial,sans-serif;border-radius:14px;padding:16px 22px;min-height:58px;cursor:pointer;text-decoration:none;border:2px solid transparent}
+.primary{width:100%;background:#7A1F2B;color:#fff;font-size:21px;min-height:64px;box-shadow:0 8px 20px rgba(122,31,43,.28)}
+.primary:hover{background:#651823}
+.ghost{background:#fff;color:#3A0D12;border-color:#3A0D12;width:100%;max-width:300px}
+.sendbox{background:#fff;border:2px solid #B8893B;border-radius:16px;padding:18px;margin-top:14px}
+.ok{margin:0 0 12px;font-weight:700;font-size:20px;color:#2E6B3A}
+.sendbtns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.app{background:#F6EEDF;color:#2A2620;border-color:#E5D6BC;font-size:18px}
+.app.wa{background:#1F7A4D;color:#fff;border-color:#1F7A4D}
+.app[hidden]{display:none}
+#share{grid-column:1 / -1}
+.small{font-size:16px;font-weight:600;margin-top:4px}
+#link{font-size:15px;color:#5B5248}
+.note{font-size:16px;color:#6B6157;margin:14px 2px 0;text-align:center}
+#overlay{position:fixed;inset:0;background:#000;z-index:50;display:flex;flex-direction:column}
+#overlay[hidden]{display:none}
+#overlay iframe{flex:1;border:0;width:100%}
+.closebtn{position:absolute;top:max(12px,env(safe-area-inset-top));left:12px;background:rgba(255,255,255,.92);color:#3A0D12;border-color:#fff;min-height:50px;font-size:17px;padding:10px 16px}
+</style>
+</head>
+<body>
+<div class="top">Personal Christmas Gift</div>
+<main>
+  <h1>Make your Christmas gift card</h1>
+  <p class="lead">Three easy steps &middot; about one minute</p>
+  <div class="grid">
+    <section class="pv" aria-label="Preview">
+      <div class="pvcard"><iframe id="pv" title="Inside of your gift card"></iframe></div>
+      <button id="see" class="btn ghost" type="button">&#9654;&nbsp; Watch it open</button>
+    </section>
+    <section>
+      <div class="step"><div class="num">1</div><div class="body">
+        <label for="to">Who is the gift for?</label>
+        <input id="to" maxlength="40" placeholder="For example: Grandma Rose" autocomplete="off">
+        <p class="help">We write &ldquo;Dear &hellip;,&rdquo; inside the card and &ldquo;A gift for &hellip;&rdquo; on the envelope. You can leave it empty.</p>
+      </div></div>
+      <div class="step"><div class="num">2</div><div class="body">
+        <label for="msg">What is your gift?</label>
+        <p class="help" style="margin:0 0 8px">They read it right under &ldquo;Your gift is&hellip;&rdquo;. Add a date or a place if you like.</p>
+        <textarea id="msg" maxlength="300" placeholder="For example: A weekend in Vienna &mdash; pack your bags for March 12!"></textarea>
+        <p id="need" class="help" style="color:#9B1C1C;font-weight:700" hidden>Please write your gift first.</p>
+        <div class="row"><span class="help" style="margin:0">Or tap an idea, then change it to your real gift:</span><span class="count"><b id="cnt">0</b> / 300</span></div>
+        <div class="chips">
+          <button class="chip" type="button">A weekend getaway for two &mdash; pack your bags!</button>
+          <button class="chip" type="button">Dinner for two at your favorite restaurant.</button>
+          <button class="chip" type="button">A spa day, just for you. You deserve it!</button>
+          <button class="chip" type="button">Two concert tickets &mdash; and I&rsquo;ll be your date!</button>
+        </div>
+      </div></div>
+      <div class="step"><div class="num">3</div><div class="body">
+        <label for="sign">Sign your gift card</label>
+        <input id="sign" maxlength="60" placeholder="For example: Love, Sarah" autocomplete="off">
+      </div></div>
+      <button id="send" class="btn primary" type="button">Send my gift &nbsp;&#10148;</button>
+      <div id="sendbox" class="sendbox" hidden>
+        <p class="ok">&#10003; Your gift card is ready! How do you want to send it?</p>
+        <p class="help" style="margin:-4px 0 12px">Your link opens the finished card &mdash; they tap the envelope to see their gift.</p>
+        <div class="sendbtns">
+          <button id="share" class="btn app wa" type="button" hidden>Send with my phone&hellip;</button>
+          <a id="wa" class="btn app wa" target="_blank" rel="noopener">WhatsApp</a>
+          <a id="sms" class="btn app" hidden>Text message</a>
+          <a id="mail" class="btn app">Email app</a>
+          <a id="gmail" class="btn app" target="_blank" rel="noopener" hidden>Gmail</a>
+          <button id="copy" class="btn app" type="button">Copy link</button>
+        </div>
+        <label class="small" for="link">Your gift card link</label>
+        <input id="link" readonly>
+        <p class="help">Want to change something? Edit the text above and tap &ldquo;Send my gift&rdquo; again &mdash; you get a new link.</p>
+      </div>
+      <p class="note">&#128274; Your words are saved only inside your link. We never see them.</p>
+      <p class="note">Need help? Message us on Etsy &mdash; we reply within 24 hours.</p>
+    </section>
+  </div>
+</main>
+<div id="overlay" hidden>
+  <iframe id="full" title="Your gift card opening"></iframe>
+  <button id="close" class="btn closebtn" type="button">&larr; Back to editing</button>
+</div>
+<script>window.CARD_CONFIG = { defaultMessage: 'A little surprise \u2014 just for you.' };</script>
+<script src="card.js"></script>
+<script>
+(function () {
+  var C = window.CardCodec, KEY = 'cardDraft-christmas-gift';
+  var $ = function (id) { return document.getElementById(id); };
+  var to = $('to'), msg = $('msg'), sign = $('sign'), cnt = $('cnt'), pv = $('pv');
+  var SHARE_TEXT = 'I have a Christmas gift for you 🎁 Tap to open it:';
+  function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
+  var saved = null; try { saved = JSON.parse(store(KEY) || 'null'); } catch (e) {}
+  to.value = saved && saved.t || '';
+  msg.value = saved && saved.m || '';
+  sign.value = saved && saved.s || '';
+  function data() { return C.clean({ t: to.value, m: msg.value, s: sign.value }); }
+  function cardUrl(hashExtra) {
+    var u = new URL('./', location.href);
+    u.search = '';
+    u.hash = 'm=' + C.encode(data()) + (hashExtra || '');
+    return u.href;
+  }
+  var tmr;
+  function refresh() {
+    cnt.textContent = msg.value.length;
+    clearTimeout(tmr);
+    tmr = setTimeout(function () {
+      pv.src = 'index.html#view=inside&m=' + C.encode(data());
+      store(KEY, JSON.stringify(data()));
+    }, 150);
+    $('sendbox').hidden = true;
+    if (msg.value.trim()) $('need').hidden = true;
+  }
+  [to, msg, sign].forEach(function (e) { e.addEventListener('input', refresh); });
+  Array.prototype.forEach.call(document.querySelectorAll('.chip'), function (b) {
+    b.addEventListener('click', function () { msg.value = b.textContent; refresh(); msg.focus(); });
+  });
+  refresh();
+  $('see').addEventListener('click', function () {
+    $('full').src = 'index.html#autoplay=1&r=' + Date.now() + '&m=' + C.encode(data());
+    $('overlay').hidden = false;
+  });
+  $('close').addEventListener('click', function () { $('overlay').hidden = true; $('full').src = 'about:blank'; });
+  $('send').addEventListener('click', function () {
+    if (!msg.value.trim()) { $('need').hidden = false; msg.focus(); return; }
+    var link = cardUrl();
+    var text = SHARE_TEXT + ' ' + link;
+    var subject = 'A Christmas gift for you';
+    $('link').value = link;
+    $('wa').href = 'https://wa.me/?text=' + encodeURIComponent(text);
+    $('sms').href = 'sms:?&body=' + encodeURIComponent(text);
+    $('mail').href = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(text);
+    $('gmail').href = 'https://mail.google.com/mail/?view=cm&fs=1&su=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(text);
+    var touch = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+    var canShare = !!(touch && navigator.share);
+    $('share').hidden = !canShare;   // phones: one button opens the phone's own list (WhatsApp, Messages, Mail, Messenger...)
+    $('sms').hidden = !touch;         // text messages only exist on phones
+    $('gmail').hidden = touch;        // computers: Gmail in the browser works without a mail program
+    $('sendbox').hidden = false;
+    $('sendbox').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (canShare) openShare(link);
+  });
+  function openShare(link) {
+    navigator.share({ title: 'A Christmas gift for you', text: SHARE_TEXT, url: link }).catch(function () {});
+  }
+  $('share').addEventListener('click', function () { openShare($('link').value); });
+  $('copy').addEventListener('click', function () {
+    var l = $('link'), done = function () { $('copy').textContent = 'Copied ✓'; setTimeout(function () { $('copy').textContent = 'Copy link'; }, 2200); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(l.value).then(done, fallback); else fallback();
+    function fallback() { l.focus(); l.select(); try { document.execCommand('copy'); done(); } catch (e) {} }
+  });
+})();
+</script>
+</body>
+</html>

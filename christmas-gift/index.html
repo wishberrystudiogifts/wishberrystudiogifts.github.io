@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>A Christmas gift for you</title>
+<meta name="description" content="Someone sent you a Christmas gift. Tap to open it.">
+<meta property="og:title" content="A Christmas gift for you 🎁">
+<meta property="og:description" content="Tap to open it ✨">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://wishberrystudiogifts.github.io/christmas-gift/">
+<meta property="og:image" content="https://wishberrystudiogifts.github.io/christmas-gift/assets/preview.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0f2a1d">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..800;1,9..144,300..800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="card.css">
+</head>
+<body>
+<img class="backdrop" src="assets/bg.jpg" alt="">
+<div id="stage"></div>
+<div id="ivwrap"></div>
+<div id="controls">
+  <button id="replay" type="button">↻ Watch again</button>
+  <a id="shop" hidden>🎁 Send a card like this</a>
+</div>
+<script>
+window.CARD_CONFIG = {
+  occasion: 'christmas-gift',
+  shopUrl: '',
+  defaultMessage: 'A little surprise \u2014 just for you.'
+};
+</script>
+<script src="card.js"></script>
+</body>
+</html>
