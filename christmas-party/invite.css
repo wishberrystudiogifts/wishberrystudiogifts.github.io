@@ -66,7 +66,7 @@ body.inside-view #stage,body.inside-view .backdrop,body.inside-view #controls{di
 .iface.d-a .kick,.iface.d-a .orn,.iface.d-a .rsvp,.iface.d-a .contact{color:#E2C27D}
 .iface.d-c .iin{color:#F3E9D2;text-shadow:0 1px 12px rgba(0,0,0,.45)}
 .iface.d-c .kick,.iface.d-c .orn,.iface.d-c .rsvp,.iface.d-c .contact{color:#D9B56A}
-.itxt{transition:opacity 1s}
+.itxt{transition:opacity 1s;will-change:opacity} /* own layer from the start: no one-frame re-raster flicker when the fade ends */
 
 /* ---------- guest buttons: RSVP, calendar, directions ---------- */
 #controls{position:fixed;left:0;right:0;bottom:max(14px,env(safe-area-inset-bottom));display:flex;flex-direction:column;align-items:center;gap:8px;z-index:5;opacity:0;transition:opacity .9s;pointer-events:none;padding:0 10px}
