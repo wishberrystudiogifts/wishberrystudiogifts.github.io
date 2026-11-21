@@ -298,7 +298,7 @@
     if (ctl) ctl.classList.add('show');
   }
 
-  /* ---------- effects: sparks, sleigh, gold dust, snow ---------- */
+  /* ---------- effects (Christmas Party, own concept 21 Nov 2026): sparks from the card, party string lights that switch on bulb by bulb, a slow fall of gold stars and holly leaves ---------- */
   function startFx() {
     var L = state.L, fx = state.n.fx, fxb = state.n.fxBack, W = L.W, H = L.H;
     // card geometry in stage units
@@ -313,47 +313,43 @@
      [7, '#F2C14E', 130, -170, 1.2, 1.18], [5, '#CBA84C', -70, -120, 1.15, 1.25], [5, '#CBA84C', 80, -110, 1.15, 1.22]].forEach(function (s) {
       el('div', null, 'position:absolute;width:' + s[0] + 'px;height:' + s[0] + 'px;border-radius:50%;background:' + s[1] + ';--dx:' + (s[2] * Math.max(k, .6)) + 'px;--dy:' + s[3] + 'px;animation:spark ' + s[4] + 's ease-out ' + s[5] + 's forwards;opacity:0', sp);
     });
-    // sleigh silhouette crossing the sky
-    var sl = el('div', null, 'position:absolute;left:0;top:0;width:360px;height:120px;opacity:0', fxb);
-    svg('<path d="M100 58 Q170 40 308 46" stroke="#C99B4A" stroke-width="2" opacity="0.8"/><line x1="8" y1="84" x2="100" y2="84" stroke="#3A2515" stroke-width="3" stroke-linecap="round"/><path d="M100 84 q12 0 12 -10" stroke="#3A2515" stroke-width="3" stroke-linecap="round"/><line x1="24" y1="78" x2="24" y2="84" stroke="#3A2515" stroke-width="3"/><line x1="80" y1="78" x2="80" y2="84" stroke="#3A2515" stroke-width="3"/><rect x="12" y="58" width="84" height="20" rx="8" fill="#2A1712"/><path d="M96 66 q14 -2 12 -16" stroke="#2A1712" stroke-width="6" stroke-linecap="round"/><circle cx="22" cy="50" r="11" fill="#241410"/><rect x="30" y="36" width="26" height="24" rx="8" fill="#2A1712"/><circle cx="52" cy="36" r="7" fill="#2A1712"/><path d="M45 31 L60 26 L52 18 Z" fill="#2A1712"/>' +
-      [140, 215, 290].map(function (x, i) { var y = 62 - i * 2; return '<g><ellipse cx="' + x + '" cy="' + y + '" rx="15" ry="9" fill="#241410"/><circle cx="' + (x + 18) + '" cy="' + (y - 14) + '" r="6.5" fill="#241410"/><path d="M' + (x - 8) + ' ' + (y + 8) + ' l-6 12 M' + (x - 2) + ' ' + (y + 8) + ' l-2 14 M' + (x + 6) + ' ' + (y + 8) + ' l4 12 M' + (x + 11) + ' ' + (y + 6) + ' l6 12" stroke="#241410" stroke-width="3" stroke-linecap="round"/><circle cx="' + (x - 16) + '" cy="' + (y - 2) + '" r="2.5" fill="#F2C14E"/></g>'; }).join('') +
-      '<circle cx="6" cy="92" r="3.5" fill="#F2C14E" opacity="0.85"/><circle cx="16" cy="100" r="2.8" fill="#F2C14E" opacity="0.55"/><circle cx="28" cy="106" r="2.2" fill="#F2C14E" opacity="0.35"/>', 360, 120, sl, 'display:block');
-    var sk = L === LAYOUTS.port ? 0.7 : 1;
-    if (sl.animate) {
-      sl.animate([
-        { transform: 'translate(' + (-0.3 * W) + 'px,' + (0.9 * H) + 'px) scale(' + (0.9 * sk) + ') rotate(-16deg)', opacity: 0 },
-        { offset: 0.08, opacity: 1 },
-        { offset: 0.52, transform: 'translate(' + (0.3 * W) + 'px,' + (0.367 * H) + 'px) scale(' + (1.25 * sk) + ') rotate(-15deg)', opacity: 1 },
-        { offset: 0.92, opacity: 1 },
-        { transform: 'translate(' + (1.05 * W) + 'px,' + (-0.167 * H) + 'px) scale(' + (1.45 * sk) + ') rotate(-13deg)', opacity: 0 }
-      ], { duration: 4600, delay: 1150, easing: 'ease-in-out', fill: 'forwards' });
-    }
-    // gold dust trail following the sleigh
-    var dust = el('div', null, 'position:absolute;inset:0', fxb);
-    var x0 = 0.1 * W, y0 = 0.818 * H, x1 = 0.933 * W, y1 = 0.051 * H;
-    for (var i = 0; i < 20; i++) {
-      var t = i / 19, sz = [8, 6, 9, 5, 8, 6, 9, 5, 8, 6, 10, 5, 8, 6, 9, 5, 8, 6, 7, 6][i];
-      var col = ['#F7D98C', '#FFF6DF', '#F2C14E'][i % 3];
-      el('div', null, 'position:absolute;left:' + (x0 + (x1 - x0) * t) + 'px;top:' + (y0 + (y1 - y0) * t) + 'px;width:' + sz + 'px;height:' + sz + 'px;border-radius:50%;background:' + col +
-        ';box-shadow:0 0 ' + (sz * 2) + 'px ' + Math.round(sz * .6) + 'px rgba(242,193,78,.85);animation:dustfall ' + (3 + (i % 3) * .2) + 's ease-in ' + (1.5 + 3.2 * t) + 's forwards;opacity:0', dust);
-    }
-    for (var j = 0; j < 8; j++) {
-      var tt = (j + 0.3) / 8, d = el('div', null, 'position:absolute;left:' + (x0 + (x1 - x0) * tt) + 'px;top:' + (y0 + (y1 - y0) * tt) + 'px;animation:dustfall 3.3s ease-in ' + (1.6 + 2.9 * tt) + 's forwards;opacity:0', dust);
-      svg('<path d="M8 0l1.8 6.2L16 8l-6.2 1.8L8 16l-1.8-6.2L0 8l6.2-1.8z" fill="' + ['#F2C14E', '#FFF6DF', '#F7D98C'][j % 3] + '"/>', 16, 16, d, 'display:block;animation:dusttwinkle ' + (0.65 + (j % 4) * .07) + 's ease-in-out infinite alternate');
-    }
-    // snow
-    var snow = el('div', null, 'position:absolute;inset:0;z-index:6;overflow:hidden', fx);
-    var rnd = mulberry(7);
-    var tiers = [[14, 3, 5, 0, .45, .6, 8.3, 10.4], [14, 6, 9, .8, .62, .8, 6.6, 8.2], [8, 13, 16, 2.2, .74, .92, 5.3, 6.6], [3, 19, 22, 3.5, .8, .85, 4.7, 5.2]];
-    tiers.forEach(function (tr) {
-      for (var q = 0; q < Math.round(tr[0] * (W / 1200 + 0.4) / 1.4); q++) {
-        var size = tr[1] + rnd() * (tr[2] - tr[1]);
-        el('div', null, 'position:absolute;left:' + (rnd() * W) + 'px;top:-30px;width:' + size + 'px;height:' + size + 'px;border-radius:50%;' +
-          'background:radial-gradient(circle at 35% 35%,rgba(255,255,255,.98),rgba(255,255,255,.55) 60%,rgba(255,255,255,0) 100%);' +
-          (tr[3] ? 'filter:blur(' + tr[3] + 'px);' : '') + '--sw:' + Math.round((rnd() * 2 - 1) * 80) + 'px;--o:' + (tr[4] + rnd() * (tr[5] - tr[4])).toFixed(2) + ';--fall:' + (H + 80) + 'px;' +
-          'animation:snowfall ' + (tr[6] + rnd() * (tr[7] - tr[6])).toFixed(1) + 's linear ' + (rnd() * 4.2).toFixed(1) + 's infinite;opacity:0', snow);
+    // party string lights: two swags across the top, behind the card; bulbs switch on one by one, then twinkle
+    var port = L === LAYOUTS.port, kb = port ? 1.25 : 1.45;
+    var y0s = port ? 8 : 6, sag = port ? 58 : 84;
+    var lights = el('div', null, 'position:absolute;inset:0;opacity:0;animation:wirein .7s ease-out forwards', fxb);
+    var wire = '', pts = [], swags = [[-0.02 * W, 0.5 * W], [0.5 * W, 1.02 * W]];
+    swags.forEach(function (sw, si) {
+      var xa = sw[0], xb = sw[1], xm = (xa + xb) / 2, yc = y0s + sag * 2;   // quadratic: control point twice the sag
+      wire += '<path d="M' + xa + ' ' + y0s + ' Q' + xm + ' ' + yc + ' ' + xb + ' ' + y0s + '" stroke="#2B2116" stroke-width="3" fill="none" opacity="0.9"/>';
+      var n = port ? 5 : 7;
+      for (var q = 1; q <= n; q++) {
+        var t = q / (n + 1), x = (1 - t) * (1 - t) * xa + 2 * (1 - t) * t * xm + t * t * xb, y = (1 - t) * (1 - t) * y0s + 2 * (1 - t) * t * yc + t * t * y0s;
+        pts.push([x, y]);
       }
     });
+    svg(wire, W, H, lights, 'position:absolute;left:0;top:0');
+    var cols = [['#FFD58A', 'rgba(255,196,92,.9)'], ['#E8574A', 'rgba(232,87,74,.85)'], ['#FFF1C9', 'rgba(255,236,190,.9)'], ['#5FB36A', 'rgba(110,200,120,.8)']];
+    pts.forEach(function (pt, q) {
+      var c = cols[q % 4], dl = (0.35 + q * 0.14).toFixed(2), bw = 13 * kb, bh = 20 * kb;
+      var b = el('div', null, 'position:absolute;left:' + (pt[0] - bw / 2) + 'px;top:' + (pt[1] - 3) + 'px;width:' + bw + 'px;height:' + (bh + 8) + 'px', lights);
+      el('div', null, 'position:absolute;left:' + (bw / 2 - 3.5 * kb) + 'px;top:0;width:' + (7 * kb) + 'px;height:' + (7 * kb) + 'px;border-radius:2px;background:#2E271C', b);
+      el('div', null, 'position:absolute;left:' + (-bw * 1.3) + 'px;top:' + (2 * kb) + 'px;width:' + (bw * 3.6) + 'px;height:' + (bw * 3.6) + 'px;border-radius:50%;background:radial-gradient(circle,' + c[1] + ' 0%,rgba(255,200,110,0) 68%);opacity:0;' +
+        'animation:bulbglow .45s ease-out ' + dl + 's forwards, bulbtwinkle ' + (2.2 + (q % 5) * .37).toFixed(2) + 's ease-in-out ' + (+dl + .6).toFixed(2) + 's infinite alternate', b);
+      el('div', null, 'position:absolute;left:0;top:' + (6 * kb) + 'px;width:' + bw + 'px;height:' + bh + 'px;border-radius:50% 50% 50% 50% / 42% 42% 58% 58%;background:radial-gradient(circle at 40% 35%,#fff 0%,' + c[0] + ' 45%,' + c[0] + ' 100%);' +
+        'filter:brightness(.38) saturate(.6);animation:bulbon .45s ease-out ' + dl + 's forwards', b);
+    });
+    // a slow fall of gold stars and holly leaves (our own shapes), in front of the scene
+    var fall = el('div', null, 'position:absolute;inset:0;z-index:6;overflow:hidden', fx);
+    var rnd = mulberry(11), nf = Math.round((port ? 22 : 30));
+    for (var f = 0; f < nf; f++) {
+      var holly = f % 3 === 2, sz = holly ? 20 + rnd() * 10 : 13 + rnd() * 11;
+      var d = el('div', null, 'position:absolute;left:' + (rnd() * W) + 'px;top:-40px;--sw:' + Math.round((rnd() * 2 - 1) * 70) + 'px;--fall:' + (H + 80) + 'px;--o:' + (0.65 + rnd() * 0.3).toFixed(2) + ';' +
+        'animation:snowfall ' + (7 + rnd() * 4).toFixed(1) + 's linear ' + (1.2 + rnd() * 3.6).toFixed(1) + 's infinite;opacity:0', fall);
+      svg(holly
+        ? '<path d="M12 2c1.5 2 3.5 2.3 5 1.6-.4 2 .6 3.6 2.4 4.3-1.8.9-2.3 2.6-1.7 4.4-1.9-.4-3.5.6-4.1 2.3-.6-1.9-2.2-2.8-4.1-2.4.6-1.8.1-3.5-1.7-4.4 1.8-.7 2.8-2.3 2.4-4.3 1.5.7 3.5.4 4.8-1.5z" fill="#2F6B3A" transform="rotate(35 12 12)"/><circle cx="16" cy="16" r="2.6" fill="#C8322B"/><circle cx="15.2" cy="15.2" r=".8" fill="#fff" opacity=".7"/>'
+        : '<path d="M12 1l2.6 7.4L22 9l-5.8 4.6L18.2 21 12 16.8 5.8 21l2-7.4L2 9l7.4-.6z" fill="' + ['#F2C14E', '#F7D98C', '#FFE6A8'][f % 3] + '"/>',
+        24, 24, d, 'display:block;width:' + sz + 'px;height:' + sz + 'px;animation:leafspin ' + (3 + rnd() * 3).toFixed(1) + 's ease-in-out infinite alternate');
+    }
   }
   function mulberry(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
 
