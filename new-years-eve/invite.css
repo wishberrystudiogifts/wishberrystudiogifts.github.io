@@ -1,0 +1,171 @@
+/* New Year's Eve invitation (21 Nov 2026): own fonts per face, SIL OFL, served from fonts/ (licence in fonts/OFL.txt) */
+@font-face{font-family:'Italiana';src:url(fonts/italiana-latin-400-normal.woff2) format('woff2');font-display:block}
+@font-face{font-family:'Cinzel';font-weight:500;src:url(fonts/cinzel-latin-500-normal.woff2) format('woff2');font-display:block}
+@font-face{font-family:'Cormorant Garamond';font-weight:500;src:url(fonts/cormorant-garamond-latin-500-normal.woff2) format('woff2');font-display:block}
+@font-face{font-family:'Cormorant Garamond';font-weight:600;src:url(fonts/cormorant-garamond-latin-600-normal.woff2) format('woff2');font-display:block}
+@font-face{font-family:'Cormorant Garamond';font-weight:500;font-style:italic;src:url(fonts/cormorant-garamond-latin-500-italic.woff2) format('woff2');font-display:block}
+@font-face{font-family:'Limelight';src:url(fonts/limelight-latin-400-normal.woff2) format('woff2');font-display:block}
+@font-face{font-family:'Poiret One';src:url(fonts/poiret-one-latin-400-normal.woff2) format('woff2');font-display:block}
+@font-face{font-family:'Josefin Sans';font-weight:300;src:url(fonts/josefin-sans-latin-300-normal.woff2) format('woff2');font-display:block}
+@font-face{font-family:'Josefin Sans';font-weight:400;src:url(fonts/josefin-sans-latin-400-normal.woff2) format('woff2');font-display:block}
+@font-face{font-family:'Josefin Sans';font-weight:600;src:url(fonts/josefin-sans-latin-600-normal.woff2) format('woff2');font-display:block}
+@font-face{font-family:'Pinyon Script';src:url(fonts/pinyon-script-latin-400-normal.woff2) format('woff2');font-display:block}
+@font-face{font-family:'Playfair Display';font-weight:400;src:url(fonts/playfair-display-latin-400-normal.woff2) format('woff2');font-display:block}
+@font-face{font-family:'Playfair Display';font-weight:600;src:url(fonts/playfair-display-latin-600-normal.woff2) format('woff2');font-display:block}
+@font-face{font-family:'Playfair Display';font-weight:400;font-style:italic;src:url(fonts/playfair-display-latin-400-italic.woff2) format('woff2');font-display:block}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#07080d;overflow:hidden;font-family:'Fraunces',Georgia,'Times New Roman',serif;-webkit-tap-highlight-color:transparent}
+.backdrop{position:fixed;left:-40px;top:-40px;width:calc(100% + 80px);height:calc(100% + 80px);object-fit:cover;filter:blur(22px) brightness(.48) saturate(1.1);z-index:0;pointer-events:none}
+#stage{position:absolute;left:50%;top:50%;overflow:hidden;z-index:1;cursor:pointer;box-shadow:0 0 90px rgba(0,0,0,.55)}
+#stage.done{cursor:default}
+.abs{position:absolute}
+.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.area{position:absolute;overflow:hidden;z-index:1}
+.cardclip{position:absolute;inset:0;z-index:2}
+.card{position:absolute;width:480px;height:672px;transform-origin:bottom center;z-index:2}
+.paper{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;mix-blend-mode:soft-light;pointer-events:none}
+.gloss{position:absolute;inset:0;background:linear-gradient(115deg,rgba(255,255,255,.13) 0%,rgba(255,255,255,.03) 38%,rgba(255,255,255,0) 60%);pointer-events:none}
+.envwrap,.crumwrap{position:absolute;width:420px;transform-origin:bottom center;pointer-events:none}
+.envwrap{height:303px;z-index:3}
+.crumwrap{height:310px;z-index:3}
+.env-body{position:absolute;left:0;bottom:0;width:420px;height:303px;display:block}
+.tag{position:absolute;right:34px;bottom:46px;transform:rotate(-7deg);background:#F1E2B8;color:#14203D;font-size:15px;font-style:italic;font-weight:500;padding:6px 14px;border-radius:4px;box-shadow:0 3px 8px rgba(10,5,5,.35);white-space:nowrap;max-width:300px;overflow:hidden;text-overflow:ellipsis}
+.flapbox{position:absolute;left:0;bottom:99px;width:420px;height:204px;perspective:1200px;perspective-origin:50% 0%;z-index:4}
+.flap{position:absolute;inset:0;transform-origin:top center;transform-style:preserve-3d}
+.flap img{position:absolute;inset:0;width:420px;height:204px;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.flap .inner{position:absolute;inset:0;transform:rotateX(180deg);backface-visibility:hidden;-webkit-backface-visibility:hidden;background:linear-gradient(to bottom,#0E1730,#18264A);clip-path:polygon(0 0,100% 0,54% 90%,50% 94%,46% 90%)}
+.crum{position:absolute;inset:0;transform-origin:50% 80%;opacity:0}
+.crum img{display:block;width:420px;height:310px}
+.hint{position:absolute;left:0;right:0;text-align:center;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:#F1E4CB;text-shadow:0 2px 10px rgba(0,0,0,.6);animation:hintpulse 2.2s ease-in-out infinite;transition:opacity .4s}
+.hint.off{opacity:0;animation:none}
+.fx{position:absolute;inset:0;pointer-events:none;z-index:6;overflow:hidden}
+.fxback{position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.motes{position:absolute;inset:0;pointer-events:none}
+/* inside-only preview mode */
+html.inside-view,body.inside-view{background:transparent}
+body.inside-view #ivwrap{position:absolute;left:50%;top:50%;width:480px;height:672px}
+@keyframes hintpulse{0%,100%{opacity:.55}50%{opacity:1}}
+@keyframes spark{0%{transform:translate(0,0) scale(.5);opacity:0}12%{opacity:1}100%{transform:translate(var(--dx),calc(var(--dy) + 70px)) scale(1);opacity:0}}
+@keyframes dustfall{0%{opacity:0;transform:translateY(0) scale(1)}12%{opacity:1}60%{opacity:.85}100%{transform:translateY(260px) scale(.4);opacity:0}}
+@keyframes dusttwinkle{from{transform:scale(.65) rotate(0deg)}to{transform:scale(1.3) rotate(90deg)}}
+@keyframes confall{0%{transform:translate(0,-40px) rotate(0deg) rotateY(0deg);opacity:0}6%{opacity:var(--o,.9)}100%{transform:translate(var(--sw),var(--fall)) rotate(var(--rot)) rotateY(900deg);opacity:var(--o,.9)}}
+@keyframes burst{0%{transform:translate(0,0) scale(.4);opacity:0}8%{opacity:1}65%{opacity:.95}100%{transform:translate(var(--dx),calc(var(--dy) + 46px)) scale(.55);opacity:0}}
+@keyframes flash{0%{transform:scale(.3);opacity:0}15%{opacity:1}100%{transform:scale(1.6);opacity:0}}
+@keyframes snowfall{0%{transform:translate(0,-80px);opacity:0}8%{opacity:var(--o,.8)}50%{transform:translate(var(--sw),calc(var(--fall) * .45))}100%{transform:translate(calc(var(--sw) * .3),var(--fall));opacity:var(--o,.8)}}
+@keyframes motedrift{0%{transform:translate(0,0);opacity:0}15%{opacity:var(--mo,.3)}85%{opacity:var(--mo,.3)}100%{transform:translate(var(--mx,40px),var(--my,-90px));opacity:0}}
+@keyframes crumpleaway{0%{opacity:0;transform:translateY(0) scale(1.02,.98) rotate(0deg)}16%{opacity:1;transform:translateY(4px) scale(.9,.76)}32%{transform:translateY(0) scale(.97,.85) rotate(2deg)}48%{transform:translateY(6px) scale(.92,.79) rotate(-3deg)}100%{transform:translateY(560px) scale(.92,.79) rotate(-20deg);opacity:0}}
+@media (prefers-reduced-motion:reduce){.hint{animation:none}}
+body.inside-view #stage,body.inside-view .backdrop,body.inside-view #controls{display:none}
+
+/* ---------- invitation face (20 Nov 2026) ---------- */
+.iface{position:absolute;inset:0;overflow:hidden;background:#F3EEE3;box-shadow:0 24px 46px rgba(5,5,3,.5)}
+.iface img.art{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.itxt{position:absolute;left:44px;right:44px;top:146px;height:338px;display:flex;align-items:center;justify-content:center;font-size:10px}
+.iin{width:100%;display:flex;flex-direction:column;align-items:center;text-align:center;color:#1F3326;font-family:'Fraunces',Georgia,'Times New Roman',serif}
+.iin .kick{font-size:1.2em;font-weight:650;letter-spacing:.3em;text-transform:uppercase;color:#7A2A22;line-height:1.3}
+.iin .title{margin-top:.35em;font-size:5.6em;line-height:1.02;font-style:italic;font-weight:480;text-wrap:balance;overflow-wrap:anywhere;max-width:100%}
+.iin .host{margin-top:.45em;font-size:1.85em;font-style:italic;font-weight:400;line-height:1.25;overflow-wrap:anywhere}
+.iin .orn{margin:1.4em 0 1.2em;display:flex;align-items:center;gap:1em;color:#7A2A22}
+.iin .orn i{display:block;width:5.4em;height:1px;background:currentColor;opacity:.85}
+.iin .orn b{display:block;width:.6em;height:.6em;transform:rotate(45deg);background:currentColor}
+.iin .date{font-size:1.55em;font-weight:650;letter-spacing:.2em;text-transform:uppercase;line-height:1.3}
+.iin .time{margin-top:.45em;font-size:1.65em;font-weight:500;letter-spacing:.08em;line-height:1.3}
+.iin .place{margin-top:.6em;font-size:1.9em;font-weight:420;line-height:1.3;text-wrap:balance;overflow-wrap:anywhere;max-width:100%}
+.iin .note{margin-top:.55em;font-size:1.6em;font-style:italic;font-weight:420;line-height:1.3;text-wrap:balance;overflow-wrap:anywhere;max-width:100%}
+.iin .rsvp{margin-top:1.2em;font-size:1.5em;font-style:italic;font-weight:420;color:#7A2A22;line-height:1.3}
+.iin .contact{margin-top:.2em;font-size:1.45em;font-weight:500;color:#7A2A22;letter-spacing:.03em;line-height:1.3;overflow-wrap:anywhere}
+.iface .paper{mix-blend-mode:multiply}
+/* three faces (21 Nov 2026) — three styles, each with its own fonts and colours; text boxes sit on the empty part of each picture */
+/* A Midnight Silver: midnight velvet, silver clock at twelve — Italiana + Cinzel + Cormorant Garamond, silver on navy */
+.iface.d-a{background:#0B1530}
+.iface.d-a .itxt{top:164px;height:392px;left:50px;right:50px}
+.iface.d-a .iin{color:#EEF2F8;font-family:'Cormorant Garamond',Georgia,serif;text-shadow:0 1px 10px rgba(0,0,0,.45)}
+.iface.d-a .kick{font-family:'Cinzel',Georgia,serif;font-weight:500;font-size:1.15em;letter-spacing:.34em;color:#C7D1E3}
+.iface.d-a .title{font-family:'Italiana',Georgia,serif;font-style:normal;font-weight:400;font-size:5.7em;line-height:1.04;margin-top:.3em;letter-spacing:.02em}
+.iface.d-a .host{font-style:italic;font-weight:500;font-size:2em}
+.iface.d-a .orn{color:#C7D1E3}
+.iface.d-a .orn b{width:.9em;height:.9em;transform:none;clip-path:polygon(50% 0,61% 39%,100% 50%,61% 61%,50% 100%,39% 61%,0 50%,39% 39%)}
+.iface.d-a .date{font-family:'Cinzel',Georgia,serif;font-weight:500;font-size:1.45em;letter-spacing:.22em}
+.iface.d-a .time{font-weight:600;font-size:1.95em;letter-spacing:.04em}
+.iface.d-a .place{font-weight:500;font-size:2.05em}
+.iface.d-a .note{font-style:italic;font-weight:500;font-size:1.8em}
+.iface.d-a .rsvp{font-style:italic;font-weight:500;font-size:1.7em;color:#B9C6DD}
+.iface.d-a .contact{font-weight:600;font-size:1.6em;letter-spacing:.03em;color:#B9C6DD}
+/* B Gold Countdown: black and gold art deco, balloons and fireworks — Limelight + Poiret One + Josefin Sans, gold on black */
+.iface.d-b{background:#0C0B09}
+.iface.d-b .itxt{top:222px;height:345px;left:64px;right:64px}
+.iface.d-b .iin{color:#F3E8CF;font-family:'Josefin Sans',Arial,sans-serif;text-shadow:0 1px 10px rgba(0,0,0,.5)}
+.iface.d-b .kick{font-family:'Poiret One',Arial,sans-serif;font-weight:400;font-size:1.45em;letter-spacing:.3em;color:#E3C37E}
+.iface.d-b .title{font-family:'Limelight',Georgia,serif;font-style:normal;font-weight:400;font-size:4.5em;line-height:1.12;margin-top:.35em;color:#E7C779;
+  background:linear-gradient(180deg,#FFF0C4 0%,#E9C46E 45%,#B8852F 70%,#F1D78F 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;text-shadow:none;filter:drop-shadow(0 1px 6px rgba(0,0,0,.6))}
+.iface.d-b .host{font-family:'Poiret One',Arial,sans-serif;font-style:normal;font-size:1.85em;margin-top:.55em}
+.iface.d-b .orn{color:#E3C37E}
+.iface.d-b .orn i{width:4em}
+.iface.d-b .date{font-weight:600;font-size:1.35em;letter-spacing:.26em}
+.iface.d-b .time{font-weight:300;font-size:1.8em;letter-spacing:.06em}
+.iface.d-b .place{font-weight:300;font-size:1.85em}
+.iface.d-b .note{font-family:'Poiret One',Arial,sans-serif;font-style:normal;font-size:1.65em}
+.iface.d-b .rsvp{font-family:'Poiret One',Arial,sans-serif;font-style:normal;font-size:1.6em;color:#E3C37E}
+.iface.d-b .contact{font-weight:400;font-size:1.4em;color:#E3C37E}
+/* C Ivory Confetti: light ivory paper, confetti balloons — Pinyon Script + Playfair Display + Josefin Sans, espresso and gold, left aligned; best for printing at home */
+.iface.d-c{background:#F6F0E3}
+.iface.d-c .itxt{top:64px;height:508px;left:40px;right:168px;justify-content:flex-start}
+.iface.d-c .iin{align-items:flex-start;text-align:left;color:#3A2E20;font-family:'Playfair Display',Georgia,serif}
+.iface.d-c .kick{font-family:'Josefin Sans',Arial,sans-serif;font-weight:600;font-size:1.15em;letter-spacing:.3em;color:#A8792E}
+.iface.d-c .title{font-family:'Pinyon Script',Georgia,serif;font-style:normal;font-weight:400;font-size:6.6em;line-height:1.02;margin-top:.2em;text-wrap:balance}
+.iface.d-c .host{font-style:italic;font-weight:400;font-size:1.8em}
+.iface.d-c .orn{color:#B08431;margin:1.2em 0 1.1em}
+.iface.d-c .orn i:last-child{display:none}
+.iface.d-c .orn i{width:7em}
+.iface.d-c .date{font-weight:600;font-size:1.4em;letter-spacing:.16em}
+.iface.d-c .time{font-weight:400;font-size:1.75em}
+.iface.d-c .place{font-weight:400;font-size:1.85em}
+.iface.d-c .note{font-style:italic;font-weight:400;font-size:1.65em}
+.iface.d-c .rsvp{font-family:'Josefin Sans',Arial,sans-serif;font-style:normal;font-weight:600;font-size:1.2em;letter-spacing:.16em;text-transform:uppercase;color:#A8792E;margin-top:1.4em}
+.iface.d-c .contact{font-weight:400;font-size:1.5em;color:#3A2E20}
+.itxt{transition:opacity 1s;will-change:opacity} /* own layer from the start: no one-frame re-raster flicker when the fade ends */
+
+/* ---------- guest buttons: RSVP, calendar, directions ---------- */
+#controls{position:fixed;left:0;right:0;bottom:max(14px,env(safe-area-inset-bottom));display:flex;flex-direction:column;align-items:center;gap:8px;z-index:5;opacity:0;transition:opacity .9s;pointer-events:none;padding:0 10px}
+#controls.show{opacity:1;pointer-events:auto}
+.crows{display:flex;flex-direction:column;align-items:center;gap:8px;max-width:100%}
+#controls.wide .crows{flex-direction:row;flex-wrap:wrap;justify-content:center}
+.crow{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+#controls:not(.wide) .again .lbl{display:none}
+#controls:not(.wide) .cbtn.again{padding-left:16px;padding-right:16px}
+.cbtn{font:600 16px/1 'Fraunces',Georgia,serif;padding:13px 18px;border-radius:999px;border:1px solid rgba(255,255,255,.45);background:rgba(25,8,8,.66);color:#F7EEDC;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);text-decoration:none;cursor:pointer;white-space:nowrap}
+.cbtn.yes{background:#F3EEE3;color:#16213F;border-color:#F3EEE3}
+.cbtn.shop{background:rgba(203,168,76,.92);color:#2a1408;border-color:rgba(255,255,255,.2)}
+.cbtn.ghost{background:rgba(25,8,8,.45)}
+.choice{background:rgba(20,8,8,.82);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.25);border-radius:18px;padding:12px 12px 12px;max-width:560px;display:flex;flex-direction:column;gap:10px;align-items:center}
+.choice[hidden]{display:none}
+.chtitle{font:500 16px/1.35 'Fraunces',Georgia,serif;color:#F7EEDC;text-align:center;padding:0 6px}
+.choice .cbtn{background:#F3EEE3;color:#16213F;border-color:#F3EEE3}
+.choice .cbtn.ghost{background:transparent;color:#F7EEDC;border-color:rgba(255,255,255,.45)}
+@media (max-width:420px){.cbtn{font-size:15px;padding:12px 15px}}
+
+/* ---------- face-only preview ---------- */
+body.inside-view .iface{box-shadow:0 10px 30px rgba(40,25,10,.25)}
+
+/* ---------- print view (5x7, Letter, A4) ---------- */
+html.print-view,body.print-view{height:auto;overflow:visible;background:#fff}
+body.print-view .pbar{max-width:720px;margin:16px auto;padding:14px 18px;border:2px solid #E5D6BC;border-radius:14px;background:#FBF7EE;font:16px/1.45 'Segoe UI',Roboto,Arial,sans-serif;color:#2A2620}
+body.print-view .pbar p{margin:0 0 8px}
+body.print-view .pbar button{font:700 18px/1 'Segoe UI',Roboto,Arial,sans-serif;padding:14px 20px;border-radius:12px;border:0;background:#7A1F2B;color:#fff;cursor:pointer}
+.psheet{position:relative;margin:0 auto 24px;background:#fff;box-shadow:0 6px 24px rgba(0,0,0,.15)}
+.psheet.s-5x7{width:5in;height:7in}
+.psheet.s-letter{width:8.5in;height:11in}
+.psheet.s-a4{width:210mm;height:297mm}
+.pcard{position:absolute;left:50%;top:50%;width:5in;height:7in;margin:-3.5in 0 0 -2.5in}
+.pcard .iface{box-shadow:none}
+.mk{position:absolute;background:#000;display:block}
+.mk.h{width:.3in;height:.5pt}.mk.v{width:.5pt;height:.3in}
+.mk.h.tl{left:-.4in;top:0}.mk.v.tl{left:0;top:-.4in}
+.mk.h.tr{right:-.4in;top:0}.mk.v.tr{right:0;top:-.4in}
+.mk.h.bl{left:-.4in;bottom:0}.mk.v.bl{left:0;bottom:-.4in}
+.mk.h.br{right:-.4in;bottom:0}.mk.v.br{right:0;bottom:-.4in}
+@media print{
+  body.print-view .pbar{display:none}
+  .psheet{margin:0;box-shadow:none;page-break-after:avoid;break-after:avoid}
+  html.print-view,body.print-view{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
