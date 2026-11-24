@@ -125,13 +125,13 @@
       winglow: [690, 590, 720, 290], hearth: [270, 320, 1560, 950], tint: [800, 496], smoke: [1042, 546] }
   };
   var LAYOUTS = {
-    port: { W: 600, H: 1100, scene: SCENES.tall, sk: 1100 / 2048, sx: -9.375, sy: 0, env: { e: 1.15, cx: 300, bottom: 1050 },
+    port: { W: 600, H: 1100, scene: SCENES.tall, sk: 0.56, sx: -22.56, sy: -46.88,   /* a little closer and higher: a strip of snow shows between the cabin and the envelope */ env: { e: 1.15, cx: 300, bottom: 1050 },
       card: { s: 1.1, cx: 300, cy: 525 }, hintY: 1061, hintSize: 25 },
     land: { W: 1200, H: 900, scene: SCENES.wide, sk: 1200 / 1728, sx: 0, sy: 0, env: { e: 0.92, cx: 425, bottom: 868 },
       card: { s: 1.16, cx: 425, cy: 448 }, hintY: 872, hintSize: 22 }
   };
   var IMAGES = ['env-pocket.webp', 'env-back.webp', 'env-flap.webp', 'env-flapin.webp', 'env-flapshadow.png',
-    'env-bundle.webp', 'env-snow.webp', 'env-dropshadow.png', 'front.jpg', 'paper.jpg', 'aurora-a.webp', 'aurora-b.webp', 'smoke.webp'];
+    'env-bundle.webp', 'env-dropshadow.png', 'front.jpg', 'paper.jpg', 'aurora-a.webp', 'aurora-b.webp', 'smoke.webp'];
   var T = { landed: 2100, autoplay: 2300, controls: 4400 };   // ms; all on the 100 ms grid (frame-by-frame video render)
 
   var stageEl = document.getElementById('stage');
@@ -207,7 +207,6 @@
     img(A + 'env-flapshadow.png', 'flapsh', null, fr);
     img(A + 'env-flap.webp', 'flap', null, el('div', 'flapFbox', null, fr));
     img(A + 'env-bundle.webp', 'bundle', null, fr);
-    img(A + 'env-snow.webp', 'esnow', null, fr);
     el('div', 'fshade', null, fr);   // the paper darkens and brightens as it turns in the air
     var puff = el('div', 'puff', null, root);
     for (i = 0; i < 30; i++) {   // landing: a fine spray of snow grains along the bottom edge (grains, not discs)
