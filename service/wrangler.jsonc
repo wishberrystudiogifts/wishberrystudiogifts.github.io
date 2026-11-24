@@ -8,6 +8,9 @@
 	"main": "src/index.js",
 	"compatibility_date": "2026-11-01",
 	"workers_dev": true,
+	// Worker Previews get their own address (<branch>-product-link.<subdomain>.workers.dev). Without this line
+	// the preview builds but has "no active URLs" (found 24 Nov 2026 in the build log).
+	"preview_urls": true,
 	// Logs: only the lines our own code prints (errors). Request addresses are NOT kept (an address holds a buyer's
 	// product link hash) and outgoing requests are NOT traced (the address of an Etsy receipt holds an order number).
 	"observability": {
