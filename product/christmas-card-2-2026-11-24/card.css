@@ -42,7 +42,7 @@ html,body{margin:0;height:100%;background:#0d1626;overflow:hidden;font-family:'C
 /* ---------- envelope (units: 312 x 430) ---------- */
 .envroot{position:absolute;width:312px;height:430px;transform-origin:0 0;pointer-events:none}
 .gshadow{left:-25px;top:-22px;width:372px;height:490px;opacity:0;z-index:1}
-.fshadow{position:absolute;left:-14px;top:372px;width:340px;height:96px;border-radius:50%;background:radial-gradient(ellipse at center,rgba(8,16,42,.6),rgba(8,16,42,.26) 45%,rgba(8,16,42,0) 70%);opacity:0;z-index:1}
+.fshadow{position:absolute;left:-10px;top:384px;width:332px;height:84px;border-radius:50%;background:radial-gradient(ellipse at center,rgba(8,16,42,.6),rgba(8,16,42,.26) 45%,rgba(8,16,42,0) 70%);opacity:0;z-index:1}
 .envB{position:absolute;inset:0;z-index:2;opacity:0}
 .eback{left:0;top:0;width:312px;height:136px}
 .inglow{position:absolute;left:36px;top:-20px;width:240px;height:190px;border-radius:50%;background:radial-gradient(ellipse at 50% 55%,rgba(255,214,140,.95),rgba(255,190,110,.5) 40%,rgba(255,180,90,0) 70%);opacity:0}
@@ -55,18 +55,22 @@ html,body{margin:0;height:100%;background:#0d1626;overflow:hidden;font-family:'C
 .cface{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden;border-radius:3px;box-shadow:0 20px 44px rgba(3,8,22,.5)}
 .cface.front{background:#1b2740}
 .cface.front img{left:0;top:0;width:100%;height:100%;object-fit:cover}
-.cface.front .gloss{position:absolute;inset:0;background:linear-gradient(118deg,rgba(255,255,255,.10) 0%,rgba(255,255,255,.02) 36%,rgba(255,255,255,0) 58%)}
+.cface.front .gloss{position:absolute;inset:0;border-radius:3px;background:linear-gradient(118deg,rgba(255,255,255,.10) 0%,rgba(255,255,255,.02) 36%,rgba(255,255,255,0) 58%);box-shadow:inset 0 0 0 1.6px rgba(255,248,228,.5)}   /* a hairline of paper edge: the card's dusk sky must not melt into the scene */
 .cface.backside{transform:rotateY(180deg)}
 .envF{position:absolute;inset:0;z-index:4;opacity:0}
 .fx,.fy,.fr{position:absolute;inset:0}
 .fr{transform-origin:50% 55%}
 .epocket{left:0;top:0;width:312px;height:430px}
-.elabel{position:absolute;left:16px;right:16px;top:279px;height:44px;display:flex;align-items:center;justify-content:center;transform:rotate(-3deg);font-family:'Caveat',cursive;font-weight:700;font-size:30px;line-height:1;color:#4B3524;white-space:nowrap;opacity:0}
+.elabel{position:absolute;left:16px;right:16px;top:279px;height:44px;display:flex;align-items:center;justify-content:center;transform:rotate(-3deg);font-family:'Caveat',cursive;font-weight:700;font-size:30px;line-height:1;color:#4B3524;white-space:nowrap;opacity:.92;mix-blend-mode:multiply}
+/* the name is WRITTEN on after the landing (wiped in from the left); the ink sinks into the paper (multiply: the grain shows through) */
+.elabel .lw{display:block;overflow:hidden;padding:7px 0}
+.elabel .lw span{display:block;padding:0 6px;text-shadow:0 0 .7px rgba(75,53,36,.55)}   /* same width as .lw: the two slides cancel exactly */
+.fshade{position:absolute;left:1px;top:1px;right:1px;bottom:1px;border-radius:3px;background:linear-gradient(120deg,rgba(8,16,44,.92),rgba(8,16,44,.6));opacity:0}
 .flapsh{left:0;top:0;width:312px;height:205px}
 .flapFbox{position:absolute;left:0;top:0;width:312px;height:181px;perspective:900px;perspective-origin:50% 0%}
 .flap{left:0;top:0;width:312px;height:181px;transform-origin:50% 0%}
 .bundle{left:0;top:101.84px;width:312px;height:155.67px}
-.esnow{left:-17px;top:343px;width:150px;height:104px;opacity:0}
+.esnow{left:-22px;top:366px;width:110px;height:80px;opacity:0}
 .puff{position:absolute;left:0;top:0;width:312px;height:430px;z-index:5}
 .puff i{position:absolute;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.8),rgba(236,243,255,.34) 42%,rgba(230,240,255,0) 68%);opacity:0}
 /* ---------- the written side of the card (also the buyer's live preview and what the video engine reads) ---------- */
@@ -102,18 +106,18 @@ html,body{margin:0;height:100%;background:#0d1626;overflow:hidden;font-family:'C
 #stage.arrive .fshadow{animation:b2-fshadow 2.1s ease-in-out 0s both}
 #stage.arrive .puff i{animation-name:b2-puff;animation-duration:.7s;animation-timing-function:ease-out;animation-fill-mode:both}
 #stage.arrive .esnow{animation:b2-fadein .3s ease 2s both}
-#stage.arrive .elabel{animation:b2-ink .4s ease 1.9s both}
+#stage.arrive .elabel .lw{animation:b2-wipeA .6s cubic-bezier(.4,0,.6,1) 1.95s both}
+#stage.arrive .elabel .lw span{animation:b2-wipeB .6s cubic-bezier(.4,0,.6,1) 1.95s both}
+#stage.arrive .fshade{animation:b2-fshade 2.2s ease-in-out 0s both}
 #stage.arrive .envB,#stage.arrive .cardrig{animation:b2-in .01s linear 2.05s both}
 #stage.still .envF,#stage.still .envB,#stage.still .cardrig,#stage.still .gshadow,#stage.still .esnow{opacity:1}
-#stage.still .elabel{opacity:.92}
-#stage.still .fshadow{opacity:.4}
+#stage.still .fshadow{opacity:.5}
 /* opening (delays are measured from the tap) */
 #stage.open .gshadow{opacity:1;animation:b2-fadeout .35s ease 1.7s both}
-#stage.open .fshadow{opacity:.4;animation:b2-fshadowout .35s ease 1.7s both}
+#stage.open .fshadow{opacity:.5;animation:b2-fshadowout .35s ease 1.7s both}
 #stage.open .envB{opacity:1;animation:b2-fadeout .35s ease 1.7s both}
 #stage.open .envF{opacity:1;animation:b2-fadeout .35s ease 1.7s both}
 #stage.open .esnow{opacity:1;animation:none}
-#stage.open .elabel{opacity:.92;animation:none}
 #stage.open .bundle{animation:b2-bundle .55s cubic-bezier(.5,0,.85,.55) 0s both}
 #stage.open .flapsh{animation:b2-fadeout .3s ease .22s both}
 #stage.open .flap{animation:b2-flapF .32s cubic-bezier(.45,0,1,.9) .25s both}
@@ -137,8 +141,11 @@ html,body{margin:0;height:100%;background:#0d1626;overflow:hidden;font-family:'C
 @keyframes b2-flyx{0%{transform:translateX(-430px)}46%{transform:translateX(62px)}74%{transform:translateX(-20px)}100%{transform:translateX(0)}}
 @keyframes b2-flyy{0%{transform:translateY(-640px)}100%{transform:translateY(0)}}
 @keyframes b2-flyr{0%{transform:perspective(1300px) rotateZ(-34deg) rotateY(58deg) rotateX(38deg) scale(.5,.5)}42%{transform:perspective(1300px) rotateZ(15deg) rotateY(-44deg) rotateX(-24deg) scale(.8,.8)}68%{transform:perspective(1300px) rotateZ(-8deg) rotateY(26deg) rotateX(16deg) scale(.95,.95)}88%{transform:perspective(1300px) rotateZ(2.4deg) rotateY(-6deg) rotateX(4deg) scale(1.02,1.02)}94%{transform:perspective(1300px) rotateZ(-.8deg) rotateY(0deg) rotateX(0deg) scale(1.012,.988)}100%{transform:perspective(1300px) rotateZ(0deg) rotateY(0deg) rotateX(0deg) scale(1,1)}}
-@keyframes b2-fshadow{0%{opacity:0;transform:translate(-190px,46px) scale(1.7,1.25)}18%{opacity:.16}46%{opacity:.26;transform:translate(40px,22px) scale(1.4,1.15)}74%{opacity:.36;transform:translate(-12px,8px) scale(1.16,1.06)}94%{opacity:.5;transform:translate(0,0) scale(1,1)}100%{opacity:.4;transform:translate(0,0) scale(1,1)}}
-@keyframes b2-fshadowout{from{opacity:.4}to{opacity:0}}
+@keyframes b2-fshadow{0%{opacity:0;transform:translate(-190px,46px) scale(1.7,1.25)}18%{opacity:.16}46%{opacity:.26;transform:translate(40px,22px) scale(1.4,1.15)}74%{opacity:.36;transform:translate(-12px,8px) scale(1.16,1.06)}94%{opacity:.56;transform:translate(0,0) scale(1,1)}100%{opacity:.5;transform:translate(0,0) scale(1,1)}}
+@keyframes b2-fshadowout{from{opacity:.5}to{opacity:0}}
+@keyframes b2-fshade{0%{opacity:.5}20%{opacity:.14}42%{opacity:.4}55%{opacity:.08}68%{opacity:.3}80%{opacity:.06}88%{opacity:.12}100%{opacity:0}}
+@keyframes b2-wipeA{from{transform:translateX(-101%)}to{transform:translateX(0)}}
+@keyframes b2-wipeB{from{transform:translateX(101%)}to{transform:translateX(0)}}
 @keyframes b2-puff{0%{opacity:0;transform:translate(0,0) scale(.35)}20%{opacity:.62}100%{opacity:0;transform:translate(var(--px),var(--py)) scale(1.7)}}
 @keyframes b2-gust{0%{opacity:0;transform:translate(var(--x0),var(--y0))}10%{opacity:var(--o)}50%{transform:translate(var(--x1),var(--y1))}88%{opacity:var(--o)}100%{opacity:0;transform:translate(var(--x2),var(--y2))}}
 @keyframes b2-hint{0%,100%{opacity:.5}50%{opacity:1}}

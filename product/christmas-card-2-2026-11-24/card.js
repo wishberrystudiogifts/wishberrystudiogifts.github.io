@@ -105,7 +105,7 @@
   function fitLabel(l) {
     var size = 30, guard = 0;   // l = the <span> inside .elabel
     l.style.fontSize = size + 'px';
-    while (l.offsetWidth > 252 && size > 15 && guard++ < 40) { size -= 1; l.style.fontSize = size + 'px'; }
+    while (l.offsetWidth - 12 > 252 && size > 15 && guard++ < 40) { size -= 1; l.style.fontSize = size + 'px'; }   // 12 = the span's side padding
   }
   function whenFonts(cb) {
     if (document.fonts && document.fonts.load) {
@@ -202,17 +202,18 @@
     var envF = el('div', 'envF', null, root);
     var fr = el('div', 'fr', null, el('div', 'fy', null, el('div', 'fx', null, envF)));
     img(A + 'env-pocket.webp', 'epocket', null, fr);
-    var label = el('span', null, null, el('div', 'elabel', null, fr));
+    var label = el('span', null, null, el('span', 'lw', null, el('div', 'elabel', null, fr)));
     label.textContent = data.t ? ('For ' + data.t) : 'With love';
     img(A + 'env-flapshadow.png', 'flapsh', null, fr);
     img(A + 'env-flap.webp', 'flap', null, el('div', 'flapFbox', null, fr));
     img(A + 'env-bundle.webp', 'bundle', null, fr);
     img(A + 'env-snow.webp', 'esnow', null, fr);
+    el('div', 'fshade', null, fr);   // the paper darkens and brightens as it turns in the air
     var puff = el('div', 'puff', null, root);
-    for (i = 0; i < 14; i++) {   // a low puff of snow dust along the bottom edge when it lands
-      var px = 6 + r() * 300, ps = 16 + r() * 26;
-      el('i', null, 'left:' + px.toFixed(0) + 'px;top:' + (420 + r() * 10).toFixed(0) + 'px;width:' + ps.toFixed(0) + 'px;height:' + ps.toFixed(0) + 'px;margin:' + (-ps / 2).toFixed(0) + 'px 0 0 ' + (-ps / 2).toFixed(0) + 'px;' +
-        '--px:' + Math.round((px - 156) * 0.28 + (r() * 2 - 1) * 14) + 'px;--py:' + Math.round(-(8 + r() * 26)) + 'px;animation-delay:' + (1.96 + r() * 0.1).toFixed(2) + 's', puff);
+    for (i = 0; i < 30; i++) {   // landing: a fine spray of snow grains along the bottom edge (grains, not discs)
+      var px = 4 + r() * 304, ps = 2.5 + r() * 6.5;
+      el('i', null, 'left:' + px.toFixed(0) + 'px;top:' + (419 + r() * 12).toFixed(0) + 'px;width:' + ps.toFixed(1) + 'px;height:' + ps.toFixed(1) + 'px;margin:' + (-ps / 2).toFixed(1) + 'px 0 0 ' + (-ps / 2).toFixed(1) + 'px;' +
+        '--px:' + Math.round((px - 156) * 0.42 + (r() * 2 - 1) * 22) + 'px;--py:' + Math.round(-(6 + r() * 44)) + 'px;animation-delay:' + (1.96 + r() * 0.12).toFixed(2) + 's', puff);
     }
 
     // card geometry for this layout (envelope units)

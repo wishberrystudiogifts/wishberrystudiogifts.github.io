@@ -87,7 +87,8 @@
   /* Christmas Card 2 "Snowy Cabin" (24 Nov 2026): the base video is the recipient page itself, rendered frame by frame
      (render-b2.js) with the written side empty and no name on the envelope. The envelope ARRIVES first (the wind brings
      it), so the tap is at 2.3 s. The words are laid out by the recipient page (index.html#view=face in a hidden frame),
-     read back and drawn on the turned card; the name is written on the envelope once it has landed and goes with it.
+     read back and drawn on the turned card; the name is WRITTEN on the envelope (wiped in from the left) once it has
+     landed, and fades with it.
      Geometry measured on every frame of the base video (render-b2.js MEASURE). */
   TEMPLATES['christmas-card-2'] = {
     kind: 'invite', fps: 30, defaultDesign: 'a', bases: { a: 'christmas-card-2-base.mp4' },
@@ -96,7 +97,7 @@
             settle: { at: 0, dur: 1 }, text: { at: 5.8, dur: 0.7 } },
     // name on the envelope: centre on the 1080x1920 frame, frame pixels per envelope unit, the page's own fit (30 -> 15 units, 252 wide)
     label: { cx: 540, cy: 1573.79, rot: -3, unit: 2.007273, size: 30, min: 15, maxW: 252, weight: 700, family: 'Caveat', color: '#4B3524', alpha: 0.92,
-             inAt: 1.9, inDur: 0.4, outAt: 4.0, outDur: 0.35,
+             inAt: 1.95, inDur: 0.6, outAt: 4.0, outDur: 0.35,
              text: function (d) { return d && d.t ? 'For ' + d.t : 'With love'; } }
   };
 
@@ -631,16 +632,20 @@
     c.font = f(size);
     while (c.measureText(text).width > G.maxW * G.unit && size > G.min) { size -= 1; c.font = f(size); }
     var m = c.measureText(text), asc = m.fontBoundingBoxAscent, desc = m.fontBoundingBoxDescent;
-    return { text: text, font: f(size), dy: (isFinite(asc) && isFinite(desc)) ? (asc - desc) / 2 : null };
+    return { text: text, font: f(size), w: m.width, dy: (isFinite(asc) && isFinite(desc)) ? (asc - desc) / 2 : null };
   }
-  function drawLabel(ctx, Lb, G, t) {
-    var a = t < G.inAt ? 0 : EASE(Math.min(1, (t - G.inAt) / G.inDur));
+  var WIPE = bezier(0.4, 0, 0.6, 1);
+  function drawLabel(ctx, Lb, G, t) {   // written on from the left after the landing; ink sinks into the paper (multiply)
+    var p = t < G.inAt ? 0 : WIPE(Math.min(1, (t - G.inAt) / G.inDur)), a = G.alpha;
     if (t > G.outAt) a *= 1 - EASE(Math.min(1, (t - G.outAt) / G.outDur));
-    if (a <= 0) return;
+    if (p <= 0 || a <= 0) return;
     ctx.save();
-    ctx.globalAlpha = a * G.alpha;
+    ctx.globalAlpha = a; ctx.globalCompositeOperation = 'multiply';
     ctx.translate(G.cx, G.cy); ctx.rotate(G.rot * Math.PI / 180);
     ctx.font = Lb.font; ctx.fillStyle = G.color; ctx.textAlign = 'center';
+    var w = Lb.w + 12 * G.unit;
+    ctx.beginPath(); ctx.rect(-w / 2, -40 * G.unit, w * p, 80 * G.unit); ctx.clip();
+    ctx.shadowColor = 'rgba(75,53,36,0.55)'; ctx.shadowBlur = 0.7 * G.unit;
     if (Lb.dy === null) { ctx.textBaseline = 'middle'; ctx.fillText(Lb.text, 0, 0); }
     else { ctx.textBaseline = 'alphabetic'; ctx.fillText(Lb.text, 0, Lb.dy); }
     ctx.restore();
