@@ -96,7 +96,7 @@
             card: { cx: 300, bottom: 894.6, s0: 1.1, s1: 1.1, ty1: 0 },   // the card is already at its reading size when the words appear
             settle: { at: 0, dur: 1 }, text: { at: 5.8, dur: 0.7 } },
     // name on the envelope: centre on the 1080x1920 frame, frame pixels per envelope unit, the page's own fit (30 -> 15 units, 252 wide)
-    label: { cx: 540, cy: 1573.79, rot: -3, unit: 2.007273, size: 30, min: 15, maxW: 252, weight: 700, family: 'Caveat', color: '#4B3524', alpha: 0.92,
+    label: { cx: 540, cy: 1573.79, rot: -3, unit: 2.007273, size: 30, min: 15, maxW: 252, weight: 700, family: 'Caveat', color: '#4B3524', alpha: 0.86,
              inAt: 1.95, inDur: 0.6, outAt: 4.0, outDur: 0.35,
              text: function (d) { return d && d.t ? 'For ' + d.t : 'With love'; } }
   };
@@ -645,7 +645,7 @@
     ctx.font = Lb.font; ctx.fillStyle = G.color; ctx.textAlign = 'center';
     var w = Lb.w + 12 * G.unit;
     ctx.beginPath(); ctx.rect(-w / 2, -40 * G.unit, w * p, 80 * G.unit); ctx.clip();
-    ctx.shadowColor = 'rgba(75,53,36,0.55)'; ctx.shadowBlur = 0.7 * G.unit;
+    ctx.shadowColor = 'rgba(75,53,36,0.6)'; ctx.shadowBlur = 1.1 * G.unit;
     if (Lb.dy === null) { ctx.textBaseline = 'middle'; ctx.fillText(Lb.text, 0, 0); }
     else { ctx.textBaseline = 'alphabetic'; ctx.fillText(Lb.text, 0, Lb.dy); }
     ctx.restore();

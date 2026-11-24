@@ -61,16 +61,16 @@ html,body{margin:0;height:100%;background:#0d1626;overflow:hidden;font-family:'C
 .fx,.fy,.fr{position:absolute;inset:0}
 .fr{transform-origin:50% 55%}
 .epocket{left:0;top:0;width:312px;height:430px}
-.elabel{position:absolute;left:16px;right:16px;top:279px;height:44px;display:flex;align-items:center;justify-content:center;transform:rotate(-3deg);font-family:'Caveat',cursive;font-weight:700;font-size:30px;line-height:1;color:#4B3524;white-space:nowrap;opacity:.92;mix-blend-mode:multiply}
+.elabel{position:absolute;left:16px;right:16px;top:279px;height:44px;display:flex;align-items:center;justify-content:center;transform:rotate(-3deg);font-family:'Caveat',cursive;font-weight:700;font-size:30px;line-height:1;color:#4B3524;white-space:nowrap;opacity:.86;mix-blend-mode:multiply}
 /* the name is WRITTEN on after the landing (wiped in from the left); the ink sinks into the paper (multiply: the grain shows through) */
 .elabel .lw{display:block;overflow:hidden;padding:7px 0}
-.elabel .lw span{display:block;padding:0 6px;text-shadow:0 0 .7px rgba(75,53,36,.55)}   /* same width as .lw: the two slides cancel exactly */
+.elabel .lw span{display:block;padding:0 6px;text-shadow:0 0 1.1px rgba(75,53,36,.6)}   /* same width as .lw: the two slides cancel exactly */
 .fshade{position:absolute;left:1px;top:1px;right:1px;bottom:1px;border-radius:3px;background:linear-gradient(120deg,rgba(8,16,44,.92),rgba(8,16,44,.6));opacity:0}
 .flapsh{left:0;top:0;width:312px;height:205px}
 .flapFbox{position:absolute;left:0;top:0;width:312px;height:181px;perspective:900px;perspective-origin:50% 0%}
 .flap{left:0;top:0;width:312px;height:181px;transform-origin:50% 0%}
 .bundle{left:0;top:101.84px;width:312px;height:155.67px}
-.esnow{left:-22px;top:366px;width:110px;height:80px;opacity:0}
+.esnow{left:-14px;top:404px;width:340px;height:46px;opacity:0}
 .puff{position:absolute;left:0;top:0;width:312px;height:430px;z-index:5}
 .puff i{position:absolute;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.8),rgba(236,243,255,.34) 42%,rgba(230,240,255,0) 68%);opacity:0}
 /* ---------- the written side of the card (also the buyer's live preview and what the video engine reads) ---------- */

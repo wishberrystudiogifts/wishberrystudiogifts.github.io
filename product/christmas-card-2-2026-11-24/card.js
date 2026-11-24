@@ -131,7 +131,7 @@
       card: { s: 1.16, cx: 425, cy: 448 }, hintY: 872, hintSize: 22 }
   };
   var IMAGES = ['env-pocket.webp', 'env-back.webp', 'env-flap.webp', 'env-flapin.webp', 'env-flapshadow.png',
-    'env-bundle.webp', 'env-dropshadow.png', 'front.jpg', 'paper.jpg', 'aurora-a.webp', 'aurora-b.webp', 'smoke.webp'];
+    'env-bundle.webp', 'env-snow.webp', 'env-dropshadow.png', 'front.jpg', 'paper.jpg', 'aurora-a.webp', 'aurora-b.webp', 'smoke.webp'];
   var T = { landed: 2100, autoplay: 2300, controls: 4400 };   // ms; all on the 100 ms grid (frame-by-frame video render)
 
   var stageEl = document.getElementById('stage');
@@ -207,6 +207,7 @@
     img(A + 'env-flapshadow.png', 'flapsh', null, fr);
     img(A + 'env-flap.webp', 'flap', null, el('div', 'flapFbox', null, fr));
     img(A + 'env-bundle.webp', 'bundle', null, fr);
+    img(A + 'env-snow.webp', 'esnow', null, fr);   /* the lip of snow along the bottom edge: the envelope has sunk in a little */
     el('div', 'fshade', null, fr);   // the paper darkens and brightens as it turns in the air
     var puff = el('div', 'puff', null, root);
     for (i = 0; i < 30; i++) {   // landing: a fine spray of snow grains along the bottom edge (grains, not discs)
