@@ -115,13 +115,22 @@
 
   /* ---------- layouts (stage units; the scene is the same picture, cropped for each) ---------- */
   var ENV = { W: 312, H: 430, cardS: 297 / 480, cardBottom: 424, rise: -430 };
-  var LAYOUTS = {
-    port: { W: 600, H: 1100, scene: { k: 1100 / 2048, x: -9.375, y: 0 }, env: { e: 1.15, cx: 300, bottom: 1050 },
-      card: { s: 1.1, cx: 300, cy: 525 }, hintY: 1056, hintSize: 27 },
-    land: { W: 1200, H: 900, scene: { k: 1200 / 1152, x: 0, y: -541.667 }, env: { e: 0.8, cx: 600, bottom: 862 },
-      card: { s: 1.16, cx: 600, cy: 448 }, hintY: 866, hintSize: 23 }
+  /* Two views of the same place: an upright picture for phones (and the vertical videos) and a wide one for computers
+     (and the horizontal listing video). Numbers of each scene are in ITS picture's pixels. aur[0] = height of the
+     northern-lights box = just above the bottom of the foreground layer (below it the lights would lie over the trees). */
+  var SCENES = {
+    tall: { bg: 'bg.jpg', fg: 'fg.webp', w: 1152, h: 2048, aur: [572, [-150, -30, 1452, 612], [-260, 60, 1600, 560], [60, -110, 1300, 560]],
+      winglow: [180, 770, 780, 300], hearth: [-175, 500, 1500, 960], tint: [560, 1488], smoke: [456, 664] },
+    wide: { bg: 'bg-land.jpg', fg: 'fg-land.webp', w: 1728, h: 1296, aur: [498, [-220, -70, 2160, 720], [-380, 30, 2460, 650], [90, -160, 1960, 680]],
+      winglow: [690, 590, 720, 290], hearth: [270, 320, 1560, 950], tint: [800, 496], smoke: [1042, 546] }
   };
-  var IMAGES = ['bg.jpg', 'fg.webp', 'env-pocket.webp', 'env-back.webp', 'env-flap.webp', 'env-flapin.webp', 'env-flapshadow.png',
+  var LAYOUTS = {
+    port: { W: 600, H: 1100, scene: SCENES.tall, sk: 1100 / 2048, sx: -9.375, sy: 0, env: { e: 1.15, cx: 300, bottom: 1050 },
+      card: { s: 1.1, cx: 300, cy: 525 }, hintY: 1056, hintSize: 27 },
+    land: { W: 1200, H: 900, scene: SCENES.wide, sk: 1200 / 1728, sx: 0, sy: 0, env: { e: 0.92, cx: 425, bottom: 868 },
+      card: { s: 1.16, cx: 425, cy: 448 }, hintY: 872, hintSize: 22 }
+  };
+  var IMAGES = ['env-pocket.webp', 'env-back.webp', 'env-flap.webp', 'env-flapin.webp', 'env-flapshadow.png',
     'env-bundle.webp', 'env-snow.webp', 'env-dropshadow.png', 'front.jpg', 'paper.jpg', 'aurora-a.webp', 'aurora-b.webp', 'smoke.webp'];
   var T = { landed: 2100, autoplay: 2300, controls: 4400 };   // ms; all on the 100 ms grid (frame-by-frame video render)
 
@@ -145,17 +154,19 @@
     var envLeft = L.env.cx - ENV.W * e / 2, envTop = L.env.bottom - ENV.H * e;
 
     // scene: the picture, northern lights BEHIND the firs (the foreground layer has a transparent sky), glows, chimney smoke
-    var sc = el('div', 'scene', 'transform:translate(' + L.scene.x + 'px,' + L.scene.y + 'px) scale(' + L.scene.k + ')', stageEl);
-    img(A + 'bg.jpg', 'bg', null, sc);
-    var aur = el('div', 'aur', null, sc);
-    img(A + 'aurora-a.webp', null, null, el('div', 'al a1', null, aur));
-    img(A + 'aurora-b.webp', null, null, el('div', 'al a2', null, aur));
-    img(A + 'aurora-a.webp', null, null, el('div', 'al a3', 'transform:scaleX(-1)', aur));
-    img(A + 'fg.webp', 'fg', null, sc);
-    el('div', 'tint', null, sc);
-    el('div', 'winglow', null, sc);
-    el('div', 'hearth', null, sc);
-    var sm = el('div', 'smokes', null, sc);
+    var S = L.scene;
+    function box(b) { return 'left:' + b[0] + 'px;top:' + b[1] + 'px;width:' + b[2] + 'px;height:' + b[3] + 'px'; }
+    var sc = el('div', 'scene', 'width:' + S.w + 'px;height:' + S.h + 'px;transform:translate(' + L.sx + 'px,' + L.sy + 'px) scale(' + L.sk + ')', stageEl);
+    img(A + S.bg, 'bg', 'width:' + S.w + 'px;height:' + S.h + 'px', sc);
+    var aur = el('div', 'aur', 'width:' + S.w + 'px;height:' + S.aur[0] + 'px', sc);
+    img(A + 'aurora-a.webp', null, null, el('div', 'al a1', box(S.aur[1]), aur));
+    img(A + 'aurora-b.webp', null, null, el('div', 'al a2', box(S.aur[2]), aur));
+    img(A + 'aurora-a.webp', null, null, el('div', 'al a3', box(S.aur[3]) + ';transform:scaleX(-1)', aur));
+    img(A + S.fg, 'fg', 'width:' + S.w + 'px', sc);
+    el('div', 'tint', 'top:' + S.tint[0] + 'px;width:' + S.w + 'px;height:' + S.tint[1] + 'px', sc);
+    el('div', 'winglow', box(S.winglow), sc);
+    el('div', 'hearth', box(S.hearth), sc);
+    var sm = el('div', 'smokes', 'left:' + S.smoke[0] + 'px;top:' + S.smoke[1] + 'px', sc);
     for (i = 0; i < 3; i++) img(A + 'smoke.webp', null, null, sm);
 
     // blown snow of the arrival
@@ -269,7 +280,7 @@
     later(function () { stageEl.classList.add('done'); controls(true); }, state.reduce ? 300 : T.controls);
   }
   function preload() {  // the arrival never starts with a half-loaded envelope
-    var jobs = IMAGES.map(function (n) {
+    var jobs = IMAGES.concat([state.L.scene.bg, state.L.scene.fg]).map(function (n) {
       return new Promise(function (res) {
         var i = new Image();
         i.onload = function () { (i.decode ? i.decode() : Promise.resolve()).then(res, res); };

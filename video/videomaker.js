@@ -92,11 +92,11 @@
   TEMPLATES['christmas-card-2'] = {
     kind: 'invite', fps: 30, defaultDesign: 'a', bases: { a: 'christmas-card-2-base.mp4' },
     geom: { frame: { W: 1080, H: 1920 }, stage: { W: 600, H: 1100 },
-            card: { cx: 300, bottom: 909.76, s0: 1.16, s1: 1.16, ty1: 0 },   // the card is already at its reading size when the words appear
+            card: { cx: 300, bottom: 894.6, s0: 1.1, s1: 1.1, ty1: 0 },   // the card is already at its reading size when the words appear
             settle: { at: 0, dur: 1 }, text: { at: 5.8, dur: 0.7 } },
     // name on the envelope: centre on the 1080x1920 frame, frame pixels per envelope unit, the page's own fit (30 -> 15 units, 252 wide)
-    label: { cx: 540, cy: 1571.79, rot: -3, unit: 2.007273, size: 30, min: 15, maxW: 252, weight: 700, family: 'Caveat', color: '#4B3524', alpha: 0.92,
-             inAt: 2.0, inDur: 0.5, outAt: 4.0, outDur: 0.35,
+    label: { cx: 540, cy: 1573.79, rot: -3, unit: 2.007273, size: 30, min: 15, maxW: 252, weight: 700, family: 'Caveat', color: '#4B3524', alpha: 0.92,
+             inAt: 1.9, inDur: 0.4, outAt: 4.0, outDur: 0.35,
              text: function (d) { return d && d.t ? 'For ' + d.t : 'With love'; } }
   };
 
