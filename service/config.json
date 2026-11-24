@@ -5,9 +5,9 @@
   "shopUrl": "https://wishberrystudiogifts.etsy.com",
   "allowedOrigins": ["https://wishberrystudiogifts.github.io"],
 
-  "_defaults_note": "Nikola's rules (23 Nov 2026): 24 hours from the FIRST opening and at most 300 openings. ttlHours is the one number to change if the time limit changes (Claude suggested 720 = 30 days; not decided) - the SAME number must then be changed in shared/config.js (tools/check-consistency.mjs compares them). maxSigns = how many invitation links one product link may sign (Claude's addition after the security review, 0 = no limit).",
+  "_defaults_note": "Nikola's rules: 30 days (720 hours) from the FIRST opening, at most 300 openings and at most 100 links per buyer (decided 24 Nov 2026, 23:03 - before that 24 hours, which he found too short: '24h can cause bad reviews'). ttlHours is the one number to change if the time limit changes - the SAME number must then be changed in shared/config.js (tools/check-consistency.mjs compares them). maxSigns = how many invitation links one product link may sign (Claude's addition after the security review, confirmed by Nikola on 24 Nov 2026; 0 = no limit).",
   "defaults": {
-    "ttlHours": 24,
+    "ttlHours": 720,
     "maxOpens": 300,
     "ttlStartsAt": "firstOpen",
     "signInvitations": true,

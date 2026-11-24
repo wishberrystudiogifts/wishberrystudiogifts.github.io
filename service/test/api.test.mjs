@@ -108,7 +108,7 @@ async function partA() {
     check('(b) openings 1-3 succeed and are counted 1, 2, 3', [o1, o2, o3].every((o) => o.status === 200) && o1.body.opens === 1 && o2.body.opens === 2 && o3.body.opens === 3, [o1.body, o3.body]);
     check('(b) the fourth opening is refused: 410, reason "opens"', o4.status === 410 && o4.body.reason === 'opens', o4.body);
     check('(b) firstOpen stays, lastOpen moves', o3.body.firstOpen === o1.body.firstOpen && o3.body.lastOpen > o1.body.lastOpen);
-    check('(b) deadline = first opening + 24 h', o1.body.expires - o1.body.firstOpen === 24 * 3600000);
+    check('(b) deadline = first opening + 30 days', o1.body.expires - o1.body.firstOpen === 720 * 3600000);
     const a3 = await act('2000000001', 't-open3', 'a');
     check('(a) activating again changes nothing: same hash, counter not reset', a3.body.links[0].hash === h1 && (await open(h1)).status === 410);
 

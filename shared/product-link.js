@@ -46,7 +46,7 @@
   function entryPath(p) { return folderPath(p) + p.entry; }
   function limits(p) {
     var g = CFG.limits || {}, o = (p && p.limits) || {};
-    return { ttlHours: o.ttlHours || g.ttlHours || 24, maxOpens: o.maxOpens || g.maxOpens || 300 };
+    return { ttlHours: o.ttlHours || g.ttlHours || 720, maxOpens: o.maxOpens || g.maxOpens || 300 };
   }
   function ttlWords(h) {
     if (h >= 48 && h % 24 === 0) return (h / 24) + ' days';

@@ -14,7 +14,7 @@ window.WB_CONFIG = {
 
   /* What the pages SAY about the limits. Must equal "defaults" in service/config.json
      (service/tools/check-consistency.mjs compares the two files; maxLinks here = maxSigns there, 0 = no limit). */
-  limits: { ttlHours: 24, maxOpens: 300, maxLinks: 100 },
+  limits: { ttlHours: 720, maxOpens: 300, maxLinks: 100 },
 
   products: {
     'christmas-card-2': {

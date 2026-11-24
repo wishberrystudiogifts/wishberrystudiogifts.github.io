@@ -34,7 +34,7 @@ Ograničenja (Nikolina pravila, 23. nov): **24 sata od PRVOG otvaranja** i **naj
 | | `mode: 'hash'` (novi standard) | `mode: 'direct'` (rezerva = stari tok) |
 |---|---|---|
 | Ulazna adresa | traži broj porudžbine | odmah otvara stranicu za pravljenje |
-| Rok i brojač | 24 h od prvog otvaranja, 300 otvaranja | nema |
+| Rok i brojač | 30 dana od prvog otvaranja, 300 otvaranja, najviše 100 linkova (Nikola, 24. nov u 23:03) | nema |
 | Invitation link | potpisan (`&s=…`), stranica primaoca proverava | bez potpisa, sve se prikazuje |
 | Servis | potreban kupcu (ne gostu) | **ne zove se nijednom** |
 
@@ -354,7 +354,7 @@ uklonjen na Etsy-ju): otvoriti `/etsy/connect` i potvrditi. Dok se to ne uradi, 
 
 ## 14. Odluke koje čekaju Nikolu
 
-1. **Rok 24 h ili 30 dana.** Za pozivnice je 24 h kratko (izmena pozivnice posle dva dana = poruka nama). Jedan broj, dva fajla.
+1. **Rok — ODLUČENO 24. nov u 23:03: 30 dana od prvog otvaranja i najviše 100 linkova** (uz 300 otvaranja). Ranije pitanje: rok 24 h ili 30 dana. Za pozivnice je 24 h kratko (izmena pozivnice posle dva dana = poruka nama). Jedan broj, dva fajla.
 2. **`maxSigns: 100`** (najviše linkova po product linku) — Claude-ov dodatak; bez njega jedan kupac može da potpiše
    neograničeno tuđih pozivnica. Ako ostaje, rečenica je u nacrtu tekstova; ako ne: `0` u oba fajla.
 3. **Kad povezati Etsy** (koraci 6 i 7) — ocena je u izveštaju.

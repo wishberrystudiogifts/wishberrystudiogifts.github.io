@@ -27,7 +27,7 @@
 <h2>Your personal link</h2>
 <ul>
 <li>To open the page we ask for your Etsy order number. We check it with Etsy and give you a personal link.</li>
-<li>The link stays open for <b><span id="ttl">24 hours</span></b> from the first time you open it and can be opened up to <b><span id="max">300</span></b> times. Then the page closes.</li>
+<li>The link stays open for <b><span id="ttl">30 days</span></b> from the first time you open it and can be opened up to <b><span id="max">300</span></b> times. Then the page closes.</li>
 <li id="maxlinks-row">While it is open, the page can make up to <b><span id="maxlinks">100</span></b> card or invitation links.</li>
 <li>Closing the page does not touch your files, and every card or invitation link you have already sent keeps working.</li>
 <li>The link is for you. Please don&rsquo;t share it or try to get around its limits; we may close a link that is misused.</li>
@@ -57,7 +57,7 @@
 <script>
 (function () {
   var c = window.WB_CONFIG || {}, l = c.limits || {};
-  var h = l.ttlHours || 24;
+  var h = l.ttlHours || 720;
   document.getElementById('ttl').textContent = h >= 48 && h % 24 === 0 ? (h / 24) + ' days' : h === 24 ? '24 hours' : h + (h === 1 ? ' hour' : ' hours');
   document.getElementById('max').textContent = l.maxOpens || 300;
   if (l.maxLinks > 0) document.getElementById('maxlinks').textContent = l.maxLinks; else document.getElementById('maxlinks-row').hidden = true;
