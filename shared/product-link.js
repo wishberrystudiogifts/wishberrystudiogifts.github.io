@@ -97,10 +97,11 @@
     var main = el('main', 'wb-card', null, b);
     return main;
   }
-  function shopButtons(main, primaryText) {
-    var row = el('div', 'wb-btns', null, main);
+  function shopButtons(main, primaryText, single) {
+    var row = el('div', 'wb-btns' + (single ? ' wb-one' : ''), null, main);
     var a = el('a', 'wb-btn wb-primary', primaryText || 'Visit our shop', row);
     a.href = CFG.shopUrl || 'https://wishberrystudiogifts.etsy.com'; a.rel = 'noopener';
+    if (single) return;
     var m = el('a', 'wb-btn wb-ghost', 'Message us on Etsy', row);
     m.href = CFG.messageUrl || CFG.shopUrl || 'https://wishberrystudiogifts.etsy.com'; m.rel = 'noopener';
   }
@@ -113,7 +114,7 @@
       var r = el('button', 'wb-btn wb-primary wb-wide', 'Try again', main); r.type = 'button';
       r.addEventListener('click', function () { location.reload(); });
     }
-    if (o.shop) shopButtons(main, o.shopText);
+    if (o.shop) shopButtons(main, o.shopText, o.shop === 'single');
     if (o.again) {
       var p = el('p', 'wb-small', null, main);
       var a = el('a', null, o.again.text, p); a.href = o.again.href;
@@ -390,7 +391,7 @@
     showMessage({ title: 'This link isn’t complete', lines: [
       'A part of this link is missing or was changed, so we can’t open it.',
       'Please ask the person who sent it to send it again — the full link, exactly as they got it.'
-    ], shop: true, shopText: 'Visit our shop' });
+    ], shop: 'single' });
   }
   /* Wraps the page's own boot(): it runs only for a link that may be shown. Use it for the first run and for hashchange. */
   PL.guard = function (boot) {

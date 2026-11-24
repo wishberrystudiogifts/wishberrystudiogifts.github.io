@@ -33,7 +33,7 @@ body.wb-page, .wb-gate {
 .wb-other { margin-top: 10px; }
 
 .wb-btns { display: grid; grid-template-columns: 1fr; gap: 10px; margin: 20px 0 10px; }
-@media (min-width: 520px) { .wb-btns { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 520px) { .wb-btns { grid-template-columns: 1fr 1fr; } .wb-btns.wb-one { grid-template-columns: 1fr; } }
 .wb-btn { display: inline-flex; align-items: center; justify-content: center; text-align: center; font: 700 19px/1.2 'Segoe UI', Roboto, Arial, sans-serif; border-radius: 14px; padding: 16px 20px; min-height: 58px; cursor: pointer; text-decoration: none; border: 2px solid transparent; }
 .wb-btn.wb-primary { background: #7A1F2B; color: #fff !important; box-shadow: 0 8px 20px rgba(122, 31, 43, .25); font-size: 21px; min-height: 64px; }
 .wb-btn.wb-primary:hover { background: #651823; }
