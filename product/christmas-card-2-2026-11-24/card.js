@@ -126,7 +126,7 @@
   };
   var LAYOUTS = {
     port: { W: 600, H: 1100, scene: SCENES.tall, sk: 1100 / 2048, sx: -9.375, sy: 0, env: { e: 1.15, cx: 300, bottom: 1050 },
-      card: { s: 1.1, cx: 300, cy: 525 }, hintY: 1056, hintSize: 27 },
+      card: { s: 1.1, cx: 300, cy: 525 }, hintY: 1061, hintSize: 25 },
     land: { W: 1200, H: 900, scene: SCENES.wide, sk: 1200 / 1728, sx: 0, sy: 0, env: { e: 0.92, cx: 425, bottom: 868 },
       card: { s: 1.16, cx: 425, cy: 448 }, hintY: 872, hintSize: 22 }
   };
