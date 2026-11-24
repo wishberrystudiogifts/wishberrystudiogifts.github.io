@@ -84,6 +84,22 @@
     bases: { a: 'new-years-eve-a-base.mp4', b: 'new-years-eve-b-base.mp4', c: 'new-years-eve-c-base.mp4' }
   };
 
+  /* Christmas Card 2 "Snowy Cabin" (24 Nov 2026): the base video is the recipient page itself, rendered frame by frame
+     (render-b2.js) with the written side empty and no name on the envelope. The envelope ARRIVES first (the wind brings
+     it), so the tap is at 2.3 s. The words are laid out by the recipient page (index.html#view=face in a hidden frame),
+     read back and drawn on the turned card; the name is written on the envelope once it has landed and goes with it.
+     Geometry measured on every frame of the base video (render-b2.js MEASURE). */
+  TEMPLATES['christmas-card-2'] = {
+    kind: 'invite', fps: 30, defaultDesign: 'a', bases: { a: 'christmas-card-2-base.mp4' },
+    geom: { frame: { W: 1080, H: 1920 }, stage: { W: 600, H: 1100 },
+            card: { cx: 300, bottom: 909.76, s0: 1.16, s1: 1.16, ty1: 0 },   // the card is already at its reading size when the words appear
+            settle: { at: 0, dur: 1 }, text: { at: 5.8, dur: 0.7 } },
+    // name on the envelope: centre on the 1080x1920 frame, frame pixels per envelope unit, the page's own fit (30 -> 15 units, 252 wide)
+    label: { cx: 540, cy: 1571.79, rot: -3, unit: 2.007273, size: 30, min: 15, maxW: 252, weight: 700, family: 'Caveat', color: '#4B3524', alpha: 0.92,
+             inAt: 2.0, inDur: 0.5, outAt: 4.0, outDur: 0.35,
+             text: function (d) { return d && d.t ? 'For ' + d.t : 'With love'; } }
+  };
+
   /* ---------- CSS-identical easing ---------- */
   function bezier(x1, y1, x2, y2) {
     function A(p1, p2) { return 1 - 3 * p2 + 3 * p1; }
@@ -608,6 +624,27 @@
     });
     return Promise.all(loads);
   }
+  /* the name written on the envelope (templates with `label`): same font, fit, place and fades as on the recipient page */
+  function prepareLabel(G, data) {
+    var c = document.createElement('canvas').getContext('2d'), text = G.text(data), size = G.size;
+    function f(sz) { return G.weight + ' ' + (sz * G.unit).toFixed(2) + 'px ' + G.family + ', cursive'; }
+    c.font = f(size);
+    while (c.measureText(text).width > G.maxW * G.unit && size > G.min) { size -= 1; c.font = f(size); }
+    var m = c.measureText(text), asc = m.fontBoundingBoxAscent, desc = m.fontBoundingBoxDescent;
+    return { text: text, font: f(size), dy: (isFinite(asc) && isFinite(desc)) ? (asc - desc) / 2 : null };
+  }
+  function drawLabel(ctx, Lb, G, t) {
+    var a = t < G.inAt ? 0 : EASE(Math.min(1, (t - G.inAt) / G.inDur));
+    if (t > G.outAt) a *= 1 - EASE(Math.min(1, (t - G.outAt) / G.outDur));
+    if (a <= 0) return;
+    ctx.save();
+    ctx.globalAlpha = a * G.alpha;
+    ctx.translate(G.cx, G.cy); ctx.rotate(G.rot * Math.PI / 180);
+    ctx.font = Lb.font; ctx.fillStyle = G.color; ctx.textAlign = 'center';
+    if (Lb.dy === null) { ctx.textBaseline = 'middle'; ctx.fillText(Lb.text, 0, 0); }
+    else { ctx.textBaseline = 'alphabetic'; ctx.fillText(Lb.text, 0, Lb.dy); }
+    ctx.restore();
+  }
   function drawInvite(c, L, k) { // c is already in face units; k = face unit -> frame pixel (shadows are in frame pixels)
     L.ops.forEach(function (op) {
       c.save();
@@ -721,11 +758,14 @@
     if (!opts.face) return Promise.reject(new Error('face'));
     return measureInvite(opts.face)
       .then(function (L) { lay = L; return ensureInviteFonts(L); })
+      .then(function () { return tpl.label ? document.fonts.load(tpl.label.weight + ' 40px ' + tpl.label.family, tpl.label.text(opts.data || {})).catch(function () { return null; }) : null; })
       .then(function () { return fetch(root + tpl.bases[design]); })
       .then(function (r) { if (!r.ok) throw new Error('base video ' + r.status); return r.arrayBuffer(); })
       .then(function (buf) {
         var layer = null, lctx = null, lastKey = '';
+        var lab = tpl.label ? prepareLabel(tpl.label, opts.data || {}) : null;
         return encodeVideo(buf, tpl.fps, opts, function (ctx, t, W, H) {
+          if (lab) drawLabel(ctx, lab, tpl.label, t);
           var a = detailsAlpha(G, t);
           if (a <= 0) return;
           var M = faceMatrix(G, t), key = M.map(function (v) { return v.toFixed(4); }).join(',');

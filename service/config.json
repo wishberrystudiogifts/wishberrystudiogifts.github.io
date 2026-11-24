@@ -43,8 +43,9 @@
       "lab": true,
       "listingIds": []
     },
-    "_example-christmas-card-2": {
-      "name": "Christmas Card 2 - Snowy Cabin (EXAMPLE - copy this entry, remove the underscore, listing ID after publishing)",
+    "christmas-card-2": {
+      "_note": "Christmas Card 2 - Snowy Cabin (built 24 Nov 2026). listingIds is EMPTY ON PURPOSE until the listing is published (planned 26 Nov 2026): write the Etsy listing ID here right after publishing. While it is empty, any paid order of the shop unlocks this product from its own page (launch grace).",
+      "name": "Christmas Card 2 - Snowy Cabin",
       "listingIds": []
     }
   },
@@ -60,6 +61,8 @@
       "1000000003": { "status": "paid", "products": ["lab-party-1"] },
       "1000000004": { "status": "paid", "products": ["lab-party-1"] },
       "1000000005": { "status": "paid", "products": ["lab-party-1"] },
+      "1000000201": { "status": "paid", "products": ["christmas-card-2"] },
+      "1000000202": { "status": "paid", "products": ["christmas-card-2"] },
       "1000000402": { "status": "unpaid" },
       "1000000404": { "status": "not_found" },
       "1000000500": { "status": "error" },

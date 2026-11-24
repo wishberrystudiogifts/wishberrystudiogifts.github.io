@@ -1,0 +1,167 @@
+/* Christmas Card 2 "Snowy Cabin" — recipient page (24 Nov 2026).
+   Everything here belongs to THIS product: its own scene, its own envelope (oat paper, snowflake liner, wax seal on
+   jute twine), its own arrival (the winter wind brings the envelope), its own opening (the twine slips off, the flap
+   lifts, the card slides up OUT of the pocket) and its own finale (northern lights behind the firs, hearth glow).
+   Only transform and opacity are animated. */
+@font-face{font-family:'Caveat';font-style:normal;font-weight:500;font-display:block;src:url(fonts/caveat-latin-500-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Caveat';font-style:normal;font-weight:500;font-display:block;src:url(fonts/caveat-latin-ext-500-normal.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:'Caveat';font-style:normal;font-weight:700;font-display:block;src:url(fonts/caveat-latin-700-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Caveat';font-style:normal;font-weight:700;font-display:block;src:url(fonts/caveat-latin-ext-700-normal.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:'Amatic SC';font-style:normal;font-weight:700;font-display:block;src:url(fonts/amatic-sc-latin-700-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Amatic SC';font-style:normal;font-weight:700;font-display:block;src:url(fonts/amatic-sc-latin-ext-700-normal.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#0d1626;overflow:hidden;font-family:'Caveat','Segoe Print','Bradley Hand',cursive;-webkit-tap-highlight-color:transparent}
+.backdrop{position:fixed;left:-40px;top:-40px;width:calc(100% + 80px);height:calc(100% + 80px);object-fit:cover;filter:blur(22px) brightness(.5) saturate(1.05);z-index:0;pointer-events:none}
+#stage{position:absolute;left:50%;top:50%;overflow:hidden;z-index:1;cursor:pointer;background:#16233d;box-shadow:0 0 90px rgba(0,0,0,.55)}
+#stage.done{cursor:default}
+#stage img{display:block;position:absolute;-webkit-user-drag:none;user-select:none}
+/* ---------- scene (image pixels: 1152 x 2048) ---------- */
+.scene{position:absolute;left:0;top:0;width:1152px;height:2048px;transform-origin:0 0;pointer-events:none}
+.scene .bg{left:0;top:0;width:1152px;height:2048px}
+.scene .fg{left:0;top:0;width:1152px}
+.aur{position:absolute;left:0;top:0;width:1152px;height:640px;overflow:hidden}
+.aur .al{position:absolute;opacity:0;will-change:opacity}
+.aur .al img{left:0;top:0;width:100%;height:100%;transform-origin:50% 100%;will-change:transform}
+.aur .a1{left:-150px;top:-30px;width:1452px;height:612px;--o:1}
+.aur .a2{left:-260px;top:60px;width:1600px;height:560px;--o:.82}
+.aur .a3{left:60px;top:-110px;width:1300px;height:560px;--o:.66}
+.aur .a1 img{animation:b2-sway1 9s ease-in-out infinite alternate}
+.aur .a2 img{animation:b2-sway2 11s ease-in-out infinite alternate}
+.aur .a3 img{animation:b2-sway3 13s ease-in-out infinite alternate}
+.winglow{position:absolute;left:180px;top:770px;width:780px;height:300px;border-radius:50%;background:radial-gradient(ellipse at center,rgba(255,196,110,.55),rgba(255,180,90,.18) 45%,rgba(255,170,80,0) 70%);opacity:.12;animation:b2-breathe 4.6s ease-in-out infinite alternate}
+.hearth{position:absolute;left:-175px;top:500px;width:1500px;height:960px;border-radius:50%;background:radial-gradient(ellipse at center,rgba(255,190,104,.62),rgba(255,170,84,.24) 38%,rgba(255,160,70,0) 68%);opacity:0;transform:scale(.45)}
+.tint{position:absolute;left:0;top:560px;width:1152px;height:1488px;background:linear-gradient(to bottom,rgba(110,255,205,.16),rgba(110,235,215,.07) 45%,rgba(120,200,230,0));opacity:0}
+.smokes{position:absolute;left:456px;top:664px;width:0;height:0}
+.smokes img{left:-80px;top:-80px;width:160px;height:160px;opacity:0;animation:b2-smoke 6.6s linear infinite}
+.smokes img:nth-child(2){animation-delay:2.2s}
+.smokes img:nth-child(3){animation-delay:4.4s}
+/* ---------- wind and snow of the arrival ---------- */
+.gust{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.gust i{position:absolute;left:0;top:0;border-radius:50%;background:radial-gradient(circle at 40% 40%,rgba(255,255,255,.98),rgba(255,255,255,.6) 55%,rgba(255,255,255,0));opacity:0}
+#stage.arrive .gust i{animation:b2-gust var(--d) linear var(--dl) both}
+/* ---------- envelope (units: 312 x 430) ---------- */
+.envroot{position:absolute;width:312px;height:430px;transform-origin:0 0;pointer-events:none}
+.gshadow{left:-25px;top:-22px;width:372px;height:490px;opacity:0;z-index:1}
+.fshadow{position:absolute;left:-14px;top:372px;width:340px;height:96px;border-radius:50%;background:radial-gradient(ellipse at center,rgba(8,16,42,.6),rgba(8,16,42,.26) 45%,rgba(8,16,42,0) 70%);opacity:0;z-index:1}
+.envB{position:absolute;inset:0;z-index:2;opacity:0}
+.eback{left:0;top:0;width:312px;height:136px}
+.inglow{position:absolute;left:36px;top:-20px;width:240px;height:190px;border-radius:50%;background:radial-gradient(ellipse at 50% 55%,rgba(255,214,140,.95),rgba(255,190,110,.5) 40%,rgba(255,180,90,0) 70%);opacity:0}
+.flapBbox{position:absolute;left:0;top:-181px;width:312px;height:181px;perspective:900px;perspective-origin:50% 100%}
+.flapB{position:absolute;inset:0;transform-origin:50% 100%;transform:rotateX(-90deg);opacity:0}
+.flapin{left:0;top:0;width:312px;height:181px}
+.cardrig{position:absolute;left:-84px;top:-248px;width:480px;height:672px;transform-origin:50% 100%;transform:scale(var(--c0));z-index:3;opacity:0}
+.cardpersp{position:absolute;inset:0;perspective:1900px}
+.card3d{position:absolute;inset:0;transform-style:preserve-3d;-webkit-transform-style:preserve-3d}
+.cface{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden;border-radius:3px;box-shadow:0 20px 44px rgba(3,8,22,.5)}
+.cface.front{background:#1b2740}
+.cface.front img{left:0;top:0;width:100%;height:100%;object-fit:cover}
+.cface.front .gloss{position:absolute;inset:0;background:linear-gradient(118deg,rgba(255,255,255,.10) 0%,rgba(255,255,255,.02) 36%,rgba(255,255,255,0) 58%)}
+.cface.backside{transform:rotateY(180deg)}
+.envF{position:absolute;inset:0;z-index:4;opacity:0}
+.fx,.fy,.fr{position:absolute;inset:0}
+.fr{transform-origin:50% 55%}
+.epocket{left:0;top:0;width:312px;height:430px}
+.elabel{position:absolute;left:16px;right:16px;top:279px;height:44px;display:flex;align-items:center;justify-content:center;transform:rotate(-3deg);font-family:'Caveat',cursive;font-weight:700;font-size:30px;line-height:1;color:#4B3524;white-space:nowrap;opacity:0}
+.flapsh{left:0;top:0;width:312px;height:205px}
+.flapFbox{position:absolute;left:0;top:0;width:312px;height:181px;perspective:900px;perspective-origin:50% 0%}
+.flap{left:0;top:0;width:312px;height:181px;transform-origin:50% 0%}
+.bundle{left:0;top:101.84px;width:312px;height:155.67px}
+.esnow{left:-17px;top:343px;width:150px;height:104px;opacity:0}
+.puff{position:absolute;left:0;top:0;width:312px;height:430px;z-index:5}
+.puff i{position:absolute;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.8),rgba(236,243,255,.34) 42%,rgba(230,240,255,0) 68%);opacity:0}
+/* ---------- the written side of the card (also the buyer's live preview and what the video engine reads) ---------- */
+.iface{position:absolute;inset:0;overflow:hidden;background:#FBF6EA}
+.iface img,.iface svg{display:block;position:absolute}
+.iface .paper{left:0;top:0;width:100%;height:100%;object-fit:cover;opacity:.9}
+.iface .orn-top{left:40px;top:34px;width:400px;height:74px}
+.iface .orn-bot{left:190px;top:596px;width:100px;height:30px}
+.iface .frame{position:absolute;inset:16px;border:1.5px solid rgba(37,50,77,.16);border-radius:2px}
+.itxt{position:absolute;left:50px;right:50px;top:132px;height:446px;display:flex;align-items:center;justify-content:center;font-size:10px;opacity:0;will-change:opacity}
+.iin{width:100%;display:flex;flex-direction:column;align-items:center;text-align:center;font-family:'Caveat','Segoe Print','Bradley Hand',cursive;color:#25324D}
+.iin .greet{font-size:4em;font-weight:700;line-height:1.15;overflow-wrap:anywhere;max-width:100%}
+.iin .msg{margin-top:.5em;font-size:3.35em;font-weight:500;line-height:1.24;white-space:pre-wrap;overflow-wrap:anywhere;max-width:100%}
+.iin .sign{margin-top:.55em;font-size:3.6em;font-weight:700;line-height:1.2;color:#8E2A32;white-space:pre-wrap;overflow-wrap:anywhere;max-width:100%}
+.iin .greet:empty,.iin .sign:empty{display:none}
+/* ---------- finale and helpers ---------- */
+.halo{position:absolute;border-radius:50%;background:radial-gradient(circle,rgba(255,226,160,.5),rgba(255,200,120,.18) 40%,rgba(255,190,110,0) 68%);opacity:0;pointer-events:none;z-index:6}
+.embers{position:absolute;inset:0;pointer-events:none;z-index:7;overflow:hidden}
+.embers i{position:absolute;border-radius:50%;background:radial-gradient(circle,#FFE9B0,#FFB85C 45%,rgba(255,150,60,0) 72%);opacity:0}
+.hint{position:absolute;left:0;right:0;text-align:center;font-family:'Amatic SC','Caveat',cursive;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#FFF4D6;text-shadow:0 2px 12px rgba(4,10,30,.75);opacity:0;z-index:8;pointer-events:none}
+#stage.landed .hint{animation:b2-hint 2.4s ease-in-out .3s infinite}
+#stage.open .hint,#stage.wait .hint{animation:none;opacity:0}
+#controls{position:fixed;left:0;right:0;bottom:max(18px,env(safe-area-inset-bottom));display:flex;flex-wrap:wrap;gap:12px;justify-content:center;z-index:5;opacity:0;transition:opacity .9s;pointer-events:none;padding:0 12px}
+#controls.show{opacity:1;pointer-events:auto}
+#controls button,#controls a{font:700 21px/1 'Caveat',cursive;padding:14px 22px;border-radius:999px;border:1px solid rgba(255,255,255,.4);background:rgba(13,22,42,.66);color:#FFF4D6;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);text-decoration:none;cursor:pointer}
+#controls a{background:rgba(246,198,104,.95);color:#1c2540;border-color:rgba(255,255,255,.25)}
+/* ---------- states ---------- */
+#stage.arrive .envF{animation:b2-in .14s linear 0s both}
+#stage.arrive .fx{animation:b2-flyx 2.05s ease-in-out 0s both}
+#stage.arrive .fy{animation:b2-flyy 2s cubic-bezier(.3,.02,.42,1) 0s both}
+#stage.arrive .fr{animation:b2-flyr 2.2s ease-in-out 0s both}
+#stage.arrive .gshadow{animation:b2-fadein .28s ease 1.86s both}
+#stage.arrive .fshadow{animation:b2-fshadow 2.1s ease-in-out 0s both}
+#stage.arrive .puff i{animation-name:b2-puff;animation-duration:.7s;animation-timing-function:ease-out;animation-fill-mode:both}
+#stage.arrive .esnow{animation:b2-fadein .3s ease 2s both}
+#stage.arrive .elabel{animation:b2-ink .5s ease 2s both}
+#stage.arrive .envB,#stage.arrive .cardrig{animation:b2-in .01s linear 2.05s both}
+#stage.still .envF,#stage.still .envB,#stage.still .cardrig,#stage.still .gshadow,#stage.still .esnow{opacity:1}
+#stage.still .elabel{opacity:.92}
+#stage.still .fshadow{opacity:.4}
+/* opening (delays are measured from the tap) */
+#stage.open .gshadow{opacity:1;animation:b2-fadeout .35s ease 1.7s both}
+#stage.open .fshadow{opacity:.4;animation:b2-fshadowout .35s ease 1.7s both}
+#stage.open .envB{opacity:1;animation:b2-fadeout .35s ease 1.7s both}
+#stage.open .envF{opacity:1;animation:b2-fadeout .35s ease 1.7s both}
+#stage.open .esnow{opacity:1;animation:none}
+#stage.open .elabel{opacity:.92;animation:none}
+#stage.open .bundle{animation:b2-bundle .55s cubic-bezier(.5,0,.85,.55) 0s both}
+#stage.open .flapsh{animation:b2-fadeout .3s ease .22s both}
+#stage.open .flap{animation:b2-flapF .32s cubic-bezier(.45,0,1,.9) .25s both}
+#stage.open .flapB{animation:b2-flapB .4s cubic-bezier(0,.1,.3,1) .57s both}
+#stage.open .inglow{animation:b2-glowin 1.5s ease .45s both}
+#stage.open .halo{animation:b2-halo 1.3s ease-out .5s both}
+#stage.open .cardrig{opacity:1;animation:b2-rise 1.05s cubic-bezier(.3,.05,.2,1) .7s both,b2-settle .8s cubic-bezier(.45,0,.2,1) 1.85s forwards}
+#stage.open .card3d{animation:b2-flip .75s cubic-bezier(.45,0,.3,1) 2.75s both}
+#stage.open .itxt{animation:b2-fadein .7s ease 3.5s both}
+#stage.open .aur .al{animation:b2-aurin 2s ease 2.05s both}
+#stage.open .hearth{animation:b2-hearth 2.6s ease-out 2s both}
+#stage.open .tint{animation:b2-fadein 2.2s ease 2.2s both}
+#stage.open .embers i{animation:b2-ember var(--d) ease-out var(--dl) infinite}
+/* reduced motion / instant end state */
+#stage.instant *{animation-duration:.01s!important;animation-delay:0s!important;animation-iteration-count:1!important}
+/* ---------- keyframes ---------- */
+@keyframes b2-in{from{opacity:0}to{opacity:1}}
+@keyframes b2-fadein{from{opacity:0}to{opacity:1}}
+@keyframes b2-fadeout{from{opacity:1}to{opacity:0}}
+@keyframes b2-ink{from{opacity:0}to{opacity:.92}}
+@keyframes b2-flyx{0%{transform:translateX(-430px)}46%{transform:translateX(62px)}74%{transform:translateX(-20px)}100%{transform:translateX(0)}}
+@keyframes b2-flyy{0%{transform:translateY(-640px)}100%{transform:translateY(0)}}
+@keyframes b2-flyr{0%{transform:perspective(1300px) rotateZ(-34deg) rotateY(58deg) rotateX(38deg) scale(.5,.5)}42%{transform:perspective(1300px) rotateZ(15deg) rotateY(-44deg) rotateX(-24deg) scale(.8,.8)}68%{transform:perspective(1300px) rotateZ(-8deg) rotateY(26deg) rotateX(16deg) scale(.95,.95)}88%{transform:perspective(1300px) rotateZ(2.4deg) rotateY(-6deg) rotateX(4deg) scale(1.02,1.02)}94%{transform:perspective(1300px) rotateZ(-.8deg) rotateY(0deg) rotateX(0deg) scale(1.012,.988)}100%{transform:perspective(1300px) rotateZ(0deg) rotateY(0deg) rotateX(0deg) scale(1,1)}}
+@keyframes b2-fshadow{0%{opacity:0;transform:translate(-190px,46px) scale(1.7,1.25)}18%{opacity:.16}46%{opacity:.26;transform:translate(40px,22px) scale(1.4,1.15)}74%{opacity:.36;transform:translate(-12px,8px) scale(1.16,1.06)}94%{opacity:.5;transform:translate(0,0) scale(1,1)}100%{opacity:.4;transform:translate(0,0) scale(1,1)}}
+@keyframes b2-fshadowout{from{opacity:.4}to{opacity:0}}
+@keyframes b2-puff{0%{opacity:0;transform:translate(0,0) scale(.35)}20%{opacity:.62}100%{opacity:0;transform:translate(var(--px),var(--py)) scale(1.7)}}
+@keyframes b2-gust{0%{opacity:0;transform:translate(var(--x0),var(--y0))}10%{opacity:var(--o)}50%{transform:translate(var(--x1),var(--y1))}88%{opacity:var(--o)}100%{opacity:0;transform:translate(var(--x2),var(--y2))}}
+@keyframes b2-hint{0%,100%{opacity:.5}50%{opacity:1}}
+@keyframes b2-bundle{0%{opacity:1;transform:translateY(0) rotate(0deg) scale(1)}18%{opacity:1;transform:translateY(-3px) rotate(-1.4deg) scale(1.025)}72%{opacity:1}100%{opacity:0;transform:translateY(300px) rotate(7deg) scale(1)}}
+@keyframes b2-flapF{0%{transform:rotateX(0deg);opacity:1}99%{opacity:1}100%{transform:rotateX(90deg);opacity:0}}
+@keyframes b2-flapB{0%{transform:rotateX(-90deg);opacity:1}100%{transform:rotateX(0deg);opacity:1}}
+@keyframes b2-glowin{0%{opacity:0}35%{opacity:1}100%{opacity:.5}}
+@keyframes b2-halo{0%{opacity:0;transform:scale(.4)}30%{opacity:.9}100%{opacity:0;transform:scale(1.5)}}
+@keyframes b2-rise{from{transform:translate(0,0) scale(var(--c0))}to{transform:translate(0,var(--rise)) scale(var(--c0))}}
+@keyframes b2-settle{from{transform:translate(0,var(--rise)) scale(var(--c0))}to{transform:translate(var(--fx),var(--fy)) scale(var(--c1))}}
+@keyframes b2-flip{from{transform:rotateY(0deg)}to{transform:rotateY(180deg)}}
+@keyframes b2-aurin{from{opacity:0}to{opacity:var(--o)}}
+@keyframes b2-sway1{from{transform:translateX(-36px) skewX(-5deg) scaleY(1)}to{transform:translateX(40px) skewX(6deg) scaleY(1.14)}}
+@keyframes b2-sway2{from{transform:translateX(50px) skewX(7deg) scaleY(1.1)}to{transform:translateX(-44px) skewX(-5deg) scaleY(.96)}}
+@keyframes b2-sway3{from{transform:translateX(-24px) skewX(4deg) scaleY(.95)}to{transform:translateX(30px) skewX(-7deg) scaleY(1.12)}}
+@keyframes b2-breathe{from{opacity:.06}to{opacity:.3}}
+@keyframes b2-hearth{0%{opacity:0;transform:scale(.45)}45%{opacity:.75}100%{opacity:.5;transform:scale(1.12)}}
+@keyframes b2-smoke{0%{opacity:0;transform:translate(0,0) scale(.35)}18%{opacity:.5}100%{opacity:0;transform:translate(62px,-200px) scale(1.7)}}
+@keyframes b2-ember{0%{opacity:0;transform:translate(0,0) scale(.6)}12%{opacity:var(--o)}70%{opacity:var(--o)}100%{opacity:0;transform:translate(var(--ex),var(--ey)) scale(1)}}
+@media (prefers-reduced-motion:reduce){.hint,.winglow,.smokes img,.aur .al img{animation:none!important}}
+/* written-side-only view (buyer's live preview, video engine) */
+html.inside-view,body.inside-view{background:transparent}
+body.inside-view #stage,body.inside-view .backdrop,body.inside-view #controls{display:none}
+body.inside-view #ivwrap{position:absolute;left:50%;top:50%;width:480px;height:672px}
+body.inside-view .iface{box-shadow:0 10px 30px rgba(20,30,60,.25)}
+body.inside-view .itxt{opacity:1}

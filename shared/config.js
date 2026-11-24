@@ -17,6 +17,14 @@ window.WB_CONFIG = {
   limits: { ttlHours: 24, maxOpens: 300, maxLinks: 100 },
 
   products: {
+    'christmas-card-2': {
+      mode: 'hash',   // <-- THE SWITCH for this product: 'hash' or 'direct'
+      folder: 'product/christmas-card-2-2026-11-24',
+      entry: 'personalize-gvhm.html',
+      name: 'Christmas card “Snowy Cabin”',
+      kind: 'card',
+      allowBare: true   // the bare page address shows the sample card (no personal words), as the older cards do
+    },
     'lab-party-1': {
       mode: 'hash',   // <-- THE SWITCH for this product: 'hash' or 'direct'
       folder: 'product/lab-party-1-2026-11-24',
