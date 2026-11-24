@@ -522,7 +522,8 @@
     }
     // NEW STANDARD (product link, Nov 2026): the page is shown only for a link that may be shown —
     // in mode 'hash' that is a correctly signed invitation link (or the buyer's own preview); in mode 'direct' every link.
-    var start = window.ProductLink ? window.ProductLink.guard(boot) : boot;
+    // If the shared code did not load, the page stays closed (it never opens "just in case").
+    var start = window.ProductLink ? window.ProductLink.guard(boot) : function () { document.body.textContent = 'This page could not load completely. Please reload it.'; };
     window.addEventListener('hashchange', function () { if (!document.body.classList.contains('print-view')) start(); });
     start();
   }

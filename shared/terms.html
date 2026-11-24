@@ -28,6 +28,7 @@
 <ul>
 <li>To open the page we ask for your Etsy order number. We check it with Etsy and give you a personal link.</li>
 <li>The link stays open for <b><span id="ttl">24 hours</span></b> from the first time you open it and can be opened up to <b><span id="max">300</span></b> times. Then the page closes.</li>
+<li id="maxlinks-row">While it is open, the page can make up to <b><span id="maxlinks">100</span></b> card or invitation links.</li>
 <li>Closing the page does not touch your files, and every card or invitation link you have already sent keeps working.</li>
 <li>The link is for you. Please don&rsquo;t share it or try to get around its limits; we may close a link that is misused.</li>
 <li>Need more time? Message us on Etsy with your order number.</li>
@@ -37,10 +38,10 @@
 <ul>
 <li>We do not ask for your name, email or address, and we use no advertising or tracking cookies.</li>
 <li>The words you type for your card or invitation are never sent to us. They travel only inside the link you send.</li>
-<li>We keep a one-way code made from your order number (not the number itself), so that the same order always gets the same personal link.</li>
-<li>We keep when your personal link was first and last opened, and how many times.</li>
-<li>For about an hour we keep a one-way code of the internet address that tried an order number, only to stop guessing.</li>
-<li>If Etsy cannot confirm an order number at that moment, the number is kept encrypted until it is confirmed, and is then deleted.</li>
+<li>We keep a code made from your order number with a secret key (not the number itself), so that the same order always gets the same personal link.</li>
+<li>We keep when your personal link was first and last opened, how many times, and how many links it has made.</li>
+<li>For a short time (deleted within two days) we keep a code made from the internet address that tried an order number, only to stop guessing.</li>
+<li>If Etsy cannot confirm an order number at that moment, the number is kept encrypted until it is confirmed &mdash; for 7 days at the latest &mdash; and is then deleted.</li>
 <li>Your browser remembers your personal link and your draft on your own device, so you can come back to it.</li>
 <li>The page is hosted by GitHub Pages and our small service runs on Cloudflare; both keep ordinary technical logs.</li>
 </ul>
@@ -59,6 +60,7 @@
   var h = l.ttlHours || 24;
   document.getElementById('ttl').textContent = h >= 48 && h % 24 === 0 ? (h / 24) + ' days' : h === 24 ? '24 hours' : h + (h === 1 ? ' hour' : ' hours');
   document.getElementById('max').textContent = l.maxOpens || 300;
+  if (l.maxLinks > 0) document.getElementById('maxlinks').textContent = l.maxLinks; else document.getElementById('maxlinks-row').hidden = true;
   if (c.shopUrl) document.getElementById('shop').href = c.shopUrl;
 })();
 </script>

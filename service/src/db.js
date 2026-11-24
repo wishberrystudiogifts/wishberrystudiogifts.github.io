@@ -1,10 +1,14 @@
 // D1 access: table names, schema that creates itself, tiny key-value store, event log.
 import { b64url, unb64url, generateSigningKey, importSigningKey } from './crypto.js';
 
-/** Table names. Previews set TABLE_PREFIX (for example "pv_") so that they never touch the live tables. */
+/**
+ * Table names. Previews set TABLE_PREFIX (for example "pv_") so that they never touch the live tables.
+ * A prefix that is set but not well-formed stops the service: silently falling back to the live tables would be worse.
+ */
 export function tables(env) {
-  const raw = String(env.TABLE_PREFIX || '').toLowerCase();
-  const p = /^[a-z][a-z0-9_]{0,15}$/.test(raw) ? raw : '';
+  const raw = env.TABLE_PREFIX === undefined || env.TABLE_PREFIX === null ? '' : String(env.TABLE_PREFIX);
+  if (raw !== '' && !/^[a-z][a-z0-9_]{0,15}$/.test(raw)) throw new Error('TABLE_PREFIX is not valid (lower-case letter, then up to 15 letters, digits or _)');
+  const p = raw;
   return { prefix: p, links: p + 'links', orders: p + 'orders', kv: p + 'kv', attempts: p + 'attempts', log: p + 'log' };
 }
 
@@ -81,6 +85,29 @@ export async function kvInit(env, k, make) {
   return kvGet(env, k);
 }
 
+/** Reads a value and removes it in one statement (one use only, even when two requests arrive together). */
+export async function kvTake(env, k) {
+  const t = tables(env);
+  const row = await env.DB.prepare(`DELETE FROM ${t.kv} WHERE k = ?1 RETURNING v`).bind(k).first();
+  return row ? row.v : null;
+}
+
+// Counters per time window, kept in the "attempts" table: per visitor (a keyed code of the address, never the address)
+// and a few overall ones ("g:…"). One statement adds and returns the new count, so simultaneous requests cannot slip past a limit.
+export async function counterBump(env, key, win) {
+  const t = tables(env);
+  const row = await env.DB.prepare(
+    `INSERT INTO ${t.attempts} (ip_key, win, n) VALUES (?1, ?2, 1)
+     ON CONFLICT(ip_key, win) DO UPDATE SET n = n + 1 RETURNING n`).bind(key, win).first();
+  return row ? row.n : 1;
+}
+
+export async function counterGet(env, key, win) {
+  const t = tables(env);
+  const row = await env.DB.prepare(`SELECT n FROM ${t.attempts} WHERE ip_key = ?1 AND win = ?2`).bind(key, win).first();
+  return row ? row.n : 0;
+}
+
 const keyCache = new Map(); // prefix -> { hashKey: Uint8Array, signing: {...} }
 
 function cacheFor(env) {
@@ -123,4 +150,28 @@ export async function logEvent(env, kind, detail) {
   } catch (e) {
     console.log('log failed', kind, e && e.message);
   }
+}
+
+/**
+ * Daily tidy-up (Cloudflare cron, see wrangler.jsonc; also started by ordinary traffic at most once a day).
+ * It never calls Etsy and never touches a link record.
+ * - visitor counters of earlier hours are deleted (we do not keep them);
+ * - an order number that could not be checked for 7 days is no longer kept, not even sealed;
+ * - sign-in states that were never used are deleted;
+ * - the owner's event notes are kept for 180 days.
+ */
+export async function housekeeping(env) {
+  const t = tables(env);
+  const now = Date.now();
+  const hour = Math.floor(now / 3600000);
+  await env.DB.batch([
+    env.DB.prepare(`DELETE FROM ${t.attempts} WHERE ip_key NOT LIKE 'g:%' AND win < ?1`).bind(hour - 1),
+    env.DB.prepare(`DELETE FROM ${t.attempts} WHERE ip_key LIKE 'g:%' AND ip_key NOT LIKE 'g:etsy:%' AND win < ?1`).bind(hour - 48),
+    env.DB.prepare(`DELETE FROM ${t.attempts} WHERE ip_key = 'g:etsy:min' AND win < ?1`).bind(Math.floor(now / 60000) - 1440),
+    env.DB.prepare(`DELETE FROM ${t.attempts} WHERE ip_key = 'g:etsy:day' AND win < ?1`).bind(Math.floor(now / 86400000) - 30),
+    env.DB.prepare(`UPDATE ${t.orders} SET sealed_order = NULL, status = 'unchecked' WHERE status = 'pending' AND created < ?1`).bind(now - 7 * 86400000),
+    env.DB.prepare(`DELETE FROM ${t.orders} WHERE status IN ('rejected', 'unpaid') AND checked_at < ?1`).bind(now - 86400000),
+    env.DB.prepare(`DELETE FROM ${t.kv} WHERE k LIKE 'oauth_state:%' AND updated < ?1`).bind(now - 3600000),
+    env.DB.prepare(`DELETE FROM ${t.log} WHERE at < ?1`).bind(now - 180 * 86400000),
+  ]);
 }

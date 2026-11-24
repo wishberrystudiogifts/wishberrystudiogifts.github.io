@@ -16,7 +16,7 @@
   var HASH_RE = /^[A-Za-z0-9_-]{22}$/;
   var LOCAL = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
   var ETSY_NOTICE = "The term 'Etsy' is a trademark of Etsy, Inc. This application uses the Etsy API but is not endorsed or certified by Etsy, Inc.";
-  var PL = { state: 'none', session: null, page: null, version: '2026-11-24' };
+  var PL = { state: 'none', session: null, page: null, version: '2026-11-24b' };
 
   /* ---------- small helpers ---------- */
   function store(k, v) {
@@ -77,15 +77,41 @@
     for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
     return bytes;
   }
-  /* Parts of the address after #, taken as they are (the signature covers the exact text of m). */
-  function fragment() {
-    var out = {}, raw = String(location.hash || '').replace(/^#/, '');
+  /* The part of the address after "#", read STRICTLY. The page's own code reads it with URLSearchParams (names are
+     percent-decoded, a leading "?" is dropped, the first "m" wins), so a signature check that read it any other way
+     could approve one "m" while the page showed another. Therefore: "m" and "s" must each be there exactly once,
+     spelled plainly, made only of base64url characters, and the browser's own parser must agree. Only a few other
+     parts are kept (view, size, autoplay); anything else is dropped. */
+  var EXTRA = { view: /^[a-z]{1,12}$/, size: /^[A-Za-z0-9]{1,12}$/, autoplay: /^[01]$/ };
+  function parseFragment() {
+    var raw = String(location.hash || '').replace(/^#/, '');
+    var out = { ok: true, m: null, s: null, extra: [] }, seen = {};
     raw.split('&').forEach(function (kv) {
-      var i = kv.indexOf('=');
-      if (i > 0) out[kv.slice(0, i)] = kv.slice(i + 1);
+      if (!kv) return;
+      var i = kv.indexOf('='), nameRaw = i < 0 ? kv : kv.slice(0, i), val = i < 0 ? '' : kv.slice(i + 1), name;
+      try { name = decodeURIComponent(nameRaw.replace(/\+/g, ' ')).replace(/^\?/, ''); } catch (e) { out.ok = false; return; }
+      if (name === 'm' || name === 's') {
+        if (seen[name] || nameRaw !== name || !/^[A-Za-z0-9_-]+$/.test(val)) { out.ok = false; return; }
+        seen[name] = 1; out[name] = val;
+      } else if (Object.prototype.hasOwnProperty.call(EXTRA, nameRaw) && EXTRA[nameRaw].test(val) && !seen['x:' + nameRaw]) {
+        seen['x:' + nameRaw] = 1; out.extra.push(nameRaw + '=' + val);
+      }
     });
+    try {
+      var q = new URLSearchParams(raw);
+      if (q.getAll('m').length !== (out.m ? 1 : 0) || q.getAll('s').length !== (out.s ? 1 : 0)) out.ok = false;
+      if (out.m && q.get('m') !== out.m) out.ok = false;
+    } catch (e) { out.ok = false; }
     return out;
   }
+  /* After a link has passed the check, the address is rewritten to exactly what was checked — so whatever way the
+     page's own code reads it, it can only find the checked "m". (No reload, no hashchange event.) */
+  function canonicalize(f) {
+    var want = '#m=' + f.m + '&s=' + f.s + (f.extra.length ? '&' + f.extra.join('&') : '');
+    if (location.hash === want) return;
+    try { history.replaceState(history.state, '', location.pathname + location.search + want); } catch (e) {}
+  }
+  function framed() { try { return window.top !== window.self; } catch (e) { return true; } }
 
   /* ---------- simple full-page messages (router and recipient page) ---------- */
   function shell(title) {
@@ -151,6 +177,13 @@
   function showRetry() {
     showMessage({ title: 'We couldn’t open your page', lines: ['Please check your internet connection and try again.', 'Still stuck? Message us on Etsy — we reply within 24 hours.'], retry: true, shop: true });
   }
+  function showSetup() {
+    showMessage({ title: 'This page isn’t ready yet', lines: ['Something on our side is not set up for this page. Please message us on Etsy and we will fix it — we reply within 24 hours.'], shop: true });
+  }
+  function showFramed() {
+    var main = showMessage({ title: 'Open this page in its own tab', lines: ['For your safety, your personal page does not open inside another website.'] });
+    var a = el('a', 'wb-btn wb-primary wb-wide', 'Open my page', main); a.href = location.href; a.target = '_top'; a.rel = 'noopener';
+  }
   function showNotFound() {
     showMessage({ title: 'Page not found', lines: ['Got a card or an invitation link? Open it exactly as you received it — the full link.'], shop: true });
   }
@@ -176,24 +209,37 @@
     var m = /^\/([A-Za-z0-9_-]{22})\/?$/.exec(location.pathname);
     if (!m) { onReady(showNotFound); return; }
     var hash = m[1];
-    onReady(function () {
-      showLoading();
-      api('POST', '/api/open/' + hash).then(function (r) {
-        if (r.status === 200 && r.body && r.body.ok) return mount(hash, r.body);
-        if (r.status === 410) return showExpired(r.body);
-        if (r.status === 404) return showUnknown(forget(hash));
-        showRetry();
-      }, function () { showRetry(); });
-    });
+    // Every opening is counted, so an opening must be a person looking at the page: not another website that loads
+    // the address in a hidden frame, and not a browser that prepares the page in advance "just in case".
+    if (framed()) { onReady(showFramed); return; }
+    function go() {
+      onReady(function () {
+        showLoading();
+        api('POST', '/api/open/' + hash).then(function (r) {
+          if (r.status === 200 && r.body && r.body.ok) return mount(hash, r.body);
+          if (r.status === 410) return showExpired(r.body);
+          if (r.status === 404) return showUnknown(forget(hash));
+          showRetry();
+        }, function () { showRetry(); });
+      });
+    }
+    if (document.prerendering) document.addEventListener('prerenderingchange', go, { once: true }); else go();
   };
 
   /* ---------- buyer page (the permanent entry address) ---------- */
   PL.entry = function (opts) {
     var key = opts && opts.product, p = product(key);
     PL.page = { kind: 'entry', product: key };
-    if (!p || p.mode !== 'hash') {
+    if (!p || (p.mode !== 'hash' && p.mode !== 'direct')) {
+      // not in shared/config.js (or a mode we do not know): the page stays closed rather than open to everyone
+      PL.state = 'error';
+      document.documentElement.className += ' wb-gated';
+      onReady(showSetup);
+      return PL.state;
+    }
+    if (p.mode === 'direct') {
       PL.state = 'maker';
-      PL.session = { mode: 'direct', product: key, base: p ? folderUrl(p) : new URL('./', document.baseURI).href, sign: false };
+      PL.session = { mode: 'direct', product: key, base: folderUrl(p), sign: false };
       return PL.state;
     }
     var s = window.__WB_SESSION;
@@ -242,23 +288,31 @@
     if (s.mode !== 'hash' || s.sign === false) return Promise.resolve(url);
     if (!window.crypto || !crypto.subtle) { var e0 = new Error('crypto'); e0.code = 'browser'; return Promise.reject(e0); }
     return digestOf(packed).then(function (d) {
+      // the same words give the same link: no second signature is asked for (each product link has a limited number)
+      if (signed[d]) return url + '&s=' + signed[d];
       return api('POST', '/api/sign', { hash: s.hash, d: d }).then(function (r) {
-        if (r.status === 200 && r.body && r.body.s) return url + '&s=' + r.body.s;
-        var e = new Error('sign'); e.code = r.status === 410 ? 'expired' : r.status === 429 ? 'limit' : 'failed'; throw e;
+        if (r.status === 200 && r.body && r.body.s) { signed[d] = r.body.s; return url + '&s=' + r.body.s; }
+        var e = new Error('sign');
+        e.code = r.status === 410 ? 'expired' : r.status === 429 ? (r.body && r.body.unchecked ? 'unchecked' : 'limit') : 'failed';
+        e.max = r.body && r.body.max;
+        throw e;
       }, function () { var e = new Error('network'); e.code = 'network'; throw e; });
     });
   };
+  var signed = {};
   PL.linkErrorText = function (err) {
     var c = err && err.code;
     if (c === 'expired') return 'Your personal link has expired, so a new link can’t be made. Links you already sent keep working. Need more time? Message us on Etsy.';
     if (c === 'browser') return 'This browser can’t make the link. Please open this page in Chrome or Safari.';
     if (c === 'network') return 'We couldn’t reach our service. Please check your internet connection and tap the button again.';
-    if (c === 'limit') return 'This personal link has made as many links as it can. Message us on Etsy and we will help.';
+    if (c === 'limit') return 'Your personal page has made as many links as it can' + (err.max ? ' (' + err.max + ')' : '') + '. Links you already made keep working. Need more? Message us on Etsy.';
+    if (c === 'unchecked') return 'We are still confirming your order with Etsy, so this page can’t make another link just yet. Please try again in a few minutes.';
     return 'Something went wrong while making your link. Please tap the button again.';
   };
 
   /* ---------- the activation form (mode 'hash', page opened at its own address) ---------- */
   function renderGate(key, p) {
+    if (framed()) { showFramed(); return; }
     var q = new URLSearchParams(location.search);
     var saved = store('wb.pl.' + key);
     if (saved && HASH_RE.test(saved) && q.get('new') !== '1') { location.replace('/' + saved); return; }
@@ -323,7 +377,7 @@
           }
           return fail('We can’t find that order number for this item. Please check the number and try again.');
         }
-        if (r.status === 404) return fail('We can’t find that order number for this item. Please check the number and try again. (Just bought it? Wait a minute and try again.)');
+        if (r.status === 404) return fail('We can’t find that order number for this item. Please check the number and try again. (Just bought it? Wait a couple of minutes and try again.)');
         if (r.status === 409) return fail('Etsy is still processing your payment. Please try again in a few minutes.');
         if (r.status === 429) return fail('Too many tries. Please wait an hour and try again, or message us on Etsy.');
         if (r.status === 400) return fail('That doesn’t look like an Etsy order number. It is a number about 10 digits long.');
@@ -345,9 +399,11 @@
   function loadKeys() {
     var keys = (window.WB_KEYS || []).filter(function (k) { return typeof k === 'string' && k.length > 40; });
     if (keys.length) return Promise.resolve(keys);
-    // No key in shared/keys.js yet: ask the service once and remember the answer for a day.
+    // No key in shared/keys.js yet (only before "embed-pubkey" has been run at the first release):
+    // ask the service once and remember the answer for a day.
     var cached = null; try { cached = JSON.parse(store('wb.keys') || 'null'); } catch (e) {}
-    if (cached && cached.url === serviceUrl() && Date.now() - cached.at < 86400000 && cached.keys && cached.keys.length) return Promise.resolve(cached.keys);
+    var age = cached ? Date.now() - Number(cached.at) : -1;
+    if (cached && cached.url === serviceUrl() && age >= 0 && age < 86400000 && Array.isArray(cached.keys) && cached.keys.length) return Promise.resolve(cached.keys);
     return api('GET', '/api/pubkey').then(function (r) {
       var ks = ((r.body && r.body.keys) || []).map(function (k) { return k.key; }).filter(Boolean);
       if (r.status !== 200 || !ks.length) throw new Error('no key');
@@ -373,17 +429,23 @@
       return next();
     }, function () { return 'network'; });
   }
-  /* Resolves true (show it), 'invalid' or 'network'. */
+  /* Resolves true (show it), 'invalid', 'network' or 'setup'. */
   PL.recipient = function (opts) {
     var key = (opts && opts.product) || (PL.page && PL.page.product), p = product(key);
-    if (!p || p.mode !== 'hash' || p.sign === false) return Promise.resolve(true);
+    if (!p || (p.mode !== 'hash' && p.mode !== 'direct')) return Promise.resolve('setup'); // unknown product: closed, not open to everyone
+    if (p.mode === 'direct' || p.sign === false) return Promise.resolve(true);
     if (previewAllowed(key)) return Promise.resolve(true);
-    var f = fragment();
-    if (!f.m) return Promise.resolve(p.allowBare === true ? true : 'invalid');
+    var f = parseFragment();
+    if (!f.ok) return Promise.resolve('invalid');
+    if (!f.m) return Promise.resolve(p.allowBare === true && !f.s ? true : 'invalid');
     if (!f.s) return Promise.resolve('invalid');
-    return verify(key, f.m, f.s);
+    return verify(key, f.m, f.s).then(function (ok) {
+      if (ok === true) canonicalize(f);
+      return ok;
+    });
   };
   function showInvalid(kind) {
+    if (kind === 'setup') { showSetup(); return; }
     if (kind === 'network') {
       showMessage({ title: 'Please try again', lines: ['We couldn’t finish opening this page. Check your internet connection and try again.'], retry: true });
       return;
@@ -396,7 +458,9 @@
   /* Wraps the page's own boot(): it runs only for a link that may be shown. Use it for the first run and for hashchange. */
   PL.guard = function (boot) {
     return function () {
-      PL.recipient().then(function (ok) { if (ok === true) boot(); else showInvalid(ok); });
+      var check;
+      try { check = PL.recipient(); } catch (e) { check = Promise.resolve('invalid'); }
+      check.then(function (ok) { if (ok === true) boot(); else showInvalid(ok); }, function () { showInvalid('invalid'); });
     };
   };
 

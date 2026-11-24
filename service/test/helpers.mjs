@@ -23,9 +23,9 @@ export function summary() {
 }
 
 /** Starts `wrangler dev --local` with its own empty database folder. vars become Worker variables. */
-export async function startService({ port, vars = {}, persist }) {
+export async function startService({ port, vars = {}, persist, anyAnswer = false }) {
   const dir = persist || fs.mkdtempSync(path.join(os.tmpdir(), 'pl-state-'));
-  const args = ['wrangler', 'dev', '--local', '--port', String(port), '--ip', '127.0.0.1', '--persist-to', dir];
+  const args = ['wrangler', 'dev', '--local', '--port', String(port), '--ip', '127.0.0.1', '--persist-to', dir, '--test-scheduled'];
   for (const [k, v] of Object.entries(vars)) args.push('--var', k + ':' + (typeof v === 'string' ? v : JSON.stringify(v)));
   const child = spawn('npx', args, { cwd: SERVICE_DIR, env: { ...process.env, WRANGLER_SEND_METRICS: 'false', CI: '1' }, stdio: ['ignore', 'pipe', 'pipe'], detached: true });
   let log = '';
@@ -33,7 +33,7 @@ export async function startService({ port, vars = {}, persist }) {
   child.stderr.on('data', (d) => { log += d; });
   const url = 'http://127.0.0.1:' + port;
   for (let i = 0; i < 80; i++) {
-    try { const r = await fetch(url + '/api/status'); if (r.ok) break; } catch (e) {}
+    try { const r = await fetch(url + '/api/status'); if (r.ok || (anyAnswer && r.status >= 400)) break; } catch (e) {}
     if (i === 79) throw new Error('service did not start:\n' + log.slice(-2000));
     await sleep(500);
   }
@@ -138,6 +138,8 @@ export async function startFakeEtsy({ port, keystring = 'testkeystring', secret 
         bump('receipt'); bump('receipt:' + rm[2]);
         if (Number(rm[1]) !== shopId) return json(res, 404, { error: 'Resource not found' });
         if (state.fail.server > 0) { state.fail.server--; return json(res, 500, { error: 'boom' }); }
+        if (state.fail.rate > 0) { state.fail.rate--; return json(res, 429, { error: 'rate limit exceeded' }); }
+        if (state.fail.forbidden > 0) { state.fail.forbidden--; return json(res, 403, { error: 'forbidden' }); }
         const r = state.receipts[rm[2]];
         if (!r) return json(res, 404, { error: 'Resource not found' });
         return json(res, 200, { receipt_id: Number(rm[2]), status: r.status || 'paid', is_paid: r.is_paid !== undefined ? r.is_paid : true, transactions: (r.listings || []).map((id, i) => ({ transaction_id: 1000 + i, listing_id: id, is_digital: true })) });

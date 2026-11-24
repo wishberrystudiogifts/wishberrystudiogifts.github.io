@@ -5,20 +5,27 @@
   "shopUrl": "https://wishberrystudiogifts.etsy.com",
   "allowedOrigins": ["https://wishberrystudiogifts.github.io"],
 
-  "_defaults_note": "Nikola's rules (23 Nov 2026): 24 hours from the FIRST opening and at most 300 openings. ttlHours is the one number to change if the time limit changes (Claude suggested 720 = 30 days; not decided). maxSigns 0 = no limit on how many invitation links one product link may sign.",
+  "_defaults_note": "Nikola's rules (23 Nov 2026): 24 hours from the FIRST opening and at most 300 openings. ttlHours is the one number to change if the time limit changes (Claude suggested 720 = 30 days; not decided) - the SAME number must then be changed in shared/config.js (tools/check-consistency.mjs compares them). maxSigns = how many invitation links one product link may sign (Claude's addition after the security review, 0 = no limit).",
   "defaults": {
     "ttlHours": 24,
     "maxOpens": 300,
     "ttlStartsAt": "firstOpen",
     "signInvitations": true,
-    "maxSigns": 0
+    "maxSigns": 100
   },
 
+  "_activation_note": "maxAttemptsPerHour: counted tries per visitor and clock hour (a try = a check that may cost a request to Etsy, or a miss). negativeCacheMinutes: for how long a 'no such order' is answered without asking Etsy again. retryCheckSeconds: an order that is 'not paid yet' or was let in unchecked is asked about again at the earliest after this. recheckMinutes / maxRechecks / slowRecheckHours: an order let in unchecked is asked about again when its link is opened or signs - the first maxRechecks times at most every recheckMinutes, afterwards at most every slowRecheckHours. maxUncheckedPerHour: how many NEW orders may be let in unchecked per hour overall. uncheckedMaxSigns: how many invitation links an unchecked link may sign during a short Etsy outage (0 = no extra limit). maxEtsyPerMinute / maxEtsyPerDay: our own brake on requests to Etsy (the app's limits are 10 per second and 10,000 per day).",
   "activation": {
     "maxAttemptsPerHour": 10,
-    "negativeCacheMinutes": 15,
+    "negativeCacheMinutes": 2,
+    "retryCheckSeconds": 60,
     "recheckMinutes": 30,
-    "maxRechecks": 5
+    "maxRechecks": 5,
+    "slowRecheckHours": 6,
+    "maxUncheckedPerHour": 30,
+    "uncheckedMaxSigns": 5,
+    "maxEtsyPerMinute": 20,
+    "maxEtsyPerDay": 2000
   },
 
   "etsy": {
@@ -40,8 +47,11 @@
     }
   },
 
-  "_mock_note": "Test orders (MockVerifier). On the live service they unlock ONLY products marked lab:true. With the variable VERIFIER=mock (local tests, previews) they may unlock any product they list and the Etsy API is never called. status: paid | unpaid | not_found | error (error = pretend Etsy is unreachable, the buyer is let in and checked later).",
+  "_mock_note": "Test orders (MockVerifier) - they never reach Etsy. On the LIVE service a test order can only unlock a product marked lab:true; every other status is answered as 'no such order' there. With the variable VERIFIER=mock (local tests, previews) a test order may unlock any product it lists, and status may also be unpaid | not_found | error | busy (error = pretend Etsy is unreachable: the buyer is let in and checked later). ranges: every number from..to behaves the same - plenty of fresh test numbers for the LAB product (each number is one link with its own deadline and counter).",
   "mock": {
+    "ranges": [
+      { "from": 1000001000, "to": 1000001999, "status": "paid", "products": ["lab-party-1"] }
+    ],
     "orders": {
       "1000000001": { "status": "paid", "products": ["lab-party-1"] },
       "1000000002": { "status": "paid", "products": ["lab-party-1"] },
@@ -50,7 +60,8 @@
       "1000000005": { "status": "paid", "products": ["lab-party-1"] },
       "1000000402": { "status": "unpaid" },
       "1000000404": { "status": "not_found" },
-      "1000000500": { "status": "error" }
+      "1000000500": { "status": "error" },
+      "1000000503": { "status": "busy" }
     }
   }
 }

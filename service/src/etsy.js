@@ -4,9 +4,10 @@
 //
 // Rules this file follows (project rule "Etsy — yellow", 23 Nov 2026): the fewest possible requests —
 // one receipt request per activation, the answer is kept, the token is refreshed only when it has run out,
-// nothing runs on a schedule, and after an error there is at most one retry.
+// nothing asks Etsy on a schedule (the daily tidy-up only cleans our own tables), after an error there is at most one
+// retry, and there is an overall cap per minute and per day.
 import { b64url, randomToken, sha256 } from './crypto.js';
-import { kvGet, kvPut, kvDelete, logEvent, tables } from './db.js';
+import { kvGet, kvPut, kvTake, counterBump, logEvent, tables } from './db.js';
 import { settings } from './settings.js';
 
 const DEFAULTS = {
@@ -16,6 +17,7 @@ const DEFAULTS = {
 };
 const TIMEOUT_MS = 8000;
 const STATE_MAX_AGE_MS = 15 * 60 * 1000;
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 /** Addresses of the Etsy API. The three ETSY_*_URL variables exist only so tests can point at a local stand-in. */
 function urls(env) {
@@ -61,24 +63,27 @@ async function saveConnection(env, conn) {
   await kvPut(env, 'etsy_token', JSON.stringify(conn));
 }
 
+async function getHealth(env) {
+  try { return JSON.parse((await kvGet(env, 'etsy_health')) || '{}') || {}; } catch (e) { return {}; }
+}
+
+/** Writes only when something really changes (a timestamp alone is refreshed at most once an hour). */
 async function setHealth(env, patch) {
-  let cur = {};
-  try { cur = JSON.parse((await kvGet(env, 'etsy_health')) || '{}'); } catch (e) {}
-  await kvPut(env, 'etsy_health', JSON.stringify({ ...cur, ...patch }));
+  const cur = await getHealth(env);
+  const next = { ...cur, ...patch };
+  const same = Object.keys(patch).every((k) => k === 'lastOk' ? cur.lastOk && patch.lastOk - cur.lastOk < 3600000 : JSON.stringify(cur[k]) === JSON.stringify(patch[k]));
+  if (!same) await kvPut(env, 'etsy_health', JSON.stringify(next));
 }
 
 export async function etsyStatus(env) {
   const conn = await getConnection(env);
-  let health = {};
-  try { health = JSON.parse((await kvGet(env, 'etsy_health')) || '{}'); } catch (e) {}
+  const health = await getHealth(env);
   return {
     apiKey: hasApiKey(env),
     connected: !!(conn && conn.refresh_token) && !health.reconnect,
     reconnectNeeded: !!health.reconnect,
+    proven: !!health.proven,
     shop: conn ? conn.shop_name || null : null,
-    connectedAt: conn ? conn.connected_at || null : null,
-    lastOk: health.lastOk || null,
-    lastError: health.lastError || null,
   };
 }
 
@@ -139,8 +144,7 @@ export async function finishConnect(request, env) {
   const code = q.get('code') || '';
   if (!/^[A-Za-z0-9_-]{16,128}$/.test(state) || !code) return { error: 'bad_request' };
 
-  const raw = await kvGet(env, 'oauth_state:' + state);
-  await kvDelete(env, 'oauth_state:' + state); // one use only
+  const raw = await kvTake(env, 'oauth_state:' + state); // read and removed in one statement: one use only
   if (!raw) return { error: 'state' };
   let saved;
   try { saved = JSON.parse(raw); } catch (e) { return { error: 'state' }; }
@@ -232,18 +236,27 @@ async function refresh(env, conn) {
       refreshed_at: now,
     };
     await saveConnection(env, next);
+    await setHealth(env, { reconnect: false });
     return { conn: next };
   }
-  // Another instance may have refreshed a moment ago (the refresh token can change on every refresh).
-  const again = await getConnection(env);
-  if (again && again.access_token !== conn.access_token && again.expires_at - 60000 > Date.now()) return { conn: again };
-  if (tok.status === 400 || tok.status === 401) {
-    // the refresh token is no longer valid (90 days unused, or access was removed on Etsy): the owner has to connect again
-    await setHealth(env, { reconnect: true, lastError: { at: Date.now(), what: 'refresh http ' + tok.status } });
-    await logEvent(env, 'etsy_reconnect_needed', 'refresh http ' + tok.status);
-    return { error: 'reconnect' };
+  // Another request may be refreshing at this very moment (the refresh token can change on every refresh):
+  // look a few times for the token it saves before concluding anything.
+  for (let i = 0; i < 4; i++) {
+    const again = await getConnection(env);
+    if (again && again.refresh_token !== conn.refresh_token && again.expires_at - 60000 > Date.now()) return { conn: again };
+    await sleep(350);
   }
-  return { error: 'http_' + tok.status };
+  if (tok.status === 400 || tok.status === 401) {
+    const now2 = await getConnection(env);
+    if (now2 && now2.refresh_token === conn.refresh_token) {
+      // the refresh token is no longer valid (90 days unused, or access was removed on Etsy): the owner has to connect again
+      await setHealth(env, { reconnect: true, reconnectAt: Date.now(), lastError: { at: Date.now(), what: 'refresh http ' + tok.status } });
+      await logEvent(env, 'etsy_reconnect_needed', 'refresh http ' + tok.status);
+      return { error: 'reconnect' };
+    }
+    return { error: 'refresh_race' };
+  }
+  return { error: tok.status === 429 ? 'rate' : 'http_' + tok.status };
 }
 
 async function currentConnection(env, { force = false } = {}) {
@@ -255,15 +268,42 @@ async function currentConnection(env, { force = false } = {}) {
 
 // ---------------------------------------------------------------- the one question we ask Etsy
 
+/** Our own overall brake on requests to Etsy (far below the app's limits of 10 per second and 10,000 per day). */
+async function withinEtsyBudget(env) {
+  const cfg = settings(env);
+  const a = cfg.activation || {};
+  const perMin = Number(a.maxEtsyPerMinute) > 0 ? Number(a.maxEtsyPerMinute) : 20;
+  const perDay = Number(a.maxEtsyPerDay) > 0 ? Number(a.maxEtsyPerDay) : 2000;
+  const now = Date.now();
+  const m = await counterBump(env, 'g:etsy:min', Math.floor(now / 60000));
+  if (m > perMin) return false;
+  const d = await counterBump(env, 'g:etsy:day', Math.floor(now / 86400000));
+  return d <= perDay;
+}
+
 /**
- * Reads one receipt of our shop.
- * Returns { result: 'ok', listingIds } | { result: 'not_found' } | { result: 'not_paid' } | { result: 'error', reason }.
- * 'error' always means "our side or Etsy could not answer" — the caller lets the buyer in and checks again later.
+ * Reads one receipt of our shop. Answers:
+ *   { result: 'ok', listingIds }   a paid order of our shop
+ *   { result: 'not_found' }        Etsy says plainly there is no such order in our shop (or it is canceled / refunded)
+ *   { result: 'not_paid' }         the order exists, the payment has not gone through yet
+ *   { result: 'busy' }             too many requests right now — nobody is let in, the buyer tries again in a minute
+ *   { result: 'error', reason }    OUR side or Etsy could not answer — the caller lets the buyer in and checks again later
+ *
+ * Until the service has read at least ONE receipt successfully ("proven"), a "no" from Etsy is not trusted:
+ * this code has never run against the live API, and a mistake of ours must not turn away a paying buyer.
  */
 export async function verifyReceipt(env, order) {
   if (!hasApiKey(env)) return { result: 'error', reason: 'no_api_key' };
+  const health = await getHealth(env);
+  // The owner has to connect again: do not knock on Etsy's door for every buyer meanwhile — one new try per hour is enough.
+  if (health.reconnect && Date.now() - (health.reconnectAt || 0) < 3600000) return { result: 'error', reason: 'reconnect' };
   let c = await currentConnection(env);
-  if (c.error) return { result: 'error', reason: c.error };
+  if (c.error === 'rate') return { result: 'busy' };
+  if (c.error) return { result: 'error', reason: c.error === 'network' ? 'etsy_down' : c.error };
+  if (!(await withinEtsyBudget(env))) {
+    await logEvent(env, 'etsy_budget', 'our own cap on requests to Etsy was reached — activations wait');
+    return { result: 'busy' };
+  }
 
   const ask = (conn) => apiGet(env, '/shops/' + conn.shop_id + '/receipts/' + order, conn.access_token);
   let res;
@@ -278,7 +318,8 @@ export async function verifyReceipt(env, order) {
     // the token was refused: refresh once, ask once more
     retried = true;
     c = await currentConnection(env, { force: true });
-    if (c.error) return { result: 'error', reason: c.error };
+    if (c.error === 'rate') return { result: 'busy' };
+    if (c.error) return { result: 'error', reason: c.error === 'network' ? 'etsy_down' : c.error };
     try { res = await ask(c.conn); } catch (e) { res = null; }
   } else if (res && res.status >= 500 && !retried) {
     retried = true;
@@ -287,25 +328,29 @@ export async function verifyReceipt(env, order) {
 
   if (!res) {
     await setHealth(env, { lastError: { at: Date.now(), what: 'network' } });
-    return { result: 'error', reason: 'network' };
+    return { result: 'error', reason: 'etsy_down' };
   }
   if (res.status === 200 && res.json && res.json.receipt_id) {
     const r = res.json;
+    await setHealth(env, { lastOk: Date.now(), lastError: null, proven: true, reconnect: false });
+    if (String(r.receipt_id) !== String(order)) return { result: 'not_found' };
     const status = String(r.status || '').toLowerCase();
     const listingIds = Array.isArray(r.transactions)
       ? r.transactions.map((t) => Number(t && t.listing_id)).filter((n) => Number.isFinite(n) && n > 0)
       : [];
-    await setHealth(env, { lastOk: Date.now(), lastError: null });
     if (status === 'canceled' || status === 'fully refunded') return { result: 'not_found' };
-    if (r.is_paid === true || status === 'paid' || status === 'completed') return { result: 'ok', listingIds };
+    if (r.is_paid === true || status === 'paid' || status === 'completed') return listingIds.length ? { result: 'ok', listingIds } : { result: 'not_found' };
     return { result: 'not_paid' };
   }
+  if (res.status === 429) return { result: 'busy' };
   if (res.status === 404 || res.status === 400) {
-    // Etsy says plainly: there is no such order in our shop
-    await setHealth(env, { lastOk: Date.now(), lastError: null });
-    return { result: 'not_found' };
+    // "No such order in your shop". Trusted only after the first receipt was ever read successfully.
+    // (403 is NOT treated as "no": Etsy answers 403 when the API key or the permission is the problem — that is our side.)
+    if (health.proven) return { result: 'not_found' };
+    await logEvent(env, 'etsy_unproven', 'Etsy answered http ' + res.status + ' before any receipt was ever read successfully — buyer let in, check the connection');
+    return { result: 'error', reason: 'unproven' };
   }
   await setHealth(env, { lastError: { at: Date.now(), what: 'http ' + res.status } });
   await logEvent(env, 'etsy_error', 'receipt http ' + res.status);
-  return { result: 'error', reason: 'http_' + res.status };
+  return { result: 'error', reason: res.status >= 500 ? 'etsy_down' : 'http_' + res.status };
 }

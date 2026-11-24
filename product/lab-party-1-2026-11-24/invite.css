@@ -121,4 +121,5 @@ body.print-view .pbar button{font:700 18px/1 'Segoe UI',Roboto,Arial,sans-serif;
 @keyframes leafspin{from{transform:rotate(-25deg)}to{transform:rotate(25deg)}}
 
 /* LAB ONLY (24 Nov 2026): this folder is a public TEST copy of a product that is for sale, so everything it makes is marked. */
-.print-view .pcard::after{content:"TEST COPY";position:absolute;left:0;right:0;top:44%;text-align:center;font:700 54px/1 'Segoe UI',Roboto,Arial,sans-serif;letter-spacing:.12em;color:rgba(122,31,43,.55);transform:rotate(-24deg);pointer-events:none;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.print-view .pcard::after{content:"TEST COPY";position:absolute;left:0;right:0;top:44%;text-align:center;font:700 54px/1 'Segoe UI',Roboto,Arial,sans-serif;letter-spacing:.12em;color:rgba(122,31,43,.55);transform:rotate(-24deg);pointer-events:none;z-index:50;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+body.print-view .pbar{margin-top:56px}

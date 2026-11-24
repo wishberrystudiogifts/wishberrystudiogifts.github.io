@@ -1,26 +1,39 @@
 // Order verifiers. Both answer the same question — "is this order number a paid order of ours, and what is in it?" —
-// with { result: 'ok', listingIds? , products? } | { result: 'not_found' } | { result: 'not_paid' } | { result: 'error', reason }.
+// with { result: 'ok', listingIds? , products? } | { result: 'not_found' } | { result: 'not_paid' } | { result: 'busy' } | { result: 'error', reason }.
 import { verifyReceipt } from './etsy.js';
 import { settings, isMockMode, productOf } from './settings.js';
 
-/** Test orders from config.json → mock.orders. Never talks to Etsy. */
+/**
+ * Test orders from config.json → mock (single numbers in "orders", whole runs of numbers in "ranges"). Never talks to Etsy.
+ * On the live service a test order can do exactly one thing: unlock a product marked lab:true. Everything else it might
+ * say ("error", an unknown status, a real product) is answered as "no such order" there.
+ */
 export class MockVerifier {
   constructor(env) { this.env = env; this.cfg = settings(env); this.name = 'mock'; }
 
-  has(order) {
-    const orders = (this.cfg.mock && this.cfg.mock.orders) || {};
-    return Object.prototype.hasOwnProperty.call(orders, order);
+  find(order) {
+    const m = this.cfg.mock || {};
+    if (m.orders && Object.prototype.hasOwnProperty.call(m.orders, order)) return m.orders[order] || {};
+    if (Array.isArray(m.ranges) && /^\d{1,15}$/.test(order)) {
+      const n = Number(order);
+      for (const r of m.ranges) {
+        if (r && Number.isSafeInteger(r.from) && Number.isSafeInteger(r.to) && n >= r.from && n <= r.to) return r;
+      }
+    }
+    return null;
   }
 
+  has(order) { return this.find(order) !== null; }
+
   async verify(order) {
-    if (!this.has(order)) return { result: 'not_found' };
-    const o = this.cfg.mock.orders[order] || {};
-    const status = String(o.status || 'paid');
-    if (status === 'not_found') return { result: 'not_found' };
-    if (status === 'unpaid') return { result: 'not_paid' };
-    if (status === 'error') return { result: 'error', reason: 'mock_error' };
-    // On the live service a test order may only ever unlock a lab product.
+    const o = this.find(order);
+    if (!o) return { result: 'not_found' };
     const mockAll = isMockMode(this.env);
+    const status = String(o.status || 'paid');
+    if (status === 'unpaid') return mockAll ? { result: 'not_paid' } : { result: 'not_found' };
+    if (status === 'error') return mockAll ? { result: 'error', reason: 'mock_error' } : { result: 'not_found' };
+    if (status === 'busy') return mockAll ? { result: 'busy' } : { result: 'not_found' };
+    if (status !== 'paid') return { result: 'not_found' };
     const products = (Array.isArray(o.products) ? o.products : []).filter((k) => {
       const p = productOf(this.cfg, k);
       return p && (mockAll || p.lab === true);

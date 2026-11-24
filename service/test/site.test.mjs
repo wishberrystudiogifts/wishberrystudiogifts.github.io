@@ -8,6 +8,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawn, execFileSync } from 'node:child_process';
 import { createRequire } from 'node:module';
+import { webcrypto } from 'node:crypto';
 import { startService, call, check, section, summary, sleep, SERVICE_DIR } from './helpers.mjs';
 
 const require = createRequire(import.meta.url);
@@ -89,9 +90,23 @@ async function guestSees(ctx, url) {
   return r;
 }
 
+/** Like guestSees, with what is on the page and what the address became. Waits for the card face (view=face) or a message page. */
+async function guestDetail(ctx, url) {
+  const p = await ctx.newPage();
+  await p.goto(url);
+  await p.waitForFunction(() => document.querySelector('.iface') || document.querySelector('#stage *') || document.querySelector('main.wb-card h1'), null, { timeout: 15000 }).catch(() => {});
+  await sleep(250);
+  const r = await p.evaluate(() => {
+    const h = document.querySelector('main.wb-card h1');
+    return { kind: h ? (/isn.t complete/.test(h.textContent) ? 'invalid' : 'other:' + h.textContent) : (document.querySelector('.iface') || document.querySelector('#stage *')) ? 'invitation' : 'nothing', text: document.body.innerText, hash: location.hash };
+  });
+  await p.close();
+  return r;
+}
+
 const OV = (extra) => ({ products: { 'lab-b': { name: 'Other item', lab: true }, ...(extra || {}) }, mock: { orders: { 2000000050: { status: 'paid', products: ['lab-b'] } } } });
 
-let browser, S1, S2, S3, P1, P2, P3, tmpDirect, tmpTwo;
+let browser, S1, S2, S3, P1, P2, P3, P5, P6, P7, tmpDirect, tmpTwo, tmpNoProd, tmpNoScript;
 try {
   // ---------- start everything ----------
   S1 = await startService({ port: 8797, vars: { VERIFIER: 'mock', STAGE: 'e2e', CONFIG_OVERRIDES: OV() } });
@@ -116,7 +131,20 @@ try {
   const c3 = path.join(tmpTwo, 'shared', 'config.js');
   fs.writeFileSync(c3, fs.readFileSync(c3, 'utf8').replace("    'lab-party-1': {", "    'lab-b': { mode: 'hash', folder: 'product/lab-party-1-2026-11-24', entry: 'personalize-l4b7.html', name: 'Other item' },\n    'lab-party-1': {"));
   fs.writeFileSync(path.join(tmpTwo, 'evil.html'), '<!doctype html><meta charset="utf-8"><script>window.__WB_SESSION={product:"lab-party-1",hash:"AAAAAAAAAAAAAAAAAAAAAA"};window.ProductLink={state:"maker"};</script><iframe id="f" style="width:390px;height:700px"></iframe><script>document.getElementById("f").src="http://127.0.0.1:8083' + LAB + 'index.html#view=face&m="+location.hash.slice(1);</script>');
+  fs.writeFileSync(path.join(tmpTwo, 'frame.html'), '<!doctype html><meta charset="utf-8"><p>another website</p><iframe id="f" style="width:390px;height:600px"></iframe><script>document.getElementById("f").src="http://127.0.0.1:8081/"+location.hash.slice(1);</script>');
   P3 = await startPages(8083, tmpTwo, S1.url);
+  // the site exactly as it is in the repository: shared/keys.js still empty (the state before the first release)
+  P5 = await startPages(8085, REPO, null);
+  // two broken copies: the product is missing from shared/config.js · the shared code is missing altogether
+  tmpNoProd = fs.mkdtempSync(path.join(os.tmpdir(), 'site-noprod-'));
+  for (const f of ['404.html', 'shared', 'product']) fs.cpSync(path.join(REPO, f), path.join(tmpNoProd, f), { recursive: true });
+  const c6 = path.join(tmpNoProd, 'shared', 'config.js');
+  fs.writeFileSync(c6, fs.readFileSync(c6, 'utf8').replace("    'lab-party-1': {", "    'renamed-by-mistake': {"));
+  P6 = await startPages(8086, tmpNoProd, S1.url);
+  tmpNoScript = fs.mkdtempSync(path.join(os.tmpdir(), 'site-noscript-'));
+  for (const f of ['404.html', 'shared', 'product']) fs.cpSync(path.join(REPO, f), path.join(tmpNoScript, f), { recursive: true });
+  fs.rmSync(path.join(tmpNoScript, 'shared', 'product-link.js'));
+  P7 = await startPages(8087, tmpNoScript, S1.url);
 
   try { browser = await pw.chromium.launch(); } catch (e) { browser = await pw.chromium.launch({ executablePath: '/usr/bin/google-chrome' }); }
 
@@ -147,6 +175,9 @@ try {
   await page.waitForFunction(() => /still processing/.test(document.querySelector('.wb-err').textContent));
   check('form: unpaid order -> "Etsy is still processing your payment"', true);
   await page.screenshot({ path: path.join(SHOTS, '1b-aktivacija-greska-390.png') });
+  await page.fill('#wb-order', '1000000503'); await page.click('#wb-gate button[type=submit]');
+  await page.waitForFunction(() => /couldn.t check your order just now/.test(document.querySelector('.wb-err').textContent));
+  check('form: service too busy to check -> "We couldn’t check your order just now. Please try again in a minute."', true);
 
   await page.fill('#wb-order', '1000000001'); await page.click('#wb-gate button[type=submit]');
   await page.waitForURL(HASH_URL, { timeout: 15000 });
@@ -156,7 +187,7 @@ try {
   check('(f) the address holds no product name and no order number', !/lab|party|1000000001/.test(new URL(hashUrl).pathname));
   const status = await page.textContent('.wb-status');
   check('(F) maker shows "Your personal link works until … · opened 1 of 300"', /Your personal link works until .+ · opened 1 of 300/.test(status), status);
-  check('the activation call carried only the order number and the product key', seen.service.filter((s) => s.includes('/api/activate')).length === 3 && seen.service.some((s) => /POST .*\/api\/open\/[A-Za-z0-9_-]{22}$/.test(s)), seen.service);
+  check('the activation call carried only the order number and the product key', seen.service.filter((s) => s.includes('/api/activate')).length === 4 && seen.service.some((s) => /POST .*\/api\/open\/[A-Za-z0-9_-]{22}$/.test(s)), seen.service);
 
   // (i) everything on the maker works under /<hash>
   await page.waitForFunction(() => [...document.querySelectorAll('.dz img')].every((i) => i.complete && i.naturalWidth > 0));
@@ -180,12 +211,16 @@ try {
   check('(i) WhatsApp / mail buttons carry the same link', (await page.getAttribute('#wa', 'href')).includes(encodeURIComponent(link)) && (await page.getAttribute('#mail', 'href')).includes(encodeURIComponent(link)));
   await page.locator('#sendbox').scrollIntoViewIfNeeded();
   await page.screenshot({ path: path.join(SHOTS, '3-link-za-slanje-390.png') });
+  await page.click('#send'); await sleep(500);
   const signReq = seen.service.filter((s) => s.includes('/api/sign'));
-  check('signing sent one request', signReq.length === 1);
+  check('signing sent one request — and tapping the button again with the same words does not use up another signature', signReq.length === 1 && (await page.inputValue('#link')) === link, signReq);
   const [popup] = await Promise.all([ctx.waitForEvent('page'), page.click('.pb[data-size="5x7"]')]);
   await popup.waitForFunction(() => document.body && document.body.classList.contains('print-view') && document.querySelector('.pcard .iface'), null, { timeout: 15000 });
   await popup.waitForFunction(() => window.__printed > 0, null, { timeout: 15000 });
   check('(i) "Print it with your details" opens the print page and calls print', /Holly Lane/.test(await popup.evaluate(() => document.querySelector('.pcard').innerText)));
+  check('(J) LAB: the print page is marked "TEST COPY" across the card', /TEST COPY/.test(await popup.evaluate(() => getComputedStyle(document.querySelector('.pcard'), '::after').content)));
+  await popup.setViewportSize({ width: 600, height: 900 });
+  await popup.screenshot({ path: path.join(SHOTS, '9-lab-stampa-test-copy.png'), fullPage: true });
   await popup.close();
   check('(i) the draft is remembered on the device', await page.evaluate(() => /Holly Lane/.test(localStorage.getItem('inviteDraft-lab-party-1') || '')));
   const badNow = seen.bad.filter((b) => !/^404 http:\/\/127\.0\.0\.1:8081\/[A-Za-z0-9_-]{22}$/.test(b) && !/\/api\/activate/.test(b));
@@ -221,6 +256,15 @@ try {
   check('(e) changing the address of an open invitation by hand -> refused too', /isn.t complete/.test(await gp.textContent('main.wb-card h1')));
   await gp.screenshot({ path: path.join(SHOTS, '5-gost-neispravan-link-390.png') });
   await gp.close();
+  // the address is read strictly: one "m", one "s", spelled plainly — and afterwards rewritten to exactly what was checked
+  const B = P1.url + LAB + 'index.html';
+  const twoM = await guestDetail(guestCtx, B + '#m=' + own + '&m=' + m[1] + '&s=' + m[2] + '&view=face');
+  const encM = await guestDetail(guestCtx, B + '#%6d=' + own + '&m=' + m[1] + '&s=' + m[2] + '&view=face');
+  const qM = await guestDetail(guestCtx, B + '#?m=' + own + '&m=' + m[1] + '&s=' + m[2] + '&view=face');
+  const twoS = await guestDetail(guestCtx, B + '#m=' + m[1] + '&s=' + m[2] + '&s=' + m[2] + '&view=face');
+  check('(e) FORGERY: own data smuggled in front of a real signed link (second "m", "%6d", "?m", second "s") -> refused', [twoM, encM, qM, twoS].every((r) => r.kind === 'invalid'), [twoM.kind, encM.kind, qM.kind, twoS.kind]);
+  const xm = await guestDetail(guestCtx, B + '#xm=' + own + '&junk=1&m=' + m[1] + '&s=' + m[2] + '&view=face');
+  check('(e) extra parts around a real signed link are dropped: the page shows the SIGNED invitation and the address is rewritten to exactly what was checked', xm.kind === 'invitation' && /Holly Lane/.test(xm.text) && !/Anywhere/.test(xm.text) && xm.hash === '#m=' + m[1] + '&s=' + m[2] + '&view=face', [xm.kind, xm.hash.slice(0, 40), xm.text.slice(0, 80)]);
   check('(5) the guest page never called the service', gseen.service.length === 0, gseen.service);
   // a forged "buyer page" on another origin cannot unlock the preview
   const ev = await guestCtx.newPage();
@@ -229,6 +273,35 @@ try {
   const evFrame = ev.frames().find((f) => f.url().includes('index.html'));
   check('(e) another website that pretends to be the buyer’s page cannot show an unsigned invitation', evFrame && /isn.t complete/.test(await evFrame.evaluate(() => (document.querySelector('main.wb-card h1') || {}).textContent || '')));
   await ev.close();
+
+  // another website loads the buyer's product link in a frame: it must not count as an opening
+  const frCtx = await phone(browser, S1.url);
+  const frSeen = track(frCtx);
+  const fr = await frCtx.newPage();
+  await fr.goto('http://localhost:8083/frame.html#' + new URL(hashUrl).pathname.slice(1));
+  await sleep(1500);
+  const inner = fr.frames().find((f) => /^http:\/\/127\.0\.0\.1:8081\//.test(f.url()));
+  const innerText = inner ? await inner.evaluate(() => document.body.innerText) : '';
+  check('another website cannot use up a buyer’s openings by loading the product link in a hidden frame (no opening is counted)', /Open this page in its own tab/.test(innerText) && frSeen.service.filter((x) => x.includes('/api/open/')).length === 0, [innerText.slice(0, 80), frSeen.service]);
+  await frCtx.close();
+
+  // mistakes on OUR side must leave a page closed, never open to everyone
+  const brCtx = await phone(browser, S1.url);
+  const np1 = await brCtx.newPage();
+  await np1.goto(P6.url + ENTRY); await np1.waitForSelector('main.wb-card h1');
+  const np1Text = await np1.textContent('h1');
+  const np2 = await guestDetail(brCtx, link.replace(':8081', ':8086'));
+  const np3 = await guestDetail(brCtx, P6.url + LAB + '#m=' + own);
+  check('product missing from shared/config.js -> buyer page and recipient page stay CLOSED ("This page isn’t ready yet")', /isn.t ready yet/.test(np1Text) && (await np1.locator('#send').count()) === 0 && /isn.t ready yet/.test(np2.kind) && /isn.t ready yet/.test(np3.kind), [np1Text, np2.kind, np3.kind]);
+  const ns = await brCtx.newPage();
+  await ns.goto(P7.url + LAB + '#m=' + own); await sleep(1200);
+  const nsText = await ns.evaluate(() => document.body.innerText);
+  const nsBuilt = await ns.evaluate(() => !!document.querySelector('#stage *, .iface'));
+  await ns.goto(P7.url + ENTRY); await sleep(800);
+  await ns.fill('#h', 'x').catch(() => {}); await ns.click('#send', { timeout: 2000 }).catch(() => {}); await sleep(500);
+  const nsLink = await ns.evaluate(() => { const l = document.getElementById('link'); return l ? l.value : ''; });
+  check('shared code failed to load -> the recipient page stays closed and the buyer page makes nothing', /could not load completely/.test(nsText) && !nsBuilt && nsLink === '', [nsText.slice(0, 80), nsBuilt, nsLink]);
+  await brCtx.close();
 
   // (d) the service is switched off: invitations keep working for guests
   await S1.stop(); S1 = null;
@@ -261,6 +334,22 @@ try {
   await p2.waitForURL(HASH_URL); await p2.waitForSelector('.wb-status');
   const h2 = p2.url();
   check('limit 3: status says "opened 1 of 3"', /opened 1 of 3/.test(await p2.textContent('.wb-status')));
+  await fillParty(p2);
+  const link2 = await makeLink(p2);
+  // before the first release shared/keys.js is empty: the recipient page asks the service for the key (and only then)
+  const kp = await webcrypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, ['sign', 'verify']);
+  const te = new TextEncoder();
+  const attackerPub = Buffer.from(await webcrypto.subtle.exportKey('raw', kp.publicKey)).toString('base64url');
+  const ownData = Buffer.from(JSON.stringify({ v: 'b', t: 'Free Party', d: '2026-12-24', p: 'Anywhere' })).toString('base64url');
+  const ownDigest = Buffer.from(await webcrypto.subtle.digest('SHA-256', te.encode(ownData))).toString('base64url');
+  const ownSig = Buffer.from(await webcrypto.subtle.sign({ name: 'ECDSA', hash: 'SHA-256' }, kp.privateKey, te.encode('wb1|lab-party-1|' + ownDigest))).toString('base64url');
+  const kctx = await phone(browser, S2.url);
+  await kctx.addInitScript(([u, k]) => { try { localStorage.setItem('wb.keys', JSON.stringify({ at: Date.now() + 10 * 365 * 86400000, url: u, keys: [k] })); } catch (e) {} }, [S2.url, attackerPub]);
+  const kseen = track(kctx);
+  const planted = await guestSees(kctx, P5.url + LAB + '#m=' + ownData + '&s=' + ownSig);
+  const honest = await guestSees(kctx, link2.replace(':8081', ':8085'));
+  check('keys.js still empty: a key planted in the browser "from the future" is ignored — a link signed with it is refused, a real one opens', planted === 'invalid' && honest === 'invitation' && kseen.service.some((x) => x.includes('/api/pubkey')), [planted, honest, kseen.service]);
+  await kctx.close();
   await p2.reload(); await p2.waitForSelector('.wb-status');
   await p2.reload(); await p2.waitForSelector('.wb-status');
   check('limit 3: third opening still works', /opened 3 of 3/.test(await p2.textContent('.wb-status')));
@@ -357,8 +446,9 @@ try {
   // a product link issued while in mode 'hash', opened after the switch to 'direct' -> simply the buyer address
   const cs = await phone(browser, S2.url);
   const ps = await cs.newPage();
-  await ps.goto(P2.url + new URL(h2).pathname.replace(/.$/, 'x')); await ps.waitForSelector('main.wb-card h1');
-  check('direct: an unknown /<hash> is still answered by the router', /can.t find this link|couldn.t open/.test(await ps.textContent('h1')));
+  await ps.goto(P2.url + new URL(h2).pathname.replace(/.$/, (ch) => (ch === 'x' ? 'y' : 'x'))); await ps.waitForSelector('main.wb-card h1');
+  const psH1 = await ps.textContent('h1');
+  check('direct: an unknown /<hash> is still answered by the router', /can.t find this link|couldn.t open/.test(psH1), psH1);
 
   // ================================================================== old pages
   section('Published pages (old standard) are untouched');
@@ -388,6 +478,6 @@ try {
 } finally {
   if (browser) await browser.close();
   for (const s of [S1, S2, S3]) if (s) await s.stop();
-  for (const p of [P1, P2, P3]) if (p) p.stop();
+  for (const p of [P1, P2, P3, P5, P6, P7]) if (p) p.stop();
 }
 process.exit(summary() ? 0 : 1);

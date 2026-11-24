@@ -13,8 +13,8 @@ window.WB_CONFIG = {
   messageUrl: 'https://wishberrystudiogifts.etsy.com',
 
   /* What the pages SAY about the limits. Must equal "defaults" in service/config.json
-     (service/tools/check-consistency.mjs compares the two files). */
-  limits: { ttlHours: 24, maxOpens: 300 },
+     (service/tools/check-consistency.mjs compares the two files; maxLinks here = maxSigns there, 0 = no limit). */
+  limits: { ttlHours: 24, maxOpens: 300, maxLinks: 100 },
 
   products: {
     'lab-party-1': {
