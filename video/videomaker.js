@@ -64,6 +64,26 @@
     }
   };
 
+  /* Invitations (24 Nov 2026): the base video is the guest page itself, rendered frame by frame WITHOUT the
+     party details and without the buttons (render-page-frames.js), one base video per design (a, b, c).
+     The details are laid out by the guest page's own code and CSS (index.html#view=face in a hidden frame),
+     read back character by character and drawn on the invitation, following its settle movement and fade.
+     Geometry measured on every frame of the base videos (render-page-frames.js MEASURE): error < 0.01 px. */
+  var INVITE_GEOM = {
+    frame: { W: 1080, H: 1920 }, stage: { W: 600, H: 1100 },       // portrait layout of the guest page
+    card: { cx: 300, bottom: 755, s0: 0.9, s1: 1.16, ty1: 127 },    // bottom centre of the 480x672 card, stage units
+    settle: { at: 98 / 30, dur: 1.2 },                               // the card grows to its reading size
+    text: { at: 4.1, dur: 1.2 }                                      // the details fade in (CSS ease)
+  };
+  TEMPLATES['christmas-party'] = {
+    kind: 'invite', fps: 30, geom: INVITE_GEOM, defaultDesign: 'b',
+    bases: { a: 'christmas-party-a-base.mp4', b: 'christmas-party-b-base.mp4', c: 'christmas-party-c-base.mp4' }
+  };
+  TEMPLATES['new-years-eve'] = {
+    kind: 'invite', fps: 30, geom: INVITE_GEOM, defaultDesign: 'b',
+    bases: { a: 'new-years-eve-a-base.mp4', b: 'new-years-eve-b-base.mp4', c: 'new-years-eve-c-base.mp4' }
+  };
+
   /* ---------- CSS-identical easing ---------- */
   function bezier(x1, y1, x2, y2) {
     function A(p1, p2) { return 1 - 3 * p2 + 3 * p1; }
@@ -404,10 +424,328 @@
     return typeof window.VideoEncoder === 'function' && typeof window.VideoDecoder === 'function' && typeof window.VideoFrame === 'function' && typeof window.EncodedVideoChunk === 'function';
   }
 
+  /* ---------- invitations: layout read from the guest page, drawn on every frame ---------- */
+  var SETTLE = bezier(0.45, 0, 0.2, 1);
+  var LS_OK = typeof CanvasRenderingContext2D !== 'undefined' && 'letterSpacing' in CanvasRenderingContext2D.prototype;
+  function faceMatrix(G, t) {   // face units (480x672) -> frame pixels at time t
+    var S = Math.min(G.frame.W / G.stage.W, G.frame.H / G.stage.H);
+    var e = SETTLE(Math.max(0, Math.min(1, (t - G.settle.at) / G.settle.dur)));
+    var s = G.card.s0 + (G.card.s1 - G.card.s0) * e, ty = G.card.ty1 * e, k = s * S;
+    return [k, 0, 0, k, G.frame.W / 2 + (G.card.cx - 240 * s - G.stage.W / 2) * S, G.frame.H / 2 + (G.card.bottom + ty - 672 * s - G.stage.H / 2) * S];
+  }
+  function detailsAlpha(G, t) { return t < G.text.at ? 0 : EASE(Math.min(1, (t - G.text.at) / G.text.dur)); }
+  function fontOf(cs) { return (cs.fontStyle || 'normal') + ' ' + (cs.fontWeight || '400') + ' ' + cs.fontSize + ' ' + cs.fontFamily; }
+  function splitTop(s) { // split at commas that are not inside parentheses
+    var out = [], depth = 0, cur = '';
+    for (var i = 0; i < s.length; i++) { var c = s[i]; if (c === '(') depth++; if (c === ')') depth--; if (c === ',' && !depth) { out.push(cur.trim()); cur = ''; } else cur += c; }
+    if (cur.trim()) out.push(cur.trim());
+    return out;
+  }
+  function parseShadow(s) { // "rgba(0, 0, 0, 0.35) 0px 1px 10px" (text-shadow) or "drop-shadow(rgba(...) 0px 1px 6px)" (filter)
+    if (!s || s === 'none') return null;
+    var m = /drop-shadow\((.*)\)\s*$/.exec(s); if (m) s = m[1];
+    s = splitTop(s)[0] || '';
+    var col = (/(rgba?\([^)]*\)|#[0-9a-f]{3,8}|\b[a-z]+\b)/i.exec(s) || [])[0] || 'rgba(0,0,0,0.5)';
+    var nums = s.replace(col, ' ').match(/-?[\d.]+px|-?[\d.]+(?=\s|$)/g) || [];
+    var n = nums.map(function (v) { return parseFloat(v) || 0; });
+    return { color: col, x: n[0] || 0, y: n[1] || 0, blur: n[2] || 0 };
+  }
+  function parseGradient(s) { // vertical linear-gradient(...) -> [{at, color}]
+    var m = /linear-gradient\((.*)\)\s*$/.exec(s); if (!m) return null;
+    var parts = splitTop(m[1]), stops = [];
+    if (parts.length && /deg|^to /.test(parts[0])) parts.shift();
+    parts.forEach(function (p, i) {
+      var q = /^(.*?)(?:\s+(-?[\d.]+)%)?$/.exec(p);
+      stops.push({ color: q[1].trim(), at: q[2] !== undefined ? parseFloat(q[2]) / 100 : (parts.length > 1 ? i / (parts.length - 1) : 0) });
+    });
+    return stops.length ? stops : null;
+  }
+  function parseMatrix(s) {
+    var m = /^matrix\(([^)]*)\)$/.exec(s || ''); if (!m) return null;
+    var v = m[1].split(',').map(parseFloat);
+    return v.length === 6 && v.every(isFinite) ? v : null;
+  }
+  function parsePolygon(s, w, h) {
+    var m = /^polygon\((.*)\)$/.exec(s || ''); if (!m) return null;
+    return splitTop(m[1]).map(function (pt) {
+      var xy = pt.trim().split(/\s+/);
+      function len(v, ref) { return /%$/.test(v) ? parseFloat(v) / 100 * ref : parseFloat(v) || 0; }
+      return [len(xy[0], w) - w / 2, len(xy[1], h) - h / 2];
+    });
+  }
+  function baselineOffset(d, cs) { // CSS px from the top of a character box to its baseline, same font and line height
+    var p = d.createElement('div');
+    p.style.cssText = 'position:absolute;left:0;top:0;white-space:nowrap;visibility:hidden;margin:0;padding:0;border:0';
+    ['fontStyle', 'fontWeight', 'fontSize', 'lineHeight', 'fontFamily', 'fontStretch', 'letterSpacing'].forEach(function (k) { p.style[k] = cs[k]; });
+    var tx = d.createTextNode('Hx'); p.appendChild(tx);
+    var mk = d.createElement('span'); mk.style.cssText = 'display:inline-block;width:0;height:0;vertical-align:baseline'; p.appendChild(mk);
+    d.body.appendChild(p);
+    var r = d.createRange(); r.setStart(tx, 0); r.setEnd(tx, 1);
+    var off = mk.getBoundingClientRect().top - r.getClientRects()[0].top;
+    d.body.removeChild(p);
+    return off;
+  }
+  function readFaces(d) { // @font-face rules of the guest page's own stylesheets (the canvas needs the same font files)
+    var out = [];
+    Array.prototype.forEach.call(d.styleSheets, function (sh) {
+      var rules; try { rules = sh.cssRules; } catch (e) { return; }   // other origins (Google Fonts): the buyer page has its own link
+      Array.prototype.forEach.call(rules || [], function (r) {
+        if (r.type !== 5) return; // CSSFontFaceRule
+        var fam = r.style.getPropertyValue('font-family').replace(/^["']|["']$/g, '').trim();
+        var u = /url\(\s*["']?([^"')]+)["']?\s*\)/.exec(r.style.getPropertyValue('src'));
+        if (!fam || !u) return;
+        out.push({ family: fam, url: new URL(u[1], sh.href || d.baseURI).href, weight: r.style.getPropertyValue('font-weight') || 'normal',
+          style: r.style.getPropertyValue('font-style') || 'normal', range: r.style.getPropertyValue('unicode-range') || '' });
+      });
+    });
+    return out;
+  }
+  function readInvite(d) {
+    var win = d.defaultView, face = d.querySelector('.iface'), txt = face.querySelector('.itxt'), inner = txt.querySelector('.iin');
+    // the guest page's own fit (fitFace): shrink everything together until the details fit the empty paper
+    var size = 10, guard = 0;
+    txt.style.fontSize = size + 'px';
+    while (inner.scrollHeight > txt.clientHeight + 1 && size > 6.5 && guard++ < 60) { size -= 0.25; txt.style.fontSize = size + 'px'; }
+    var fr = face.getBoundingClientRect(), k = 480 / fr.width, range = d.createRange(), ops = [];
+    function fx(v) { return (v - fr.left) * k; }
+    function fy(v) { return (v - fr.top) * k; }
+    Array.prototype.forEach.call(inner.children, function (el) {
+      var cs = win.getComputedStyle(el);
+      if (cs.display === 'none' || cs.visibility === 'hidden') return;
+      if (el.classList.contains('orn')) {   // the ornament: two hairlines and a diamond (or a star)
+        Array.prototype.forEach.call(el.children, function (c) {
+          var s = win.getComputedStyle(c);
+          if (s.display === 'none' || s.visibility === 'hidden') return;
+          var keep = c.style.transform; c.style.transform = 'none';
+          var r = c.getBoundingClientRect(); c.style.transform = keep;
+          ops.push({ type: 'shape', cx: fx(r.left + r.width / 2), cy: fy(r.top + r.height / 2), w: r.width * k, h: r.height * k,
+            color: s.backgroundColor, alpha: parseFloat(s.opacity), m: parseMatrix(s.transform), clip: parsePolygon(s.clipPath, r.width * k, r.height * k) });
+        });
+        return;
+      }
+      var node = el.firstChild;
+      if (!node || node.nodeType !== 3 || !node.data) return;
+      var fsz = parseFloat(cs.fontSize) || 10;
+      var op = { type: 'text', font: fontOf(cs), color: cs.color, shadow: parseShadow(cs.textShadow) || parseShadow(cs.filter),
+        ls: parseFloat(cs.letterSpacing) || 0, lines: [] };
+      var fill = cs.webkitTextFillColor || cs.getPropertyValue('-webkit-text-fill-color');
+      if (fill && /^(transparent|rgba\(0, 0, 0, 0\))$/.test(fill) && /gradient/.test(cs.backgroundImage)) {
+        var stops = parseGradient(cs.backgroundImage), b = el.getBoundingClientRect();
+        if (stops) op.grad = { y0: fy(b.top), y1: fy(b.bottom), stops: stops };
+      }
+      var upper = cs.textTransform === 'uppercase', asc = baselineOffset(d, cs), text = node.data, i = 0, line = null;
+      while (i < text.length) {
+        var n = text.codePointAt(i) > 0xffff ? 2 : 1, ch = text.substr(i, n);
+        range.setStart(node, i); range.setEnd(node, i + n); i += n;
+        var rs = range.getClientRects(), r = null;
+        for (var j = 0; j < rs.length; j++) if (rs[j].width > 0 || rs[j].height > 0) { r = rs[j]; break; }
+        if (!r) continue;
+        if (/\s/.test(ch)) { if (line) line.chars.push(null); continue; }   // a space ends a word
+        var top = fy(r.top);
+        if (!line || Math.abs(top - line.top) > fsz * 0.4) { line = { top: top, chars: [] }; op.lines.push(line); }
+        line.chars.push({ ch: upper ? ch.toUpperCase() : ch, x: fx(r.left) });
+      }
+      op.lines.forEach(function (L) {
+        L.base = L.top + asc; L.words = [];
+        var w = null;
+        L.chars.forEach(function (c) {
+          if (!c) { w = null; return; }
+          if (!w) { w = { text: '', x: c.x, chars: [] }; L.words.push(w); }
+          w.text += c.ch; w.chars.push(c);
+        });
+        delete L.chars;
+      });
+      ops.push(op);
+    });
+    return { ops: ops, size: size, faces: readFaces(d) };
+  }
+  function measureInvite(url) { // the guest page lays out the details (hidden frame, 480x672 = the card's own size)
+    return new Promise(function (resolve, reject) {
+      var ifr = document.createElement('iframe'), finished = false;
+      ifr.setAttribute('aria-hidden', 'true'); ifr.setAttribute('tabindex', '-1'); ifr.title = 'Invitation layout';
+      ifr.style.cssText = 'position:fixed;left:-10000px;top:0;width:480px;height:672px;border:0;opacity:0;pointer-events:none';
+      var timer = setTimeout(function () { finish(new Error('layout timeout')); }, 30000);
+      function finish(err, res) {
+        if (finished) return; finished = true; clearTimeout(timer);
+        if (ifr.parentNode) ifr.parentNode.removeChild(ifr);
+        if (err) reject(err); else resolve(res);
+      }
+      ifr.onload = function () {
+        var d, inner;
+        try { d = ifr.contentDocument; inner = d && d.querySelector('.iface .itxt .iin'); } catch (e) { finish(e); return; }
+        if (!inner) { finish(new Error('layout')); return; }
+        var loads = [];
+        Array.prototype.forEach.call(inner.children, function (el) {
+          if (el.textContent) loads.push(d.fonts.load(fontOf(d.defaultView.getComputedStyle(el)), el.textContent).catch(function () { return null; }));
+        });
+        Promise.all(loads)
+          .then(function () { return d.fonts.ready; })
+          .then(function () { return new Promise(function (r) { setTimeout(r, 60); }); })
+          .then(function () { finish(null, readInvite(d)); })
+          .catch(function (e) { finish(e || new Error('layout')); });
+      };
+      ifr.src = url;
+      document.body.appendChild(ifr);
+    });
+  }
+  var addedFaces = {};
+  function ensureInviteFonts(L) { // the same font files in this page, so the canvas draws exactly what the guest page lays out
+    var used = {};
+    L.ops.forEach(function (op) { if (op.font) used[op.font.split(/\s\d[\d.]*px\s/)[1].split(',')[0].replace(/["']/g, '').trim().toLowerCase()] = true; });
+    L.faces.forEach(function (f) {
+      if (!used[f.family.toLowerCase()] || addedFaces[f.family + '|' + f.url]) return;
+      try {
+        var desc = { weight: f.weight, style: f.style }; if (f.range) desc.unicodeRange = f.range;
+        var ff = new FontFace(f.family, 'url("' + f.url + '")', desc);
+        document.fonts.add(ff); addedFaces[f.family + '|' + f.url] = true;
+      } catch (e) { /* the canvas falls back like the page does */ }
+    });
+    var seen = {}, loads = [];
+    L.ops.forEach(function (op) {
+      if (op.type !== 'text' || seen[op.font]) return; seen[op.font] = true;
+      var sample = op.lines.map(function (l) { return l.words.map(function (w) { return w.text; }).join(' '); }).join(' ');
+      loads.push(document.fonts.load(op.font, sample || 'A').catch(function () { return null; }));
+    });
+    return Promise.all(loads);
+  }
+  function drawInvite(c, L, k) { // c is already in face units; k = face unit -> frame pixel (shadows are in frame pixels)
+    L.ops.forEach(function (op) {
+      c.save();
+      if (op.type === 'shape') {
+        c.globalAlpha = isFinite(op.alpha) ? op.alpha : 1;
+        c.fillStyle = op.color;
+        c.translate(op.cx, op.cy);
+        if (op.m) c.transform(op.m[0], op.m[1], op.m[2], op.m[3], op.m[4], op.m[5]);
+        if (op.clip && op.clip.length > 2) {
+          c.beginPath(); c.moveTo(op.clip[0][0], op.clip[0][1]);
+          for (var q = 1; q < op.clip.length; q++) c.lineTo(op.clip[q][0], op.clip[q][1]);
+          c.closePath(); c.fill();
+        } else c.fillRect(-op.w / 2, -op.h / 2, op.w, op.h);
+        c.restore();
+        return;
+      }
+      c.font = op.font; c.textAlign = 'left'; c.textBaseline = 'alphabetic';
+      if (op.grad) {
+        var g = c.createLinearGradient(0, op.grad.y0, 0, op.grad.y1);
+        op.grad.stops.forEach(function (s) { try { g.addColorStop(Math.max(0, Math.min(1, s.at)), s.color); } catch (e) { /* skip */ } });
+        c.fillStyle = g;
+      } else c.fillStyle = op.color;
+      if (op.shadow) { c.shadowColor = op.shadow.color; c.shadowOffsetX = op.shadow.x * k; c.shadowOffsetY = op.shadow.y * k; c.shadowBlur = op.shadow.blur * k; }
+      var perChar = op.ls && !LS_OK;
+      if (op.ls && LS_OK) c.letterSpacing = op.ls + 'px';
+      op.lines.forEach(function (Ln) {
+        Ln.words.forEach(function (w) {
+          if (perChar) w.chars.forEach(function (ch) { c.fillText(ch.ch, ch.x, Ln.base); });
+          else c.fillText(w.text, w.x, Ln.base);
+        });
+      });
+      c.restore();
+    });
+  }
+
+  function encodeVideo(buf, fps, opts, overlay, onProgress, started, extra) { // decode our base video, draw, encode again
+    var QP = opts.quantizer || 20, base, canvas, ctx, ecfg;
+    base = demux(buf);
+    return VideoDecoder.isConfigSupported({ codec: base.codec, description: base.description, codedWidth: base.width, codedHeight: base.height })
+      .then(function (ds) {
+        if (!ds.supported) throw new Error('decoder ' + base.codec);
+        return pickEncoder(base.width, base.height, fps, opts.bitrate || 8000000);
+      })
+      .then(function (cfg) {
+        if (!cfg) throw new Error('encoder');
+        ecfg = cfg;
+        var W = base.width, H = base.height, N = base.samples.length;
+        canvas = document.createElement('canvas'); canvas.width = W; canvas.height = H;
+        ctx = canvas.getContext('2d', { alpha: false });
+        return new Promise(function (resolve, reject) {
+          var frames = [], desc = null, params = {}, failed = null, index = 0;
+          function fail(e) { if (!failed) { failed = e || new Error('codec error'); reject(failed); } }
+          var encoder = new VideoEncoder({
+            output: function (chunk, meta) {
+              if (meta && meta.decoderConfig && meta.decoderConfig.description && !desc) desc = toU8(meta.decoderConfig.description);
+              var d = new Uint8Array(chunk.byteLength); chunk.copyTo(d);
+              if (isAnnexB(d)) d = annexToAvcc(d, params);
+              frames.push({ data: d, key: chunk.type === 'key', pts: Math.round(chunk.timestamp * fps / 1e6) });
+            },
+            error: fail
+          });
+          encoder.configure(ecfg);
+          var decoder = new VideoDecoder({
+            output: function (vf) {
+              if (failed) { vf.close(); return; }
+              var i = index++, t = i / fps;
+              ctx.drawImage(vf, 0, 0, W, H); vf.close();
+              try { overlay(ctx, t, W, H); } catch (e) { fail(e); return; }
+              var nf = new VideoFrame(canvas, { timestamp: Math.round(i * 1e6 / fps), duration: Math.round(1e6 / fps) });
+              encoder.encode(nf, ecfg.bitrateMode === 'quantizer' ? { keyFrame: i === 0, avc: { quantizer: QP } } : { keyFrame: i === 0 });
+              nf.close();
+              if (onProgress) onProgress(Math.min(1, (i + 1) / N));
+            },
+            error: fail
+          });
+          decoder.configure({ codec: base.codec, description: base.description, codedWidth: W, codedHeight: H });
+          var k = 0;
+          function pump() {
+            if (failed) return;
+            while (k < N && decoder.decodeQueueSize < 4 && encoder.encodeQueueSize < 4) {
+              var s = base.samples[k];
+              decoder.decode(new EncodedVideoChunk({ type: s.key ? 'key' : 'delta', timestamp: Math.round(s.dts * 1e6 / base.timescale), duration: Math.round(s.dur * 1e6 / base.timescale), data: base.bytes.subarray(s.offset, s.offset + s.size) }));
+              k++;
+            }
+            if (k < N) { setTimeout(pump, 2); return; }
+            decoder.flush()
+              .then(function () { return encoder.flush(); })
+              .then(function () {
+                try { decoder.close(); } catch (e) { /* closed */ }
+                try { encoder.close(); } catch (e) { /* closed */ }
+                if (failed) return;
+                if (frames.length !== N) throw new Error('frames ' + frames.length + '/' + N);
+                if (!desc && params.sps && params.pps) desc = buildAvcC(params.sps, params.pps);
+                if (!desc) throw new Error('no H.264 parameters');
+                var mp4 = mux({ width: W, height: H, fps: fps, frames: frames, description: desc });
+                var res = { blob: new Blob([mp4], { type: 'video/mp4' }), seconds: (Date.now() - started) / 1000, codec: ecfg.codec + (ecfg.bitrateMode === 'quantizer' ? ' q' + QP : ' vbr'), frames: N, keyFrames: frames.filter(function (f) { return f.key; }).length };
+                Object.keys(extra || {}).forEach(function (x) { res[x] = extra[x]; });
+                resolve(res);
+              })
+              .catch(fail);
+          }
+          pump();
+        });
+      });
+  }
+
+  function makeInvite(tpl, opts, onProgress) {
+    var root = opts.root || '', design = Object.prototype.hasOwnProperty.call(tpl.bases, opts.design) ? opts.design : tpl.defaultDesign;
+    var G = tpl.geom, started = Date.now(), lay = null;
+    if (!supported()) return Promise.reject(new Error('unsupported'));
+    if (!opts.face) return Promise.reject(new Error('face'));
+    return measureInvite(opts.face)
+      .then(function (L) { lay = L; return ensureInviteFonts(L); })
+      .then(function () { return fetch(root + tpl.bases[design]); })
+      .then(function (r) { if (!r.ok) throw new Error('base video ' + r.status); return r.arrayBuffer(); })
+      .then(function (buf) {
+        var layer = null, lctx = null, lastKey = '';
+        return encodeVideo(buf, tpl.fps, opts, function (ctx, t, W, H) {
+          var a = detailsAlpha(G, t);
+          if (a <= 0) return;
+          var M = faceMatrix(G, t), key = M.map(function (v) { return v.toFixed(4); }).join(',');
+          if (!layer) { layer = document.createElement('canvas'); layer.width = W; layer.height = H; lctx = layer.getContext('2d'); }
+          if (key !== lastKey) {   // the details move only while the card settles; afterwards the same layer is reused
+            lctx.setTransform(1, 0, 0, 1, 0, 0); lctx.clearRect(0, 0, W, H);
+            lctx.setTransform(M[0], M[1], M[2], M[3], M[4], M[5]);
+            drawInvite(lctx, lay, M[0]);
+            lastKey = key;
+          }
+          ctx.save(); ctx.globalAlpha = a; ctx.drawImage(layer, 0, 0); ctx.restore();   // one layer = the page's group opacity
+        }, onProgress, started, { fontSize: lay.size, design: design });
+      });
+  }
+
   /* ---------- the whole job ---------- */
   function make(opts, onProgress) {
     var tpl = TEMPLATES[opts.template || 'christmas'];
     if (!tpl) return Promise.reject(new Error('template'));
+    if (tpl.kind === 'invite') return makeInvite(tpl, opts, onProgress);
     var root = opts.root || '';
     var data = { t: (opts.data.t || '').trim(), m: (opts.data.m || '').trim() || tpl.defaultMessage, s: (opts.data.s || '').trim() };
     var fps = tpl.fps, started = Date.now(), QP = opts.quantizer || 20;

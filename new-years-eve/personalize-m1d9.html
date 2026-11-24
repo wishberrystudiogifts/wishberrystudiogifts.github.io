@@ -61,6 +61,15 @@ summary{cursor:pointer;color:#16213F;font-size:16px;font-weight:600}
 .closebtn{position:absolute;top:max(12px,env(safe-area-inset-top));left:12px;background:rgba(255,255,255,.92);color:#16213F;border-color:#fff;min-height:50px;font-size:17px;padding:10px 16px}
 .or{display:flex;align-items:center;gap:12px;margin:18px 2px 12px;color:#8A7F72;font-size:16px}
 .or:before,.or:after{content:"";flex:1;height:2px;background:#E5D6BC}
+.vbtn{width:100%;background:#fff;color:#16213F;border-color:#16213F;font-size:20px;min-height:60px}
+.vbtn:hover{background:#F4F6FA}
+.vbtn:disabled{opacity:.6;cursor:default}
+.vhelp{text-align:center;margin:8px 6px 0}
+.vphone{display:none;text-align:center;margin:6px 6px 0;font-size:15px;color:#8A7F72}
+@media (min-width:700px) and (hover:hover) and (pointer:fine){.vphone{display:block}} /* computers only: the video is vertical, made for phones */
+.pbar{height:12px;background:#EFE5D3;border-radius:6px;overflow:hidden;margin:4px 0 10px}
+.pbar>div{height:100%;width:0;background:#8B6A24;transition:width .2s}
+#vid{display:block;width:100%;max-width:270px;aspect-ratio:9/16;margin:0 auto 14px;border-radius:12px;background:#000;box-shadow:0 10px 26px rgba(0,0,0,.18)}
 .printbox{background:#fff;border:2px solid #EADFCB;border-radius:16px;padding:16px 18px}
 .printbox .stitle{margin-bottom:6px}
 .pbtns{display:grid;grid-template-columns:1fr;gap:10px;margin-top:10px}
@@ -160,6 +169,27 @@ summary{cursor:pointer;color:#16213F;font-size:16px;font-weight:600}
         <p class="help">Want to change something? Edit it above and tap &ldquo;Send my invitation&rdquo; again &mdash; you get a new link.</p>
       </div>
       <div class="or" aria-hidden="true">or</div>
+      <button id="mkvid" class="btn vbtn" type="button">&#127916;&nbsp; Make it a video</button>
+      <p class="help vhelp">Get a 12-second video of your invitation opening with your party details &mdash; to send in any chat or save on your phone.</p>
+      <p class="help vphone">&#128241;&nbsp; Made for phones &mdash; looks best when your guests open it on a phone</p>
+      <div id="videobox" class="sendbox" hidden>
+        <div id="vwork">
+          <p class="ok" id="vptext">Making your video&hellip; 0%</p>
+          <div class="pbar"><div id="vpbar"></div></div>
+          <p class="help" style="margin:0">It takes a few seconds. Please keep this page open.</p>
+        </div>
+        <div id="vdone" hidden>
+          <p class="ok">&#10003; Your video is ready!</p>
+          <video id="vid" playsinline muted loop controls></video>
+          <div class="sendbtns">
+            <button id="vshare" class="btn app wa" type="button" hidden>Send the video&hellip;</button>
+            <a id="vsave" class="btn app" download="new-years-eve-video-invitation.mp4">Save the video</a>
+          </div>
+          <p id="vhint" class="help" style="margin:0" hidden>On iPhone: tap &ldquo;Send the video&hellip;&rdquo;, then &ldquo;Save Video&rdquo; to keep it in Photos.</p>
+        </div>
+        <p id="verr" class="help" style="color:#9B1C1C;font-weight:700;margin:0" hidden></p>
+      </div>
+      <div class="or" aria-hidden="true">or</div>
       <div class="printbox">
         <div class="stitle">&#128424;&nbsp; Print it with your details</div>
         <p class="help" style="margin:0">Opens your invitation ready to print or save as a PDF.</p>
@@ -180,6 +210,7 @@ summary{cursor:pointer;color:#16213F;font-size:16px;font-weight:600}
   <button id="close" class="btn closebtn" type="button">&larr; Back to editing</button>
 </div>
 <script src="invite.js"></script>
+<script src="../video/videomaker.js?v=20261124"></script>
 <script>
 (function () {
   var C = window.InviteCodec, KEY = 'inviteDraft-new-years-eve';
@@ -219,6 +250,7 @@ summary{cursor:pointer;color:#16213F;font-size:16px;font-weight:600}
       store(KEY, JSON.stringify(data()));
     }, 150);
     $('sendbox').hidden = true;
+    $('videobox').hidden = true;
     if ($('d').value) $('needd').hidden = true;
     if ($('p').value.trim()) $('needp').hidden = true;
   }
@@ -264,6 +296,44 @@ summary{cursor:pointer;color:#16213F;font-size:16px;font-weight:600}
     var l = $('link'), done = function () { $('copy').textContent = 'Copied ✓'; setTimeout(function () { $('copy').textContent = 'Copy link'; }, 2200); };
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(l.value).then(done, fallback); else fallback();
     function fallback() { l.focus(); l.select(); try { document.execCommand('copy'); done(); } catch (e) {} }
+  });
+  // Make it a video (24 Nov 2026): the buyer's own phone or computer makes a 12-second MP4 of the invitation
+  // opening, with these party details in the chosen design (../video/videomaker.js; nothing is uploaded)
+  var VT = 'new-years-eve', VFILE = 'new-years-eve-video-invitation.mp4', VTITLE = 'You\u2019re invited!';
+  var vfile = null, vurl = null, vbusy = false;
+  var NOVIDEO = 'This browser can\u2019t make the video. On iPhone, open this page in Safari (iOS 16.4 or newer); on Android or a computer, use Chrome. You can still send your invitation with \u201cSend my invitation\u201d above.';
+  $('mkvid').addEventListener('click', function () {
+    if (vbusy) return;
+    if (!check()) return;
+    var box = $('videobox');
+    box.hidden = false; $('verr').hidden = true; $('vdone').hidden = true;
+    if (!window.WishberryVideo || !WishberryVideo.supported()) {
+      $('vwork').hidden = true; $('verr').textContent = NOVIDEO; $('verr').hidden = false;
+      box.scrollIntoView({ behavior: 'smooth', block: 'center' }); return;
+    }
+    vbusy = true; $('mkvid').disabled = true; $('vwork').hidden = false;
+    $('vpbar').style.width = '0%'; $('vptext').textContent = 'Making your video\u2026 0%';
+    box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    WishberryVideo.make({ template: VT, root: '../video/', face: 'index.html#view=face&m=' + packed(), design: data().v || C.defaultDesign }, function (p) {
+      var pct = Math.round(p * 100);
+      $('vpbar').style.width = pct + '%'; $('vptext').textContent = 'Making your video\u2026 ' + pct + '%';
+    }).then(function (res) {
+      if (vurl) URL.revokeObjectURL(vurl);
+      vurl = URL.createObjectURL(res.blob);
+      vfile = new File([res.blob], VFILE, { type: 'video/mp4' });
+      $('vid').src = vurl; $('vsave').href = vurl;
+      var can = false; try { can = !!(navigator.canShare && navigator.canShare({ files: [vfile] })); } catch (e) { can = false; }
+      $('vshare').hidden = !can; $('vhint').hidden = !can; $('vsave').style.gridColumn = can ? '' : '1 / -1';
+      $('vwork').hidden = true; $('vdone').hidden = false;
+      var pl = $('vid').play(); if (pl && pl.catch) pl.catch(function () {});
+    }).catch(function (err) {
+      $('vwork').hidden = true;
+      $('verr').textContent = err && err.message === 'unsupported' ? NOVIDEO : 'Sorry, the video could not be made on this device. Please try again in Chrome or Safari \u2014 or send your invitation with \u201cSend my invitation\u201d above.';
+      $('verr').hidden = false;
+    }).then(function () { vbusy = false; $('mkvid').disabled = false; });
+  });
+  $('vshare').addEventListener('click', function () {
+    if (vfile) navigator.share({ files: [vfile], title: VTITLE }).catch(function () {});
   });
   Array.prototype.forEach.call(document.querySelectorAll('.pb'), function (b) {
     b.addEventListener('click', function () {
