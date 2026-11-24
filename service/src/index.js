@@ -158,7 +158,7 @@ export default {
 
         const open = /^\/api\/open\/([^/]+)$/.exec(path);
         if (open && method === 'POST') {
-          const r = await openLink(env, open[1]);
+          const r = await openLink(env, open[1], clientIp(request, env));
           if (r.recheck) ctx.waitUntil(recheckOrder(env, r.recheck).catch((e) => console.log('recheck failed', e && e.message)));
           return json(cfg, request, r.http, r.body);
         }
@@ -167,7 +167,7 @@ export default {
           const body = await readBody(request);
           if (body === 'too_large') return json(cfg, request, 413, { ok: false, error: 'too_large' });
           if (!body) return json(cfg, request, 400, { ok: false, error: 'bad_request' });
-          const r = await signLink(env, { hash: body.hash, d: body.d });
+          const r = await signLink(env, { hash: body.hash, d: body.d, ip: clientIp(request, env) });
           if (r.recheck) ctx.waitUntil(recheckOrder(env, r.recheck).catch((e) => console.log('recheck failed', e && e.message)));
           return json(cfg, request, r.http, r.body);
         }

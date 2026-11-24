@@ -72,8 +72,21 @@ function activationSettings(cfg) {
     slowRecheckMs: Math.max(recheckMs, num(a.slowRecheckHours, 6) * HOUR),
     maxUnchecked: num(a.maxUncheckedPerHour, 30, 1),
     uncheckedSigns: Math.floor(num(a.uncheckedMaxSigns, 5)),
+    opensPerVisitor: Math.floor(num(a.maxOpensPerVisitorHour, 60)),
+    signsPerVisitor: Math.floor(num(a.maxSignsPerVisitorHour, 40)),
   };
 }
+
+/**
+ * A brake per visitor and clock hour on openings ("o") and signatures ("s"), so that one source cannot use up a link's
+ * whole allowance in a second. Over the brake nothing is counted on the link itself. 0 = no brake.
+ */
+async function visitorBudget(env, ip, kind, max) {
+  if (!(max > 0)) return true;
+  const who = await ipKey(await getHashKey(env), visitorOf(ip));
+  return (await counterBump(env, who + ':' + kind, Math.floor(Date.now() / HOUR))) <= max;
+}
+const slowDown = { http: 429, body: { ok: false, error: 'slow_down' } };
 
 // Reasons for which EVERY buyer is let in for as long as they last (the shop is not connected to Etsy yet, or the
 // connection has never once worked). Their links are not held back; all other reasons are short outages.
@@ -338,8 +351,9 @@ export async function recheckOrder(env, oKey, opts = {}) {
 
 // ---------------------------------------------------------------- POST /api/open/{hash}
 
-export async function openLink(env, hash) {
+export async function openLink(env, hash, ip) {
   if (!HASH_RE.test(hash)) return { http: 404, body: { ok: false, error: 'not_found' } };
+  if (!(await visitorBudget(env, ip, 'o', activationSettings(settings(env)).opensPerVisitor))) return slowDown;
   const t = tables(env);
   const now = Date.now();
   // The check and the count are ONE statement, so two openings at the same moment can never both slip past the limit.
@@ -385,6 +399,7 @@ export async function signLink(env, input) {
   const cfg = settings(env);
   const t = tables(env);
   const now = Date.now();
+  if (!(await visitorBudget(env, input.ip, 's', activationSettings(cfg).signsPerVisitor))) return slowDown;
 
   const pre = await env.DB.prepare(`SELECT product FROM ${t.links} WHERE hash = ?1`).bind(hash).first();
   if (!pre) return { http: 404, body: { ok: false, error: 'not_found' } };

@@ -14,7 +14,7 @@
     "maxSigns": 100
   },
 
-  "_activation_note": "maxAttemptsPerHour: counted tries per visitor and clock hour (a try = a check that may cost a request to Etsy, or a miss). negativeCacheMinutes: for how long a 'no such order' is answered without asking Etsy again. retryCheckSeconds: an order that is 'not paid yet' or was let in unchecked is asked about again at the earliest after this. recheckMinutes / maxRechecks / slowRecheckHours: an order let in unchecked is asked about again when its link is opened or signs - the first maxRechecks times at most every recheckMinutes, afterwards at most every slowRecheckHours. maxUncheckedPerHour: how many NEW orders may be let in unchecked per hour overall. uncheckedMaxSigns: how many invitation links an unchecked link may sign during a short Etsy outage (0 = no extra limit). maxEtsyPerMinute / maxEtsyPerDay: our own brake on requests to Etsy (the app's limits are 10 per second and 10,000 per day).",
+  "_activation_note": "maxAttemptsPerHour: counted tries per visitor and clock hour (a try = a check that may cost a request to Etsy, or a miss). negativeCacheMinutes: for how long a 'no such order' is answered without asking Etsy again. retryCheckSeconds: an order that is 'not paid yet' or was let in unchecked is asked about again at the earliest after this. recheckMinutes / maxRechecks / slowRecheckHours: an order let in unchecked is asked about again when its link is opened or signs - the first maxRechecks times at most every recheckMinutes, afterwards at most every slowRecheckHours. maxUncheckedPerHour: how many NEW orders may be let in unchecked per hour overall. uncheckedMaxSigns: how many invitation links an unchecked link may sign during a short Etsy outage (0 = no extra limit). maxEtsyPerMinute / maxEtsyPerDay: our own brake on requests to Etsy (the app's limits are 10 per second and 10,000 per day). maxOpensPerVisitorHour / maxSignsPerVisitorHour: how many openings / new invitation links ONE visitor (one internet address) may make per clock hour, over all links - so that nobody can use up a link's whole allowance in a second (0 = no brake).",
   "activation": {
     "maxAttemptsPerHour": 10,
     "negativeCacheMinutes": 2,
@@ -25,7 +25,9 @@
     "maxUncheckedPerHour": 30,
     "uncheckedMaxSigns": 5,
     "maxEtsyPerMinute": 20,
-    "maxEtsyPerDay": 2000
+    "maxEtsyPerDay": 2000,
+    "maxOpensPerVisitorHour": 60,
+    "maxSignsPerVisitorHour": 40
   },
 
   "etsy": {

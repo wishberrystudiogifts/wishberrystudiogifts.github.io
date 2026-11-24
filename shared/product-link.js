@@ -184,6 +184,9 @@
     var main = showMessage({ title: 'Open this page in its own tab', lines: ['For your safety, your personal page does not open inside another website.'] });
     var a = el('a', 'wb-btn wb-primary wb-wide', 'Open my page', main); a.href = location.href; a.target = '_top'; a.rel = 'noopener';
   }
+  function showSlow() {
+    showMessage({ title: 'Please try again a little later', lines: ['This page was opened many times from your internet connection in the last hour, so we paused it for a moment. Nothing is lost.', 'Still stuck? Message us on Etsy — we reply within 24 hours.'], retry: true, shop: true });
+  }
   function showNotFound() {
     showMessage({ title: 'Page not found', lines: ['Got a card or an invitation link? Open it exactly as you received it — the full link.'], shop: true });
   }
@@ -219,6 +222,7 @@
           if (r.status === 200 && r.body && r.body.ok) return mount(hash, r.body);
           if (r.status === 410) return showExpired(r.body);
           if (r.status === 404) return showUnknown(forget(hash));
+          if (r.status === 429) return showSlow();
           showRetry();
         }, function () { showRetry(); });
       });
@@ -293,7 +297,7 @@
       return api('POST', '/api/sign', { hash: s.hash, d: d }).then(function (r) {
         if (r.status === 200 && r.body && r.body.s) { signed[d] = r.body.s; return url + '&s=' + r.body.s; }
         var e = new Error('sign');
-        e.code = r.status === 410 ? 'expired' : r.status === 429 ? (r.body && r.body.unchecked ? 'unchecked' : 'limit') : 'failed';
+        e.code = r.status === 410 ? 'expired' : r.status === 429 ? (r.body && r.body.error === 'slow_down' ? 'slow' : r.body && r.body.unchecked ? 'unchecked' : 'limit') : 'failed';
         e.max = r.body && r.body.max;
         throw e;
       }, function () { var e = new Error('network'); e.code = 'network'; throw e; });
@@ -306,6 +310,7 @@
     if (c === 'browser') return 'This browser can’t make the link. Please open this page in Chrome or Safari.';
     if (c === 'network') return 'We couldn’t reach our service. Please check your internet connection and tap the button again.';
     if (c === 'limit') return 'Your personal page has made as many links as it can' + (err.max ? ' (' + err.max + ')' : '') + '. Links you already made keep working. Need more? Message us on Etsy.';
+    if (c === 'slow') return 'That was a lot of links in a short time. Please wait a few minutes and tap the button again.';
     if (c === 'unchecked') return 'We are still confirming your order with Etsy, so this page can’t make another link just yet. Please try again in a few minutes.';
     return 'Something went wrong while making your link. Please tap the button again.';
   };

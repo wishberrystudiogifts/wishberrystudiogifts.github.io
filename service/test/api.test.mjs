@@ -65,7 +65,7 @@ const OVERRIDES_A = {
       2000000777: { status: 'something-new' },
     },
   },
-  activation: { maxAttemptsPerHour: 10, negativeCacheMinutes: 2, retryCheckSeconds: 1, recheckMinutes: 0, maxRechecks: 3, maxUncheckedPerHour: 4, uncheckedMaxSigns: 2 },
+  activation: { maxAttemptsPerHour: 10, negativeCacheMinutes: 2, retryCheckSeconds: 1, recheckMinutes: 0, maxRechecks: 3, maxUncheckedPerHour: 4, uncheckedMaxSigns: 2, maxOpensPerVisitorHour: 12, maxSignsPerVisitorHour: 6 },
 };
 
 async function partA() {
@@ -74,8 +74,10 @@ async function partA() {
   const svc = await startService({ port: 8791, vars: { VERIFIER: 'mock', STAGE: 'test', CONFIG_OVERRIDES: OVERRIDES_A } });
   const S = svc.url;
   const act = (order, product, ip) => call(S, 'POST', '/api/activate', { order, product }, ip ? { 'X-Test-IP': ip } : {});
-  const open = (h) => call(S, 'POST', '/api/open/' + h);
-  const sign = async (h, text) => call(S, 'POST', '/api/sign', { hash: h, d: await digestOf(text) });
+  // openings and signatures are also braked per visitor: by default every call here comes from "another visitor"
+  let serial = 0;
+  const open = (h, ip) => call(S, 'POST', '/api/open/' + h, null, { 'X-Test-IP': ip || 'o' + (++serial) });
+  const sign = async (h, text, ip) => call(S, 'POST', '/api/sign', { hash: h, d: await digestOf(text) }, { 'X-Test-IP': ip || 's' + (++serial) });
   try {
     // (a) same order -> same hash and the same counter; invalid -> error
     const a1 = await act('2000000001', 't-open3', 'a');
@@ -167,6 +169,15 @@ async function partA() {
     const okCount = burst.filter((r) => r.status === 200).length;
     check('25 simultaneous openings with a limit of 5 -> exactly 5 succeed', okCount === 5 && burst.filter((r) => r.status === 410).length === 20, okCount);
     check('counter after the burst is exactly 5', new Set(burst.filter((r) => r.status === 200).map((r) => r.body.opens)).size === 5);
+
+    // one source cannot use up a link's allowance in a burst (brake per visitor and hour: here 12 openings, 6 signatures)
+    const vb = await act('2000000008', 't-plain', 'vb'); const hvb = vb.body.links[0].hash;
+    const flood = await Promise.all(Array.from({ length: 40 }, () => open(hvb, '198.51.100.7')));
+    const after = await open(hvb, '198.51.100.8');
+    check('40 openings fired at once from ONE address: 12 are counted, 28 are stopped (429) — the link is not used up', flood.filter((r) => r.status === 200).length === 12 && flood.filter((r) => r.status === 429 && r.body.error === 'slow_down').length === 28 && after.status === 200 && after.body.opens === 13, [flood.map((r) => r.status).join(','), after.body]);
+    const sf = [];
+    for (let i = 0; i < 9; i++) sf.push((await sign(hvb, 'flood' + i, '198.51.100.7')).status);
+    check('the same for signatures: 6 from one address in an hour, then 429 — the buyer (another address) is not affected', sf.join(',') === '200,200,200,200,200,200,429,429,429' && (await sign(hvb, 'buyer', '198.51.100.9')).body.signs === 7, sf);
 
     // guessing a hash
     check('(f) guessed hash -> 404', (await open('abcdefghijklmnopqrstuv')).status === 404);
@@ -261,7 +272,7 @@ async function partA() {
     try {
       const S2 = svc2.url;
       const act2 = (order, product, ip) => call(S2, 'POST', '/api/activate', { order, product }, { 'X-Test-IP': ip });
-      const open2 = (h) => call(S2, 'POST', '/api/open/' + h);
+      const open2 = (h) => call(S2, 'POST', '/api/open/' + h, null, { 'X-Test-IP': 'r' + (++serial) });
       check('a link withdrawn by the service is closed (410 "withdrawn")', (await open2(hw1)).body.reason === 'withdrawn');
       const back = await act2('2000000008', 't-plain', 'w2');
       check('...and opens again once the order is confirmed (an automatic withdrawal is lifted)', back.body.links[0].hash === hw1 && (await open2(hw1)).status === 200);
@@ -304,7 +315,7 @@ async function partA() {
 const OVERRIDES_B = {
   products: { 'card-a': { name: 'Card A', listingIds: [555001] }, 'card-b': { name: 'Card B', listingIds: [] } },
   mock: { orders: { 2000000099: { status: 'paid', products: ['card-a', 'lab-party-1'] } } },
-  activation: { maxAttemptsPerHour: 500, negativeCacheMinutes: 0.02, retryCheckSeconds: 1, recheckMinutes: 0, maxRechecks: 50, maxUncheckedPerHour: 100, uncheckedMaxSigns: 2, maxEtsyPerMinute: 1000, maxEtsyPerDay: 100000 },
+  activation: { maxAttemptsPerHour: 500, negativeCacheMinutes: 0.02, retryCheckSeconds: 1, recheckMinutes: 0, maxRechecks: 50, maxUncheckedPerHour: 100, uncheckedMaxSigns: 2, maxEtsyPerMinute: 1000, maxEtsyPerDay: 100000, maxOpensPerVisitorHour: 0, maxSignsPerVisitorHour: 0 },
 };
 
 async function partB() {
