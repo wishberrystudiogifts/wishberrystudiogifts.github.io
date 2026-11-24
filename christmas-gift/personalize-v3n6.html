@@ -59,6 +59,8 @@ textarea{min-height:150px;resize:vertical;line-height:1.45}
 .vbtn:hover{background:#FFF8EC}
 .vbtn:disabled{opacity:.6;cursor:default}
 .vhelp{text-align:center;margin:8px 6px 0}
+.vphone{display:none;text-align:center;margin:6px 6px 0;font-size:15px;color:#8A7F72}
+@media (min-width:700px) and (hover:hover) and (pointer:fine){.vphone{display:block}} /* computers only: the video is vertical, made for phones */
 .pbar{height:12px;background:#EFE5D3;border-radius:6px;overflow:hidden;margin:4px 0 10px}
 .pbar>div{height:100%;width:0;background:#7A1F2B;transition:width .2s}
 #vid{display:block;width:100%;max-width:270px;aspect-ratio:9/16;margin:0 auto 14px;border-radius:12px;background:#000;box-shadow:0 10px 26px rgba(0,0,0,.18)}
@@ -116,6 +118,7 @@ textarea{min-height:150px;resize:vertical;line-height:1.45}
       <div class="or" aria-hidden="true">or</div>
       <button id="mkvid" class="btn vbtn" type="button">&#127916;&nbsp; Make it a video</button>
       <p class="help vhelp">Get a 12-second video of your gift card opening with your words &mdash; to send in any chat or save on your phone.</p>
+      <p class="help vphone">&#128241;&nbsp; Made for phones &mdash; looks best when your recipient opens it on a phone</p>
       <div id="videobox" class="sendbox" hidden>
         <div id="vwork">
           <p class="ok" id="vptext">Making your video&hellip; 0%</p>
