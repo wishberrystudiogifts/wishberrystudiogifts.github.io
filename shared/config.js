@@ -18,7 +18,7 @@ window.WB_CONFIG = {
 
   products: {
     'christmas-card-2': {
-      mode: 'hash',   // <-- THE SWITCH for this product: 'hash' or 'direct'
+      mode: 'hash',   // SWITCH of Christmas Card 2 — this ONE line: 'hash' or 'direct'
       folder: 'product/christmas-card-2-2026-11-24',
       entry: 'personalize-gvhm.html',
       name: 'Christmas card “Snowy Cabin”',
