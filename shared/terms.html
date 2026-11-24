@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your personal page — terms and privacy</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="/shared/product-link.css?v=20261124">
+<script src="/shared/config.js?v=20261124"></script>
+<style>
+.wb-card h2{font:600 22px/1.25 Georgia,'Times New Roman',serif;color:#1F3326;margin:26px 0 8px}
+.wb-card li{font-size:18px;margin:0 0 8px}
+.wb-card ul{margin:0 0 14px;padding-left:22px}
+.wb-card .caps{font-size:16px;color:#5B5248}
+</style>
+</head>
+<body class="wb-page">
+<main class="wb-card">
+<p class="wb-badge">Wishberry Studio Gifts</p>
+<h1>Your personal page — terms and privacy</h1>
+<p>Plain words, one page.</p>
+
+<h2>What the page is</h2>
+<p>When you buy one of our printable cards or invitations on Etsy, your download includes a link to a personal page on this website. There you add your own words and make a link, a print or a video with them.</p>
+<p>The files you download from Etsy are the product, and they are yours to keep. The personal page is a free extra that comes with them.</p>
+
+<h2>Your personal link</h2>
+<ul>
+<li>To open the page we ask for your Etsy order number. We check it with Etsy and give you a personal link.</li>
+<li>The link stays open for <b><span id="ttl">24 hours</span></b> from the first time you open it and can be opened up to <b><span id="max">300</span></b> times. Then the page closes.</li>
+<li>Closing the page does not touch your files, and every card or invitation link you have already sent keeps working.</li>
+<li>The link is for you. Please don&rsquo;t share it or try to get around its limits; we may close a link that is misused.</li>
+<li>Need more time? Message us on Etsy with your order number.</li>
+</ul>
+
+<h2>What we keep (privacy)</h2>
+<ul>
+<li>We do not ask for your name, email or address, and we use no advertising or tracking cookies.</li>
+<li>The words you type for your card or invitation are never sent to us. They travel only inside the link you send.</li>
+<li>We keep a one-way code made from your order number (not the number itself), so that the same order always gets the same personal link.</li>
+<li>We keep when your personal link was first and last opened, and how many times.</li>
+<li>For about an hour we keep a one-way code of the internet address that tried an order number, only to stop guessing.</li>
+<li>If Etsy cannot confirm an order number at that moment, the number is kept encrypted until it is confirmed, and is then deleted.</li>
+<li>Your browser remembers your personal link and your draft on your own device, so you can come back to it.</li>
+<li>The page is hosted by GitHub Pages and our small service runs on Cloudflare; both keep ordinary technical logs.</li>
+</ul>
+
+<h2>Etsy</h2>
+<p>This page is run by the shop WishberrystudioGifts, not by Etsy. The term &lsquo;Etsy&rsquo; is a trademark of Etsy, Inc. This application uses the Etsy API but is not endorsed or certified by Etsy, Inc.</p>
+<p class="caps">THIS PAGE AND ITS TOOLS ARE PROVIDED SOLELY BY WISHBERRYSTUDIOGIFTS, &ldquo;AS IS&rdquo;, WITHOUT WARRANTIES OF ANY KIND. ETSY, INC. AND ITS AFFILIATES ARE NOT THE DEVELOPER OF THIS APPLICATION, HAVE NOT REVIEWED IT AND ARE NOT RESPONSIBLE FOR IT.</p>
+
+<h2>Questions</h2>
+<p>Message us on Etsy &mdash; we reply within 24 hours.</p>
+<p><a class="wb-btn wb-ghost" id="shop" href="https://wishberrystudiogifts.etsy.com" rel="noopener">Visit our shop on Etsy</a></p>
+</main>
+<script>
+(function () {
+  var c = window.WB_CONFIG || {}, l = c.limits || {};
+  var h = l.ttlHours || 24;
+  document.getElementById('ttl').textContent = h >= 48 && h % 24 === 0 ? (h / 24) + ' days' : h === 24 ? '24 hours' : h + (h === 1 ? ' hour' : ' hours');
+  document.getElementById('max').textContent = l.maxOpens || 300;
+  if (c.shopUrl) document.getElementById('shop').href = c.shopUrl;
+})();
+</script>
+</body>
+</html>

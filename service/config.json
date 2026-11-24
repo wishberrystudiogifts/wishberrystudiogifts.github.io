@@ -1,0 +1,56 @@
+{
+  "_readme": "Settings of the product link service. Keys that start with an underscore are notes and are ignored by the code. Full guide: service/README.md.",
+
+  "site": "https://wishberrystudiogifts.github.io",
+  "shopUrl": "https://wishberrystudiogifts.etsy.com",
+  "allowedOrigins": ["https://wishberrystudiogifts.github.io"],
+
+  "_defaults_note": "Nikola's rules (23 Nov 2026): 24 hours from the FIRST opening and at most 300 openings. ttlHours is the one number to change if the time limit changes (Claude suggested 720 = 30 days; not decided). maxSigns 0 = no limit on how many invitation links one product link may sign.",
+  "defaults": {
+    "ttlHours": 24,
+    "maxOpens": 300,
+    "ttlStartsAt": "firstOpen",
+    "signInvitations": true,
+    "maxSigns": 0
+  },
+
+  "activation": {
+    "maxAttemptsPerHour": 10,
+    "negativeCacheMinutes": 15,
+    "recheckMinutes": 30,
+    "maxRechecks": 5
+  },
+
+  "etsy": {
+    "shopName": "WishberrystudioGifts",
+    "scopes": "transactions_r",
+    "shopId": null
+  },
+
+  "_products_note": "One entry per NEW product (new standard). Key = product key, the same key as in shared/config.js on the site. listingIds = the Etsy listing ID(s) that include this product (numbers). While listingIds is empty, ANY paid order of our shop unlocks the product when the buyer comes from that product's page (launch grace) - fill the ID in right after the listing is published. Optional per product: ttlHours, maxOpens, ttlStartsAt, maxSigns. lab:true = test product, unlocked only by the test orders below, never by a real order.",
+  "products": {
+    "lab-party-1": {
+      "name": "LAB - Christmas Party invitation (test copy, not for sale)",
+      "lab": true,
+      "listingIds": []
+    },
+    "_example-christmas-card-2": {
+      "name": "Christmas Card 2 - Snowy Cabin (EXAMPLE - copy this entry, remove the underscore, listing ID after publishing)",
+      "listingIds": []
+    }
+  },
+
+  "_mock_note": "Test orders (MockVerifier). On the live service they unlock ONLY products marked lab:true. With the variable VERIFIER=mock (local tests, previews) they may unlock any product they list and the Etsy API is never called. status: paid | unpaid | not_found | error (error = pretend Etsy is unreachable, the buyer is let in and checked later).",
+  "mock": {
+    "orders": {
+      "1000000001": { "status": "paid", "products": ["lab-party-1"] },
+      "1000000002": { "status": "paid", "products": ["lab-party-1"] },
+      "1000000003": { "status": "paid", "products": ["lab-party-1"] },
+      "1000000004": { "status": "paid", "products": ["lab-party-1"] },
+      "1000000005": { "status": "paid", "products": ["lab-party-1"] },
+      "1000000402": { "status": "unpaid" },
+      "1000000404": { "status": "not_found" },
+      "1000000500": { "status": "error" }
+    }
+  }
+}

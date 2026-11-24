@@ -1,0 +1,46 @@
+{
+	// Wishberry product link service — Cloudflare Worker + D1.
+	// Workers Builds (set up 23 Nov 2026): root directory /service · main -> "npx wrangler deploy" · other branches -> "npx wrangler preview".
+	"$schema": "node_modules/wrangler/config-schema.json",
+
+	// MUST stay exactly "product-link": Workers Builds fails when it differs from the Worker name in the dashboard.
+	"name": "product-link",
+	"main": "src/index.js",
+	"compatibility_date": "2026-11-01",
+	"workers_dev": true,
+	// Logs: only the lines our own code prints (errors). Request addresses are NOT kept (an address holds a buyer's
+	// product link hash) and outgoing requests are NOT traced (the address of an Etsy receipt holds an order number).
+	"observability": {
+		"enabled": true,
+		"logs": { "enabled": true, "invocation_logs": false },
+		"traces": { "enabled": false }
+	},
+
+	// Live database (Cloudflare dashboard -> D1 -> product-link-db). The tables create themselves on the first request.
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "product-link-db",
+			"database_id": "9261c19a-3f8b-4b77-891e-0b39074a5a4c"
+		}
+	],
+
+	// Worker Previews (every push of a non-main branch that touches service/): previews do NOT inherit the settings above,
+	// so the database is named again here. A preview uses the same database but its OWN tables (prefix pv_) and never
+	// calls Etsy (VERIFIER=mock): it cannot read or change a live record. To give previews a database of their own later,
+	// create one in the dashboard and put its name and id here.
+	"previews": {
+		"vars": {
+			"STAGE": "preview",
+			"TABLE_PREFIX": "pv_",
+			"VERIFIER": "mock"
+		},
+		"d1_databases": [
+			{
+				"binding": "DB",
+				"database_name": "product-link-db",
+				"database_id": "9261c19a-3f8b-4b77-891e-0b39074a5a4c"
+			}
+		]
+	}
+}
