@@ -84,20 +84,23 @@
     bases: { a: 'new-years-eve-a-base.mp4', b: 'new-years-eve-b-base.mp4', c: 'new-years-eve-c-base.mp4' }
   };
 
-  /* Christmas Card 2 "Snowy Cabin" (24 Nov 2026): the base video is the recipient page itself, rendered frame by frame
-     (render-b2.js) with the written side empty and no name on the envelope. The envelope ARRIVES first (the wind brings
-     it), so the tap is at 2.3 s. The words are laid out by the recipient page (index.html#view=face in a hidden frame),
-     read back and drawn on the turned card; the name is WRITTEN on the envelope (wiped in from the left) once it has
-     landed, and fades with it.
+  /* Christmas Card 2 "Snowy Cabin" (24 Nov 2026; scene "the cabin doorstep" and new numbers 25 Nov 2026): the base video is
+     the recipient page itself, rendered frame by frame (render-b2.js) with the written side empty and no name on the
+     envelope. The envelope ARRIVES first (the wind slides it in over the porch boards), so the tap is at 2.3 s. The words
+     are laid out by the recipient page (index.html#view=face in a hidden frame), read back and drawn on the turned card;
+     the name is WRITTEN on the envelope (wiped in from the left) once it has come to rest. The envelope stays on the boards
+     and the card settles OVER it: the name is drawn until the last frame before the card's lower edge reaches the writing
+     (frame 134 = 4.467 s: edge at y 1291, writing from y 1333; frame 135 = 4.5 s: edge at y 1355) - a cut, not a fade.
      Geometry measured on every frame of the base video (render-b2.js MEASURE). */
   TEMPLATES['christmas-card-2'] = {
     kind: 'invite', fps: 30, defaultDesign: 'a', bases: { a: 'christmas-card-2-base.mp4' },
     geom: { frame: { W: 1080, H: 1920 }, stage: { W: 600, H: 1100 },
-            card: { cx: 300, bottom: 894.6, s0: 1.1, s1: 1.1, ty1: 0 },   // the card is already at its reading size when the words appear
+            card: { cx: 300, bottom: 912.8, s0: 1.05, s1: 1.05, ty1: 0 },   // the card is already at its reading size when the words appear
             settle: { at: 0, dur: 1 }, text: { at: 5.8, dur: 0.7 } },
-    // name on the envelope: centre on the 1080x1920 frame, frame pixels per envelope unit, the page's own fit (30 -> 15 units, 252 wide)
-    label: { cx: 540, cy: 1573.79, rot: -3, unit: 2.007273, size: 30, min: 15, maxW: 252, weight: 700, family: 'Caveat', color: '#4B3524', alpha: 0.86,
-             inAt: 1.95, inDur: 0.6, outAt: 4.0, outDur: 0.35,
+    // name on the envelope: centre on the 1080x1920 frame, frame pixels per envelope unit, the page's own fit (30 -> 15 units, 252 wide).
+    // The envelope lies turned by +3 degrees and the name is written at -3 degrees on it: level on the screen (rot 0).
+    label: { cx: 515.47, cy: 1356.73, rot: 0, unit: 1.570909, size: 30, min: 15, maxW: 252, weight: 700, family: 'Caveat', color: '#4B3524', alpha: 0.86,
+             inAt: 1.95, inDur: 0.6, outAt: 4.475, outDur: 0.02,
              text: function (d) { return d && d.t ? 'For ' + d.t : 'With love'; } }
   };
 

@@ -127,11 +127,11 @@
   };
   var LAYOUTS = {
     port: { W: 600, H: 1100, scene: SCENES.tall, sk: 1100 / 2048, sx: -9.375, sy: 0, flame: [54.5, 132.5], lr: 190,
-      env: { e: 1, cx: 290, cy: 690, rot: 3 }, card: { s: 1.05, cx: 300, cy: 560 }, hintY: 958, hintSize: 25,
-      glints: [[478.7,173.9,0.928],[340.1,1010.3,0.737],[121.5,998.2,0.924],[18.6,955.3,0.283],[499.7,979.7,0.94],[499.8,99.0,0.694],[19.4,586.8,0.427],[568.5,500.7,0.608],[550.0,919.3,0.873],[580.5,623.8,0.502],[307.4,954.6,0.863],[101.3,940.5,0.739],[222.0,974.5,0.962],[587.7,225.4,0.47],[586.4,319.9,0.357],[21.4,754.9,0.378]] },
+      env: { e: 0.9, cx: 290, cy: 700, rot: 3, far: 150 }, card: { s: 1.05, cx: 300, cy: 560 }, hintY: 944, hintSize: 25,
+      glints: [[586.5,114.4,0.832],[570.0,505.5,0.318],[560.6,202.0,0.491],[580.4,411.3,0.251],[108.7,994.1,0.619],[17.8,663.0,0.22],[588.3,739.7,0.395],[515.7,1035.7,0.442],[25.5,901.1,0.334],[563.1,858.3,0.738],[462.3,34.6,0.782],[38.6,829.8,0.511],[37.2,1000.2,0.688],[525.5,103.1,0.567],[410.6,107.9,0.466],[364.8,988.7,0.6]] },
     land: { W: 1200, H: 900, scene: SCENES.wide, sk: 1200 / 1728, sx: 0, sy: 0, flame: [239.6, 302.1], lr: 250,
-      env: { e: 0.9, cx: 600, cy: 640, rot: 3 }, card: { s: 1.02, cx: 600, cy: 450 }, hintY: 850, hintSize: 22,
-      glints: [[812.8,61.1,1.0],[559.0,812.5,0.442],[508.0,844.2,0.401],[902.0,89.4,0.705],[991.6,178.1,1.0],[943.3,807.0,1.0],[1002.2,710.5,0.982],[1034.4,243.7,0.93],[1019.6,833.4,0.904],[675.2,84.1,0.44],[874.6,679.3,0.899],[187.6,750.6,1.0],[1127.0,516.6,1.0],[854.7,849.9,0.917],[1071.4,88.8,0.915],[1013.0,390.0,0.965]] }
+      env: { e: 0.85, cx: 600, cy: 590, rot: 3, far: 430 }, card: { s: 1.02, cx: 600, cy: 450 }, hintY: 824, hintSize: 22,
+      glints: [[1092.3,620.1,0.708],[851.6,831.8,0.67],[1074.5,107.4,0.761],[1116.8,514.1,0.718],[179.8,834.8,0.705],[256.8,799.1,0.582],[951.5,848.4,0.555],[858.6,13.8,0.397],[61.5,774.7,0.513],[714.6,48.5,0.342],[1026.2,883.4,0.78],[352.0,828.1,0.434],[1081.1,821.1,0.665],[416.2,811.8,0.693],[937.0,83.3,0.624],[1007.0,801.9,0.446]] }
   };
   var FROST_N = 6;
   // needed before the envelope may arrive / needed only after the tap (loaded meanwhile, never block the arrival)
@@ -181,7 +181,7 @@
     });
     // frost (six layers by birth time) and its ice glints
     var frost = el('div', 'frost', null, stageEl);
-    for (i = 1; i <= FROST_N; i++) img(A + S.frost + '-' + i + '.webp', null, 'animation-delay:' + (2.1 + (i - 1) * 0.5).toFixed(1) + 's', frost);
+    for (i = 1; i <= FROST_N; i++) img(A + S.frost + '-' + i + '.webp', null, 'animation-delay:' + (2.15 + (i - 1) * 0.45).toFixed(2) + 's', frost);
     var gl = el('div', 'glints', null, stageEl);
     L.glints.forEach(function (g) {
       var sv = svg('<circle cx="15" cy="15" r="6" fill="#fff" opacity=".35"/><path d="M15 0l1.7 13.3L30 15l-13.3 1.7L15 30l-1.7-13.3L0 15l13.3-1.7z" fill="#fff"/>', 30, 30, gl);
@@ -199,7 +199,7 @@
 
     // envelope
     var root = el('div', 'envroot', 'left:' + (L.env.cx - ENV.W / 2) + 'px;top:' + (L.env.cy - ENV.H / 2) + 'px;transform:rotate(' + L.env.rot + 'deg) scale(' + e + ')', stageEl);
-    img(A + 'env-dropshadow.png', 'gshadow', null, el('div', 'fly', null, el('div', 'soff', null, root)));   // the shadow follows the flight, away from the lantern
+    img(A + 'env-dropshadow.png', 'gshadow', null, el('div', 'fly', null, el('div', 'far', null, el('div', 'soff', null, root))));   // the shadow follows the flight, away from the lantern
     img(A + 'env-flapbshadow.png', 'fbsh', null, root);
     var envB = el('div', 'envB', null, root);
     img(A + 'env-back.webp', 'eback', null, envB);
@@ -212,14 +212,14 @@
     el('div', 'csh a', null, rig); el('div', 'csh b', null, rig);
     var c3 = el('div', 'card3d', null, el('div', 'cardpersp', null, rig));
     var front = el('div', 'cface front', null, c3);
-    img(A + 'front.jpg', null, null, front); el('div', 'gloss', null, front); el('div', 'warm', null, front);
+    img(A + 'front.jpg', null, null, front); el('div', 'gloss', null, front); el('div', 'warm', null, front); el('div', 'tsh', null, front);
     var back = el('div', 'cface backside', null, c3);
     var face = buildFace(back, data); state.face = face;
-    el('div', 'warm', null, back);
+    el('div', 'warm', null, back); el('div', 'tsh', null, back);
 
     // front of the envelope: pocket (its own layer ABOVE the card), name, flap, twine with seal, blown snow
     var envF = el('div', 'envF', null, root);
-    var fr = el('div', 'fr', null, el('div', 'fly', null, envF));
+    var fr = el('div', 'fr', null, el('div', 'fly', null, el('div', 'far', null, envF)));
     img(A + 'env-pocket.webp', 'epocket', null, fr);
     var label = el('span', null, null, el('span', 'lw', null, el('div', 'elabel', null, fr)));
     label.textContent = data.t ? ('For ' + data.t) : 'With love';
@@ -246,27 +246,23 @@
     stageEl.style.setProperty('--fx', (lx - ENV.W / 2 + hgt * sn).toFixed(2) + 'px');
     stageEl.style.setProperty('--fy', (ly - ENV.cardBottom + hgt * cs).toFixed(2) + 'px');
     stageEl.style.setProperty('--unrot', (-L.env.rot) + 'deg');
+    stageEl.style.setProperty('--far', L.env.far + 'px');   // extra way in from the right, so the first frame is empty
 
-    // wind: powder snow streaming from the right, low over the boards (grains + soft veils)
+    // wind: powder snow streaming from the right, low over the boards (separate flakes; the fast ones show as short streaks)
     var gust = el('div', 'gust', null, stageEl);
-    for (i = 0; i < 34; i++) {
-      var sz = 2.5 + r() * 7, y0 = H * (0.18 + r() * 0.74), dy2 = 30 + r() * 150, big = sz > 8;
-      el('i', null, 'width:' + sz.toFixed(1) + 'px;height:' + sz.toFixed(1) + 'px;' + (big ? 'filter:blur(1.2px);' : '') +
+    for (i = 0; i < 54; i++) {
+      var streak = i % 3 === 0, sz = 2.2 + r() * (streak ? 3.2 : 6.2), y0 = H * (0.16 + r() * 0.76), dy2 = 26 + r() * 140, big = !streak && sz > 7;
+      el('i', streak ? 's' : null, 'width:' + (streak ? sz * (2.4 + r() * 2.2) : sz).toFixed(1) + 'px;height:' + (streak ? sz * 0.7 : sz).toFixed(1) + 'px;' + (big ? 'filter:blur(1.2px);' : '') +
         '--x0:' + Math.round(W + 40 + r() * 160) + 'px;--y0:' + Math.round(y0) + 'px;' +
         '--x1:' + Math.round(W * (0.38 + r() * 0.3)) + 'px;--y1:' + Math.round(y0 + dy2 * (0.35 + r() * 0.3)) + 'px;' +
         '--x2:' + Math.round(-50 - r() * 90) + 'px;--y2:' + Math.round(y0 + dy2) + 'px;' +
-        '--o:' + (0.45 + r() * 0.45).toFixed(2) + ';--d:' + (0.95 + r() * 0.6).toFixed(2) + 's;--dl:' + (r() * 1.25).toFixed(2) + 's', gust);
-    }
-    for (i = 0; i < 4; i++) {
-      var vw = W * (0.7 + r() * 0.5), vh = 70 + r() * 80, vy = H * (0.3 + i * 0.14 + r() * 0.08);
-      el('b', null, 'width:' + vw.toFixed(0) + 'px;height:' + vh.toFixed(0) + 'px;' +
-        '--x0:' + Math.round(W * 0.75) + 'px;--y0:' + Math.round(vy) + 'px;--x2:' + Math.round(-vw * 0.95) + 'px;--y2:' + Math.round(vy + 30 + r() * 40) + 'px;' +
-        '--o:' + (0.55 + r() * 0.4).toFixed(2) + ';--d:' + (1.15 + r() * 0.4).toFixed(2) + 's;--dl:' + (i * 0.22 + r() * 0.15).toFixed(2) + 's', gust);
+        '--o:' + (0.42 + r() * 0.45).toFixed(2) + ';--d:' + ((streak ? 0.62 : 0.95) + r() * 0.55).toFixed(2) + 's;--dl:' + (r() * 1.3).toFixed(2) + 's', gust);
     }
 
     // helpers: the glow from inside the envelope, the hint
     var hs = 560 * e, hc = toStage(ENV.W / 2, 70);
     el('div', 'halo', 'left:' + (hc[0] - hs / 2) + 'px;top:' + (hc[1] - hs / 2) + 'px;width:' + hs + 'px;height:' + hs + 'px', stageEl);
+    el('div', 'grain', null, stageEl);
     var hint = el('div', 'hint', 'top:' + L.hintY + 'px;font-size:' + L.hintSize + 'px', stageEl);
     var coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
     hint.textContent = (coarse ? 'Tap' : 'Click') + ' the envelope to open';
