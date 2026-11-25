@@ -123,13 +123,12 @@ html,body{margin:0;height:100%;background:#120e0c;overflow:hidden;font-family:'C
 #stage.arrive .envB,#stage.arrive .cardrig{animation:b2-in .01s linear 2.05s both}
 #stage.still .envF,#stage.still .envB,#stage.still .cardrig,#stage.still .soff,#stage.still .drift,#stage.still .grains i{opacity:1}
 /* opening (delays are measured from the tap) */
-/* the envelope STAYS on the boards (nothing dissolves in a photograph): the card leaves the pocket, comes forward and settles
-   over it; the envelope is taken away only when the card hides it completely, its ground shadow as the card's own shadow covers it */
-#stage.open .soff{opacity:1;animation:b2-fadeout .25s linear 2.43s both}
-#stage.open .envB{opacity:1;animation:b2-fadeout .01s linear 2.68s both}
-#stage.open .envF{opacity:1;animation:b2-fadeout .01s linear 2.68s both}
+/* the envelope STAYS on the boards to the end (nothing dissolves in a photograph): the card leaves the pocket, comes forward
+   and settles over it; when the card turns, the open envelope is still lying underneath. (Only the base video of "Make it a
+   video" takes it away once the card hides it - render-b2 EXTRA - because the engine cannot redraw the name during the turn.) */
+#stage.open .soff,#stage.open .envB,#stage.open .envF{opacity:1}
 #stage.open .drift{opacity:1;animation:none}
-#stage.open .fbsh{animation:b2-fbsh 1.88s linear .8s both}
+#stage.open .fbsh{animation:b2-fadein .2s linear .8s both}
 #stage.open .bundle{animation:b2-bundle .55s cubic-bezier(.5,0,.85,.55) 0s both}
 #stage.open .flapsh{animation:b2-fadeout .3s ease .22s both}
 #stage.open .flap{animation:b2-flapF .32s cubic-bezier(.45,0,1,.9) .25s both}
@@ -173,7 +172,6 @@ html,body{margin:0;height:100%;background:#120e0c;overflow:hidden;font-family:'C
 @keyframes b2-bundle{0%{opacity:1;transform:translateY(0) rotate(0deg) scale(1)}18%{opacity:1;transform:translateY(-3px) rotate(-1.4deg) scale(1.025)}72%{opacity:1}100%{opacity:0;transform:translateY(300px) rotate(7deg) scale(1)}}
 @keyframes b2-flapF{0%{transform:rotateX(0deg);opacity:1}99%{opacity:1}100%{transform:rotateX(90deg);opacity:0}}
 @keyframes b2-flapB{0%{transform:rotateX(-90deg);opacity:1}100%{transform:rotateX(0deg);opacity:1}}
-@keyframes b2-fbsh{0%{opacity:0}11%{opacity:1}99.4%{opacity:1}100%{opacity:0}}
 @keyframes b2-glowin{0%{opacity:0}35%{opacity:1}100%{opacity:.5}}
 @keyframes b2-halo{0%{opacity:0;transform:scale(.4)}30%{opacity:.9}100%{opacity:0;transform:scale(1.5)}}
 @keyframes b2-rise{from{transform:translate(0,0) rotate(0deg) scale(var(--c0))}to{transform:translate(0,var(--rise)) rotate(0deg) scale(var(--c0))}}

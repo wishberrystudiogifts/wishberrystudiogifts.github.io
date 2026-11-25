@@ -127,7 +127,7 @@
   };
   var LAYOUTS = {
     port: { W: 600, H: 1100, scene: SCENES.tall, sk: 1100 / 2048, sx: -9.375, sy: 0, flame: [54.5, 132.5], lr: 190,
-      env: { e: 0.9, cx: 290, cy: 700, rot: 3, far: 150 }, card: { s: 1.05, cx: 300, cy: 560 }, hintY: 944, hintSize: 25,
+      env: { e: 0.9, cx: 290, cy: 700, rot: 3, far: 150, dim: 0.76 }, card: { s: 1.05, cx: 300, cy: 560 }, hintY: 944, hintSize: 25,
       glints: [[586.5,114.4,0.832],[570.0,505.5,0.318],[560.6,202.0,0.491],[580.4,411.3,0.251],[108.7,994.1,0.619],[17.8,663.0,0.22],[588.3,739.7,0.395],[515.7,1035.7,0.442],[25.5,901.1,0.334],[563.1,858.3,0.738],[462.3,34.6,0.782],[38.6,829.8,0.511],[37.2,1000.2,0.688],[525.5,103.1,0.567],[410.6,107.9,0.466],[364.8,988.7,0.6]] },
     land: { W: 1200, H: 900, scene: SCENES.wide, sk: 1200 / 1728, sx: 0, sy: 0, flame: [239.6, 302.1], lr: 250,
       env: { e: 0.85, cx: 600, cy: 590, rot: 3, far: 430 }, card: { s: 1.02, cx: 600, cy: 450 }, hintY: 824, hintSize: 22,
@@ -226,9 +226,13 @@
     img(A + 'env-flapshadow.png', 'flapsh', null, fr);
     img(A + 'env-flap.webp', 'flap', null, el('div', 'flapFbox', null, fr));
     img(A + 'env-bundle.webp', 'bundle', null, fr);
-    img(A + 'env-drift.webp', 'drift', null, fr);   // a little powder snow left against the windward edge
+    var drift = img(A + 'env-drift.webp', 'drift', null, fr);   // a little powder snow left against the windward edge
     el('div', 'lwarm', null, fr);    // the lantern's flicker on the paper
     el('div', 'fshade', null, fr);   // the paper darkens while it is in the air
+    if (L.env.dim && L.env.dim < 1) {   // upright scene: the envelope rests far from the lantern, in the blue dusk - paper must not outshine the snow beside it
+      envB.style.filter = envF.style.filter = 'brightness(' + L.env.dim + ')';
+      drift.style.filter = 'brightness(' + (1 / L.env.dim).toFixed(4) + ')';   // the snow crumbs keep the brightness of the scene they were cut from
+    }
     var puff = el('div', 'puff', null, root);
     for (i = 0; i < 22; i++) {   // where it touches down: a fine spray of grains from the leading (left) and lower edges
       var onLeft = r() < 0.6, px = onLeft ? r() * 10 : r() * 180, py = onLeft ? 40 + r() * 380 : 420 + r() * 10, ps = 2.5 + r() * 6, first = r() < 0.4;
