@@ -1,0 +1,72 @@
+{
+  "_readme": "Settings of the product link service. Keys that start with an underscore are notes and are ignored by the code. Full guide: service/README.md.",
+
+  "site": "https://wishberrystudiogifts.github.io",
+  "shopUrl": "https://wishberrystudiogifts.etsy.com",
+  "allowedOrigins": ["https://wishberrystudiogifts.github.io"],
+
+  "_defaults_note": "Nikola's rules: 30 days (720 hours) from the FIRST opening, at most 300 openings and at most 100 links per buyer (decided 24 Nov 2026, 23:03 - before that 24 hours, which he found too short: '24h can cause bad reviews'). ttlHours is the one number to change if the time limit changes - the SAME number must then be changed in shared/config.js (tools/check-consistency.mjs compares them). maxSigns = how many invitation links one product link may sign (Claude's addition after the security review, confirmed by Nikola on 24 Nov 2026; 0 = no limit).",
+  "defaults": {
+    "ttlHours": 720,
+    "maxOpens": 300,
+    "ttlStartsAt": "firstOpen",
+    "signInvitations": true,
+    "maxSigns": 100
+  },
+
+  "_activation_note": "maxAttemptsPerHour: counted tries per visitor and clock hour (a try = a check that may cost a request to Etsy, or a miss). negativeCacheMinutes: for how long a 'no such order' is answered without asking Etsy again. retryCheckSeconds: an order that is 'not paid yet' or was let in unchecked is asked about again at the earliest after this. recheckMinutes / maxRechecks / slowRecheckHours: an order let in unchecked is asked about again when its link is opened or signs - the first maxRechecks times at most every recheckMinutes, afterwards at most every slowRecheckHours. maxUncheckedPerHour: how many NEW orders may be let in unchecked per hour overall. uncheckedMaxSigns: how many invitation links an unchecked link may sign during a short Etsy outage (0 = no extra limit). maxEtsyPerMinute / maxEtsyPerDay: our own brake on requests to Etsy (the app's limits are 10 per second and 10,000 per day). maxOpensPerVisitorHour / maxSignsPerVisitorHour: how many openings / new invitation links ONE visitor (one internet address) may make per clock hour, over all links - so that nobody can use up a link's whole allowance in a second (0 = no brake).",
+  "activation": {
+    "maxAttemptsPerHour": 10,
+    "negativeCacheMinutes": 2,
+    "retryCheckSeconds": 60,
+    "recheckMinutes": 30,
+    "maxRechecks": 5,
+    "slowRecheckHours": 6,
+    "maxUncheckedPerHour": 30,
+    "uncheckedMaxSigns": 5,
+    "maxEtsyPerMinute": 20,
+    "maxEtsyPerDay": 2000,
+    "maxOpensPerVisitorHour": 60,
+    "maxSignsPerVisitorHour": 40
+  },
+
+  "etsy": {
+    "shopName": "WishberrystudioGifts",
+    "scopes": "transactions_r",
+    "shopId": null
+  },
+
+  "_products_note": "One entry per NEW product (new standard). Key = product key, the same key as in shared/config.js on the site. listingIds = the Etsy listing ID(s) that include this product (numbers). While listingIds is empty, ANY paid order of our shop unlocks the product when the buyer comes from that product's page (launch grace) - fill the ID in right after the listing is published. Optional per product: ttlHours, maxOpens, ttlStartsAt, maxSigns. lab:true = test product, unlocked only by the test orders below, never by a real order.",
+  "products": {
+    "lab-party-1": {
+      "name": "LAB - Christmas Party invitation (test copy, not for sale)",
+      "lab": true,
+      "listingIds": []
+    },
+    "christmas-card-2": {
+      "_note": "Christmas Card 2 - Snowy Cabin (built 24 Nov 2026). listingIds is EMPTY ON PURPOSE until the listing is published (planned 26 Nov 2026): write the Etsy listing ID here right after publishing. While it is empty, any paid order of the shop unlocks this product from its own page (launch grace).",
+      "name": "Christmas Card 2 - Snowy Cabin",
+      "listingIds": []
+    }
+  },
+
+  "_mock_note": "Test orders (MockVerifier) - they never reach Etsy. On the LIVE service a test order can only unlock a product marked lab:true; every other status is answered as 'no such order' there. With the variable VERIFIER=mock (local tests, previews) a test order may unlock any product it lists, and status may also be unpaid | not_found | error | busy (error = pretend Etsy is unreachable: the buyer is let in and checked later). ranges: every number from..to behaves the same - plenty of fresh test numbers for the LAB product (each number is one link with its own deadline and counter).",
+  "mock": {
+    "ranges": [
+      { "from": 1000001000, "to": 1000001999, "status": "paid", "products": ["lab-party-1"] }
+    ],
+    "orders": {
+      "1000000001": { "status": "paid", "products": ["lab-party-1"] },
+      "1000000002": { "status": "paid", "products": ["lab-party-1"] },
+      "1000000003": { "status": "paid", "products": ["lab-party-1"] },
+      "1000000004": { "status": "paid", "products": ["lab-party-1"] },
+      "1000000005": { "status": "paid", "products": ["lab-party-1"] },
+      "1000000201": { "status": "paid", "products": ["christmas-card-2"] },
+      "1000000202": { "status": "paid", "products": ["christmas-card-2"] },
+      "1000000402": { "status": "unpaid" },
+      "1000000404": { "status": "not_found" },
+      "1000000500": { "status": "error" },
+      "1000000503": { "status": "busy" }
+    }
+  }
+}

@@ -1,0 +1,4 @@
+# Local tests only. Copy to ".dev.vars" (that file is never committed).
+# VERIFIER=mock -> the Etsy API is never called; test orders from config.json unlock any product they list.
+VERIFIER=mock
+STAGE=local

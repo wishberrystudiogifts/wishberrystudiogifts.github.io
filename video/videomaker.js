@@ -84,6 +84,26 @@
     bases: { a: 'new-years-eve-a-base.mp4', b: 'new-years-eve-b-base.mp4', c: 'new-years-eve-c-base.mp4' }
   };
 
+  /* Christmas Card 2 "Snowy Cabin" (24 Nov 2026; scene "the cabin doorstep" and new numbers 25 Nov 2026): the base video is
+     the recipient page itself, rendered frame by frame (render-b2.js) with the written side empty and no name on the
+     envelope. The envelope ARRIVES first (the wind slides it in over the porch boards), so the tap is at 2.3 s. The words
+     are laid out by the recipient page (index.html#view=face in a hidden frame), read back and drawn on the turned card;
+     the name is WRITTEN on the envelope (wiped in from the left) once it has come to rest. The envelope stays on the boards
+     and the card settles OVER it: the name is drawn until the last frame before the card's lower edge reaches the writing
+     (frame 134 = 4.467 s: edge at y 1291, writing from y 1333; frame 135 = 4.5 s: edge at y 1355) - a cut, not a fade.
+     Geometry measured on every frame of the base video (render-b2.js MEASURE). */
+  TEMPLATES['christmas-card-2'] = {
+    kind: 'invite', fps: 30, defaultDesign: 'a', bases: { a: 'christmas-card-2-base.mp4' },
+    geom: { frame: { W: 1080, H: 1920 }, stage: { W: 600, H: 1100 },
+            card: { cx: 300, bottom: 896.13, s0: 1.05, s1: 1.05, ty1: 0 },   // measured on the base video 25 Nov (render-b2.js MEASURE; the stage fills the frame: scale 1.8, no side bars): the card is already at its reading size when the words appear
+            settle: { at: 0, dur: 1 }, text: { at: 7.9, dur: 0.7 } },   // 25 Nov: the envelope opens at 3.3 s (was 2.3) and the picture is shown longer
+    // name on the envelope: centre on the 1080x1920 frame, frame pixels per envelope unit, the page's own fit (30 -> 15 units, 252 wide).
+    // The envelope lies turned by +3 degrees and the name is written at -3 degrees on it: level on the screen (rot 0).
+    label: { cx: 515.52, cy: 1353.67, rot: 0, unit: 1.44, size: 30, min: 15, maxW: 252, weight: 700, family: 'Caveat', color: '#4B3524', alpha: 0.86,
+             inAt: 1.95, inDur: 0.6, outAt: 5.475, outDur: 0.02,
+             text: function (d) { return d && d.t ? 'For ' + d.t : 'With love'; } }
+  };
+
   /* ---------- CSS-identical easing ---------- */
   function bezier(x1, y1, x2, y2) {
     function A(p1, p2) { return 1 - 3 * p2 + 3 * p1; }
@@ -608,6 +628,31 @@
     });
     return Promise.all(loads);
   }
+  /* the name written on the envelope (templates with `label`): same font, fit, place and fades as on the recipient page */
+  function prepareLabel(G, data) {
+    var c = document.createElement('canvas').getContext('2d'), text = G.text(data), size = G.size;
+    function f(sz) { return G.weight + ' ' + (sz * G.unit).toFixed(2) + 'px ' + G.family + ', cursive'; }
+    c.font = f(size);
+    while (c.measureText(text).width > G.maxW * G.unit && size > G.min) { size -= 1; c.font = f(size); }
+    var m = c.measureText(text), asc = m.fontBoundingBoxAscent, desc = m.fontBoundingBoxDescent;
+    return { text: text, font: f(size), w: m.width, dy: (isFinite(asc) && isFinite(desc)) ? (asc - desc) / 2 : null };
+  }
+  var WIPE = bezier(0.4, 0, 0.6, 1);
+  function drawLabel(ctx, Lb, G, t) {   // written on from the left after the landing; ink sinks into the paper (multiply)
+    var p = t < G.inAt ? 0 : WIPE(Math.min(1, (t - G.inAt) / G.inDur)), a = G.alpha;
+    if (t > G.outAt) a *= 1 - EASE(Math.min(1, (t - G.outAt) / G.outDur));
+    if (p <= 0 || a <= 0) return;
+    ctx.save();
+    ctx.globalAlpha = a; ctx.globalCompositeOperation = 'multiply';
+    ctx.translate(G.cx, G.cy); ctx.rotate(G.rot * Math.PI / 180);
+    ctx.font = Lb.font; ctx.fillStyle = G.color; ctx.textAlign = 'center';
+    var w = Lb.w + 12 * G.unit;
+    ctx.beginPath(); ctx.rect(-w / 2, -40 * G.unit, w * p, 80 * G.unit); ctx.clip();
+    ctx.shadowColor = 'rgba(75,53,36,0.6)'; ctx.shadowBlur = 1.1 * G.unit;
+    if (Lb.dy === null) { ctx.textBaseline = 'middle'; ctx.fillText(Lb.text, 0, 0); }
+    else { ctx.textBaseline = 'alphabetic'; ctx.fillText(Lb.text, 0, Lb.dy); }
+    ctx.restore();
+  }
   function drawInvite(c, L, k) { // c is already in face units; k = face unit -> frame pixel (shadows are in frame pixels)
     L.ops.forEach(function (op) {
       c.save();
@@ -721,11 +766,14 @@
     if (!opts.face) return Promise.reject(new Error('face'));
     return measureInvite(opts.face)
       .then(function (L) { lay = L; return ensureInviteFonts(L); })
+      .then(function () { return tpl.label ? document.fonts.load(tpl.label.weight + ' 40px ' + tpl.label.family, tpl.label.text(opts.data || {})).catch(function () { return null; }) : null; })
       .then(function () { return fetch(root + tpl.bases[design]); })
       .then(function (r) { if (!r.ok) throw new Error('base video ' + r.status); return r.arrayBuffer(); })
       .then(function (buf) {
         var layer = null, lctx = null, lastKey = '';
+        var lab = tpl.label ? prepareLabel(tpl.label, opts.data || {}) : null;
         return encodeVideo(buf, tpl.fps, opts, function (ctx, t, W, H) {
+          if (lab) drawLabel(ctx, lab, tpl.label, t);
           var a = detailsAlpha(G, t);
           if (a <= 0) return;
           var M = faceMatrix(G, t), key = M.map(function (v) { return v.toFixed(4); }).join(',');

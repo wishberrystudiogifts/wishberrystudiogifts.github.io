@@ -1,0 +1,58 @@
+{
+	// Wishberry product link service — Cloudflare Worker + D1.
+	// Workers Builds (set up 23 Nov 2026): root directory /service · main -> "npx wrangler deploy" · other branches -> "npx wrangler preview".
+	"$schema": "node_modules/wrangler/config-schema.json",
+
+	// MUST stay exactly "product-link": Workers Builds fails when it differs from the Worker name in the dashboard.
+	"name": "product-link",
+	"main": "src/index.js",
+	"compatibility_date": "2026-11-01",
+	"workers_dev": true,
+	// Worker Previews get their own address (<branch>-product-link.<subdomain>.workers.dev). Without this line
+	// the preview builds but has "no active URLs" (found 24 Nov 2026 in the build log).
+	"preview_urls": true,
+	// Logs: only the lines our own code prints (errors). Request addresses are NOT kept (an address holds a buyer's
+	// product link hash) and outgoing requests are NOT traced (the address of an Etsy receipt holds an order number).
+	"observability": {
+		"enabled": true,
+		"logs": { "enabled": true, "invocation_logs": false },
+		"traces": { "enabled": false }
+	},
+
+	// Live database (Cloudflare dashboard -> D1 -> product-link-db). The tables create themselves on the first request.
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "product-link-db",
+			"database_id": "9261c19a-3f8b-4b77-891e-0b39074a5a4c"
+		}
+	],
+
+	// Daily tidy-up of our own tables at 03:17 UTC (src/db.js → housekeeping). It never calls Etsy.
+	"triggers": { "crons": ["17 3 * * *"] },
+
+	// Worker Previews (every push of a non-main branch that touches service/): previews do NOT inherit the settings above,
+	// so the database and the log settings are named again here. A preview uses the SAME database but its OWN tables
+	// (prefix pv_), its own keys, and never calls Etsy (VERIFIER=mock). The code of a preview only ever reads and writes
+	// the pv_ tables; the separation is by table name, not by a second database. To give previews a database of their
+	// own later, create one in the dashboard and put its name and id here.
+	"previews": {
+		"vars": {
+			"STAGE": "preview",
+			"TABLE_PREFIX": "pv_",
+			"VERIFIER": "mock"
+		},
+		"observability": {
+			"enabled": true,
+			"logs": { "enabled": true, "invocation_logs": false },
+			"traces": { "enabled": false }
+		},
+		"d1_databases": [
+			{
+				"binding": "DB",
+				"database_name": "product-link-db",
+				"database_id": "9261c19a-3f8b-4b77-891e-0b39074a5a4c"
+			}
+		]
+	}
+}

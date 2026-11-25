@@ -1,0 +1,59 @@
+/* Wishberry — styles of the product link screens (activation form, status line, "expired" and other plain messages).
+   Phone first; every text is at least 16px; one big button. */
+
+/* --- buyer page opened at its own address in mode 'hash': only the activation form is shown --- */
+html.wb-gated body > *:not(#wb-gate) { display: none !important; }
+html.wb-gated, html.wb-gated body { background: #FBF7EE !important; overflow: auto !important; height: auto !important; min-height: 100%; }
+
+/* --- plain message pages (router, recipient page) --- */
+html.wb-plain, html.wb-plain body.wb-page {
+  margin: 0 !important; padding: 0 !important; height: auto !important; min-height: 100% !important; overflow: auto !important;
+  background: #FBF7EE !important; position: static !important;
+}
+body.wb-page, .wb-gate {
+  color: #2A2620; font: 18px/1.55 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-text-size-adjust: 100%;
+}
+.wb-gate { min-height: 100vh; background: #FBF7EE; }
+.wb-card { box-sizing: border-box; max-width: 34em; margin: 0 auto; padding: 28px 20px 44px; text-align: left; }
+.wb-card * { box-sizing: border-box; }
+.wb-card h1 { font: 600 30px/1.2 'Fraunces', Georgia, 'Times New Roman', serif; color: #1F3326; margin: 6px 0 12px; text-align: left; }
+.wb-card p { margin: 0 0 14px; font-size: 18px; color: #2A2620; text-align: left; max-width: none; }
+.wb-card .wb-lead { font-size: 19px; color: #3D362E; }
+.wb-card .wb-badge { display: inline-block; margin: 0 0 6px; padding: 5px 12px; border-radius: 999px; background: #1F3326; color: #F4ECDD; font-size: 16px; letter-spacing: .04em; }
+.wb-card .wb-small { font-size: 16px; color: #5B5248; }
+.wb-card .wb-legal { border-top: 2px solid #EADFCB; padding-top: 14px; margin-top: 18px; }
+.wb-card a { color: #1F3326; }
+.wb-card .wb-loading { font-size: 19px; color: #5B5248; text-align: center; padding: 22vh 0; }
+
+.wb-form { margin: 18px 0 10px; }
+.wb-form label { display: block; font-weight: 700; font-size: 18px; margin: 0 0 6px; color: #2A2620; }
+.wb-form input { width: 100%; font: inherit; font-size: 22px; letter-spacing: .04em; color: #2A2620; background: #FFFDF8; border: 2px solid #CDBFA6; border-radius: 12px; padding: 14px; min-height: 58px; outline: none; }
+.wb-form input:focus { border-color: #1F3326; box-shadow: 0 0 0 4px rgba(31, 51, 38, .15); }
+.wb-card .wb-err { color: #9B1C1C; font-weight: 700; margin: 10px 0 0; }
+.wb-other { margin-top: 10px; }
+
+.wb-btns { display: grid; grid-template-columns: 1fr; gap: 10px; margin: 20px 0 10px; }
+@media (min-width: 520px) { .wb-btns { grid-template-columns: 1fr 1fr; } .wb-btns.wb-one { grid-template-columns: 1fr; } }
+.wb-btn { display: inline-flex; align-items: center; justify-content: center; text-align: center; font: 700 19px/1.2 'Segoe UI', Roboto, Arial, sans-serif; border-radius: 14px; padding: 16px 20px; min-height: 58px; cursor: pointer; text-decoration: none; border: 2px solid transparent; }
+.wb-btn.wb-primary { background: #7A1F2B; color: #fff !important; box-shadow: 0 8px 20px rgba(122, 31, 43, .25); font-size: 21px; min-height: 64px; }
+.wb-btn.wb-primary:hover { background: #651823; }
+.wb-btn.wb-primary[disabled] { opacity: .7; cursor: default; }
+.wb-btn.wb-ghost { background: #fff; color: #1F3326 !important; border-color: #1F3326; }
+.wb-btn.wb-wide { width: 100%; margin-top: 14px; }
+
+.wb-help { margin: 16px 0 8px; background: #fff; border: 2px solid #EADFCB; border-radius: 14px; padding: 12px 16px; }
+.wb-help summary { cursor: pointer; font-weight: 700; font-size: 18px; color: #1F3326; }
+.wb-help ul { margin: 10px 0 2px; padding-left: 22px; }
+.wb-help li { font-size: 17px; margin: 0 0 8px; }
+.wb-steps { margin: 18px 0 16px; padding-left: 26px; }
+.wb-steps li { font-size: 18px; margin: 0 0 6px; }
+
+/* --- the line at the top of the buyer's page in mode 'hash' --- */
+.wb-status { display: flex; gap: 8px; align-items: flex-start; justify-content: center; background: #F1F4EF; color: #1F3326; border-bottom: 2px solid #D3DDD2; padding: 10px 16px; font: 600 16px/1.4 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; text-align: center; }
+.wb-status .wb-lock { flex: none; }
+
+/* --- a ribbon for test copies (LAB) so nobody mistakes them for a product --- */
+.wb-testribbon { position: fixed; z-index: 9999; left: 0; right: 0; bottom: 0; background: #7A1F2B; color: #fff; font: 700 16px/1.3 'Segoe UI', Roboto, Arial, sans-serif; text-align: center; padding: 8px 12px; letter-spacing: .06em; pointer-events: none; }
+.wb-testribbon.wb-top { top: 0; bottom: auto; }
+.inside-view .wb-testribbon, html.wb-gated .wb-testribbon { display: none; }
+@media print { .wb-testribbon, .wb-status { display: none !important; } }

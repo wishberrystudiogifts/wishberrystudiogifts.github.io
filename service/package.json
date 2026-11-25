@@ -1,0 +1,17 @@
+{
+  "name": "product-link-service",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Wishberry product link service (Cloudflare Worker + D1): personal product links with an expiry and an open counter.",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev --local --port 8787",
+    "deploy": "wrangler deploy",
+    "preview": "wrangler preview",
+    "check": "wrangler deploy --dry-run --outdir .wrangler/dry-run",
+    "test": "node test/run-all.mjs"
+  },
+  "devDependencies": {
+    "wrangler": "4.167.0"
+  }
+}

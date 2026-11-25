@@ -1,0 +1,223 @@
+/* Christmas Card 2 "Snowy Cabin" — recipient page (24 Nov 2026; scene and finale redone 25 Nov 2026).
+   ONE story, "a letter that comes home": the card's picture shows the cabin from afar — the scene is the DOORSTEP of that
+   cabin, seen from above (old porch boards, drifted snow, a lit lantern, a fir branch, the doormat, a sled).
+   The winter wind slides the envelope in over the boards; it lies there by lantern light (contact shadow away from the
+   lantern, a little blown snow against its windward edge). Tap: the twine with the seal slips off, the flap lifts, the
+   card slides up OUT of the pocket. Finale (this product only): the lantern flame flares, its warm light spreads over
+   the boards, and frost draws crystal ferns on the wood around the card — but not where the lantern's warmth reaches.
+   Only transform and opacity are animated. */
+@font-face{font-family:'Caveat';font-style:normal;font-weight:500;font-display:block;src:url(fonts/caveat-latin-500-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Caveat';font-style:normal;font-weight:500;font-display:block;src:url(fonts/caveat-latin-ext-500-normal.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:'Caveat';font-style:normal;font-weight:700;font-display:block;src:url(fonts/caveat-latin-700-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Caveat';font-style:normal;font-weight:700;font-display:block;src:url(fonts/caveat-latin-ext-700-normal.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:'Amatic SC';font-style:normal;font-weight:700;font-display:block;src:url(fonts/amatic-sc-latin-700-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Amatic SC';font-style:normal;font-weight:700;font-display:block;src:url(fonts/amatic-sc-latin-ext-700-normal.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#120e0c;overflow:hidden;font-family:'Caveat','Segoe Print','Bradley Hand',cursive;-webkit-tap-highlight-color:transparent}
+.backdrop{position:fixed;left:-40px;top:-40px;width:calc(100% + 80px);height:calc(100% + 80px);object-fit:cover;filter:blur(22px) brightness(.5) saturate(1.05);z-index:0;pointer-events:none}
+#stage{position:absolute;left:50%;top:50%;overflow:hidden;z-index:1;cursor:pointer;background:#1b1512;box-shadow:0 0 90px rgba(0,0,0,.55)}
+#stage.done{cursor:default}
+#stage img{display:block;position:absolute;-webkit-user-drag:none;user-select:none}
+/* ---------- scene: the picture + the same picture in lantern light (two overlays: the near pool, the far wash) ---------- */
+.scene{position:absolute;left:0;top:0;transform-origin:0 0;pointer-events:none}
+.scene img{left:0;top:0}
+.scene .lit{opacity:0;will-change:opacity}
+/* the lantern: a living flame (three soft lights that breathe out of step) */
+.lant{position:absolute;width:0;height:0;pointer-events:none;z-index:1}
+.lant i{position:absolute;border-radius:50%;will-change:opacity,transform}
+.lant .g1{background:radial-gradient(circle,rgba(255,196,110,.50),rgba(255,176,84,.20) 38%,rgba(255,160,70,0) 68%);opacity:.24;animation:b2-flick1 2.3s ease-in-out infinite alternate}
+.lant .g2{background:radial-gradient(circle,rgba(255,214,140,.55),rgba(255,190,104,.2) 42%,rgba(255,180,90,0) 70%);opacity:.22;animation:b2-flick2 1.3s ease-in-out infinite alternate}
+.lant .core{background:radial-gradient(circle,rgba(255,250,228,.95),rgba(255,226,150,.5) 45%,rgba(255,200,110,0) 72%);opacity:.34;animation:b2-flick3 .7s ease-in-out infinite alternate}
+/* frost: six layers by birth time, faded in one after another = it grows from the edges toward the card */
+.frost{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:1;opacity:.46}   /* 25 Nov: frost, not fog */
+.frost img{left:0;top:0;width:100%;height:100%;opacity:0;will-change:opacity}
+.glints{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:1}
+.glints svg{position:absolute;width:30px;height:30px;margin:-15px 0 0 -15px;opacity:0}
+/* snow grains the wind leaves on the boards */
+.grains{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:1}
+.grains i{position:absolute;border-radius:45% 55% 50% 60%;background:radial-gradient(circle at 35% 30%,#eef4ff,#c5d3ee 60%,#9fb1d4);box-shadow:1px 1.4px 1.4px rgba(6,8,20,.45);opacity:0}
+/* ---------- wind and powder snow of the arrival (from the right, low over the boards) ---------- */
+.gust{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:5}
+.gust i{position:absolute;left:0;top:0;border-radius:50%;background:radial-gradient(circle at 40% 40%,rgba(255,255,255,.98),rgba(238,244,255,.6) 55%,rgba(230,240,255,0));opacity:0}
+.gust i.s{background:linear-gradient(90deg,rgba(240,246,255,.9),rgba(236,243,255,.45) 40%,rgba(230,240,255,0))}   /* a flake seen as a short streak: it is fast */
+/* ---------- envelope (units: 312 x 430; the root is turned by a few degrees: it lies as the wind left it) ---------- */
+.envroot{position:absolute;width:312px;height:430px;transform-origin:156px 215px;pointer-events:none;z-index:2}
+.soff,.far,.fly{position:absolute;left:0;top:0;width:312px;height:430px}
+.fly{transform-origin:50% 55%;will-change:transform}
+.soff{opacity:0;z-index:1}
+.gshadow{left:-25px;top:-22px;width:372px;height:490px;filter:blur(5px)}
+.fbsh{left:-20px;top:-201px;width:352px;height:221px;opacity:0;z-index:1}
+.envB{position:absolute;inset:0;z-index:2;opacity:0}
+.eback{left:0;top:0;width:312px;height:136px}
+.inglow{position:absolute;left:36px;top:-20px;width:240px;height:190px;border-radius:50%;background:radial-gradient(ellipse at 50% 55%,rgba(255,214,140,.95),rgba(255,190,110,.5) 40%,rgba(255,180,90,0) 70%);opacity:0}
+.flapBbox{position:absolute;left:0;top:-181px;width:312px;height:181px;perspective:900px;perspective-origin:50% 100%}
+.flapB{position:absolute;inset:0;transform-origin:50% 100%;transform:rotateX(-90deg);opacity:0}
+.flapin{left:0;top:0;width:312px;height:181px}
+.cardrig{position:absolute;left:-84px;top:-248px;width:480px;height:672px;transform-origin:50% 100%;transform:translate(0,0) rotate(0deg) scale(var(--c0));z-index:3;opacity:0}
+/* the card's shadow: short while it slides out (a little lifted - it passes over the lantern's foot and the fir twigs), long and soft (away from the lantern) once it comes forward */
+.csh{position:absolute;inset:0;border-radius:3px}
+.csh.a{box-shadow:6px 9px 15px rgba(6,8,20,.55);opacity:0}   /* no shadow while the card is still inside the envelope */
+.csh.b{box-shadow:2px 3px 4px rgba(6,4,10,.38),16px 12px 34px rgba(10,8,14,.3);opacity:0}
+.cardpersp{position:absolute;inset:0;perspective:1900px}
+.card3d{position:absolute;inset:0;transform-style:preserve-3d;-webkit-transform-style:preserve-3d}
+.cface{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden;border-radius:3px}
+.cface.front{background:#1b2740}
+.cface.front img{left:0;top:0;width:100%;height:100%;object-fit:cover}
+.cface.front .gloss{position:absolute;inset:0;border-radius:3px;background:linear-gradient(118deg,rgba(255,255,255,.08) 0%,rgba(255,255,255,.02) 36%,rgba(255,255,255,0) 58%);box-shadow:inset 0 0 0 1.2px rgba(255,248,228,.42)}   /* a hairline of paper edge */
+.cface .warm{position:absolute;inset:0;border-radius:3px;background:radial-gradient(ellipse 88% 72% at 0% 0%,rgba(255,168,74,.48),rgba(255,170,80,.17) 45%,rgba(255,170,80,0) 76%),linear-gradient(135deg,rgba(10,16,40,0) 45%,rgba(10,16,40,.30) 100%);opacity:.5;pointer-events:none}   /* lantern light on the card's near corner, evening on the far one */
+.cface .tsh{position:absolute;inset:0;border-radius:3px;background:#0a0d1c;opacity:0;pointer-events:none}   /* a side turned away from the light is in shade: the card darkens as it turns edge-on and the written side brightens as it comes round */
+.cface.backside{transform:rotateY(180deg)}
+.envF{position:absolute;inset:0;z-index:4;opacity:0}
+.envT{position:absolute;inset:0;z-index:4;opacity:0}   /* the twine bundle once it has left the envelope (see #stage.open) */
+.bwrap{position:absolute;left:0;top:101.84px;width:312px;height:155.67px;will-change:transform}
+.bwrap img{left:0;top:0;width:312px;height:155.67px}
+.bwrap .bsh{filter:brightness(0) blur(1.6px);opacity:0;transform:translate(1.5px,2.5px)}
+.fr{position:absolute;inset:0}
+.epocket{left:0;top:0;width:312px;height:430px}
+.elabel{position:absolute;left:16px;right:16px;top:279px;height:44px;display:flex;align-items:center;justify-content:center;transform:rotate(-3deg);font-family:'Caveat',cursive;font-weight:700;font-size:30px;line-height:1;color:#4B3524;white-space:nowrap;opacity:.86;mix-blend-mode:multiply}
+/* the name is WRITTEN on after the envelope has come to rest (wiped in from the left); the ink sinks into the paper */
+.elabel .lw{display:block;overflow:hidden;padding:7px 0}
+.elabel .lw span{display:block;padding:0 6px;text-shadow:0 0 1.1px rgba(75,53,36,.6)}   /* same width as .lw: the two slides cancel exactly */
+.ewarm{position:absolute;left:1px;top:1px;right:1px;bottom:1px;border-radius:3px;pointer-events:none;background:radial-gradient(ellipse 110% 80% at 0% 0%,rgba(255,150,60,.34),rgba(255,150,60,.12) 45%,rgba(255,150,60,0) 75%)}
+.eflare{position:absolute;left:1px;top:1px;right:1px;bottom:1px;border-radius:3px;pointer-events:none;background:linear-gradient(150deg,rgba(255,170,80,.5),rgba(255,160,76,.28) 60%,rgba(255,150,70,.16));mix-blend-mode:soft-light;opacity:0}   /* 25 Nov: when the lantern flares, its light reaches the envelope too */
+#stage.open .eflare{animation:b2-fadeto 1.2s ease-out 1.5s both}
+.contact{position:absolute;left:0;top:0;width:312px;height:430px;border-radius:3px;transform:skew(.5deg,.35deg);transform-origin:0 0;box-shadow:0 0 1.5px 1px rgba(12,7,4,.55),3px 4px 3px rgba(12,7,4,.5),8px 12px 14px rgba(8,6,14,.32);opacity:0}   /* 25 Nov: the paper touches the boards (tight dark contact on the far side from the lantern) */
+#stage.arrive .contact{animation:b2-fadein .2s ease 1.95s both}
+#stage.open .contact,#stage.still .contact,#stage.instant .contact{opacity:1;animation:none}
+.eshade{position:absolute;left:1px;top:1px;right:1px;bottom:1px;border-radius:3px;pointer-events:none;background:linear-gradient(128deg,rgba(255,196,120,.10) 0%,rgba(255,196,120,0) 30%,rgba(16,20,42,.12) 58%,rgba(12,15,34,.30) 100%);box-shadow:inset 1.2px 1.2px 0 rgba(255,226,180,.55),inset -1px -1px 0 rgba(50,32,16,.45)}   /* 25 Nov: paper is lit from the lantern's side and falls into the blue dusk on the far side (was evenly lit) */
+.fshade{position:absolute;left:1px;top:1px;right:1px;bottom:1px;border-radius:3px;background:linear-gradient(120deg,rgba(10,10,26,.9),rgba(10,10,26,.6));opacity:0}
+.lwarm{position:absolute;left:1px;top:1px;right:1px;bottom:1px;border-radius:3px;background:radial-gradient(ellipse 120% 95% at 0% 8%,rgba(255,176,88,.95),rgba(255,170,84,.42) 40%,rgba(255,170,90,0) 78%);mix-blend-mode:soft-light;opacity:.5;animation:b2-flick2 1.3s ease-in-out infinite alternate}   /* the lantern's flicker reaches the paper */
+.flapsh{left:0;top:0;width:312px;height:205px}
+.flapFbox{position:absolute;left:0;top:0;width:312px;height:181px;perspective:900px;perspective-origin:50% 0%}
+.flap{left:0;top:0;width:312px;height:181px;transform-origin:50% 0%}
+.bundle{left:0;top:101.84px;width:312px;height:155.67px;filter:drop-shadow(2px 3.5px 2.2px rgba(28,16,6,.55))}   /* 25 Nov: seal and sprig stand off the paper */
+.drift{left:282px;top:-20px;width:70px;height:470px;opacity:0;display:none}   /* 25 Nov: removed - the crumbs read as a cut-out */
+.puff{position:absolute;left:0;top:0;width:312px;height:430px;z-index:5}
+.puff i{position:absolute;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.8),rgba(236,243,255,.34) 42%,rgba(230,240,255,0) 68%);opacity:0}
+/* ---------- the written side of the card (also the buyer's live preview and what the video engine reads) ---------- */
+.iface{position:absolute;inset:0;overflow:hidden;background:#FBF6EA}
+.iface img,.iface svg{display:block;position:absolute}
+.iface .paper{left:0;top:0;width:100%;height:100%;object-fit:cover;opacity:.9}
+.iface .orn-top{left:40px;top:34px;width:400px;height:74px}
+.iface .orn-bot{left:190px;top:596px;width:100px;height:30px}
+.iface .frame{position:absolute;inset:16px;border:1.5px solid rgba(37,50,77,.16);border-radius:2px}
+.itxt{position:absolute;left:50px;right:50px;top:132px;height:446px;display:flex;align-items:center;justify-content:center;font-size:10px;opacity:0;will-change:opacity}
+.iin{width:100%;display:flex;flex-direction:column;align-items:center;text-align:center;font-family:'Caveat','Segoe Print','Bradley Hand',cursive;color:#25324D}
+.iin .greet{font-size:4em;font-weight:700;line-height:1.15;overflow-wrap:anywhere;max-width:100%}
+.iin .msg{margin-top:.5em;font-size:3.35em;font-weight:500;line-height:1.24;white-space:pre-wrap;overflow-wrap:anywhere;max-width:100%}
+.iin .sign{margin-top:.55em;font-size:3.6em;font-weight:700;line-height:1.2;color:#8E2A32;white-space:pre-wrap;overflow-wrap:anywhere;max-width:100%}
+.iin .greet:empty,.iin .sign:empty{display:none}
+/* one film grain over the photograph and the paper alike */
+.grain{position:absolute;left:0;top:0;width:100%;height:100%;background:url(assets/grain.png) 0 0/80px 80px;opacity:.26;pointer-events:none;z-index:7}
+/* ---------- helpers ---------- */
+.halo{position:absolute;border-radius:50%;background:radial-gradient(circle,rgba(255,226,160,.5),rgba(255,200,120,.18) 40%,rgba(255,190,110,0) 68%);opacity:0;pointer-events:none;z-index:6}
+.hint{position:absolute;left:0;right:0;text-align:center;font-family:'Amatic SC','Caveat',cursive;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#FFF4D6;text-shadow:0 2px 12px rgba(4,6,16,.85);opacity:0;z-index:8;pointer-events:none}
+#stage.landed .hint{animation:b2-hint 2.4s ease-in-out .3s infinite}
+#stage.open .hint,#stage.wait .hint{animation:none;opacity:0}
+#controls{position:fixed;left:0;right:0;bottom:max(18px,env(safe-area-inset-bottom));display:flex;flex-wrap:wrap;gap:12px;justify-content:center;z-index:5;opacity:0;transition:opacity .9s;pointer-events:none;padding:0 12px}
+#controls.show{opacity:1;pointer-events:auto}
+#controls button,#controls a{font:700 21px/1 'Caveat',cursive;padding:14px 22px;border-radius:999px;border:1px solid rgba(255,255,255,.4);background:rgba(20,15,13,.7);color:#FFF4D6;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);text-decoration:none;cursor:pointer}
+#controls a{background:rgba(246,198,104,.95);color:#231a14;border-color:rgba(255,255,255,.25)}
+/* ---------- states ---------- */
+/* arrival: 2.1 s — low flight in from the right, touch, slide, one short hop, slide to rest */
+#stage.arrive .envF{animation:b2-in .01s linear 0s both}
+#stage.arrive .fly{animation:b2-fly 2.1s linear 0s both}
+#stage.arrive .far{animation:b2-far 2.1s linear 0s both}   /* it starts wholly outside the picture, however wide the picture is */
+#stage.arrive .soff{animation:b2-soff 2.1s linear 0s both}
+#stage.arrive .fshade{animation:b2-fshade 2.1s linear 0s both}
+#stage.arrive .gust i{animation:b2-gust var(--d) linear var(--dl) both}
+#stage.arrive .grains i{animation:b2-fadein .3s ease var(--dl) both}
+#stage.arrive .puff i{animation:b2-puff .65s ease-out var(--dl) both}
+#stage.arrive .drift{animation:b2-fadein .5s ease 1.6s both}
+#stage.arrive .elabel .lw{animation:b2-wipeA .6s cubic-bezier(.4,0,.6,1) 1.95s both}
+#stage.arrive .elabel .lw span{animation:b2-wipeB .6s cubic-bezier(.4,0,.6,1) 1.95s both}
+#stage.arrive .envB,#stage.arrive .cardrig{animation:b2-in .01s linear 2.05s both}
+#stage.still .envF,#stage.still .envB,#stage.still .cardrig,#stage.still .soff,#stage.still .drift,#stage.still .grains i{opacity:1}
+/* opening (delays are measured from the tap) */
+/* the envelope STAYS on the boards to the end (nothing dissolves in a photograph): the card leaves the pocket, comes forward
+   and settles over it; when the card turns, the open envelope is still lying underneath. (Only the base video of "Make it a
+   video" takes it away once the card hides it - render-b2 EXTRA - because the engine cannot redraw the name during the turn.) */
+#stage.open .soff,#stage.open .envB,#stage.open .envF{opacity:1}
+#stage.open .drift{opacity:1;animation:none}
+#stage.open .fbsh{animation:b2-fadein .2s linear .8s both}
+/* the twine with the seal SLIPS OFF and stays lying on the boards just below the envelope (nothing vanishes in a photograph);
+   later the card settles over the envelope and the seal is left peeking out under the card's lower edge */
+#stage.open .envT{opacity:1}
+#stage.open .fr .bundle{opacity:0}   /* the twin (.envT) takes over at the tap: same picture, same place */
+#stage.open .bwrap{animation:b2-bundle .8s linear 0s both}
+#stage.open .bwrap .bsh{animation:b2-bsh .3s ease-out .05s both}
+#stage.open .flapsh{animation:b2-fadeout .3s ease .22s both}
+#stage.open .flap{animation:b2-flapF .32s cubic-bezier(.45,0,1,.9) .25s both}
+#stage.open .flapB{animation:b2-flapB .4s cubic-bezier(0,.1,.3,1) .57s both}
+#stage.open .inglow{animation:b2-glowin 1.5s ease .45s both}
+#stage.open .halo{animation:b2-halo 1.3s ease-out .5s both}
+#stage.open .cardrig{opacity:1;animation:b2-rise 1.05s cubic-bezier(.3,.05,.2,1) .7s both,b2-settle .8s cubic-bezier(.45,0,.2,1) 1.85s forwards,b2-ztop .01s linear 1.79s both}
+#stage.open .csh.a{animation:b2-csha 1.95s linear .7s both}
+#stage.open .csh.b{animation:b2-fadein .8s ease 1.85s both,b2-shflip .75s cubic-bezier(.45,0,.3,1) 3.85s both}
+#stage.open .card3d{animation:b2-flip .75s cubic-bezier(.45,0,.3,1) 3.85s both}
+#stage.open .cface.front .tsh{animation:b2-tshA .75s cubic-bezier(.45,0,.3,1) 3.85s both}
+#stage.open .cface.backside .tsh{animation:b2-tshB .75s cubic-bezier(.45,0,.3,1) 3.85s both}
+#stage.open .itxt{animation:b2-fadein .7s ease 4.6s both}
+/* finale: the flame flares, the light spreads (near pool, then the far wash), frost grows, ice glints; then a calm flicker.
+   The resting flicker (first in each list - the same running animation, not restarted) goes on until the flare takes over,
+   so the lantern does not blink at the tap. */
+#stage.open .lant .g1{animation:b2-flick1 2.3s ease-in-out infinite alternate,b2-flare1 2.4s ease-out 1.45s forwards,b2-calm1 2.9s ease-in-out 3.9s infinite alternate}
+#stage.open .lant .g2{animation:b2-flick2 1.3s ease-in-out infinite alternate,b2-flare2 2s ease-out 1.45s forwards,b2-calm2 1.1s ease-in-out 3.5s infinite alternate}
+#stage.open .lant .core{animation:b2-flick3 .7s ease-in-out infinite alternate,b2-flare3 1.6s ease-out 1.45s forwards,b2-calm3 .61s ease-in-out 3.1s infinite alternate}
+#stage.open .lit.near{animation:b2-fadeto 1s ease-out 1.5s both,b2-calm4 .83s ease-in-out 2.6s infinite alternate}
+#stage.open .lit.far{animation:b2-fadeto8 2s ease-in-out 1.9s both,b2-calm5 1.37s ease-in-out 4s infinite alternate}
+#stage.open .cface .warm{animation:b2-warm 1.4s ease 1.7s both}
+#stage.open .frost img{animation:b2-fadeto 1.3s ease-in-out both}
+#stage.open .glints svg{animation:b2-glint var(--d) ease-in-out var(--dl) infinite}
+/* reduced motion / instant end state */
+#stage.instant *{animation-duration:.01s!important;animation-delay:0s!important;animation-iteration-count:1!important}
+#stage.instant .glints svg{animation:none!important;opacity:.5}
+/* ---------- keyframes ---------- */
+@keyframes b2-in{from{opacity:0}to{opacity:1}}
+@keyframes b2-fadein{from{opacity:0}to{opacity:1}}
+@keyframes b2-fadeout{from{opacity:1}to{opacity:0}}
+@keyframes b2-fadeto8{from{opacity:0}to{opacity:.8}}
+@keyframes b2-fadeto{from{opacity:0}to{opacity:.996}}   /* big overlays stop just short of 1: at exactly 1 the browser draws the layer on another path and every pixel shifts by a rounding step (seen as a 'jump' in the video check) */
+@keyframes b2-warm{from{opacity:.5}to{opacity:1}}
+@keyframes b2-fly{0.00%{transform:translate(560.0px,-130.0px) perspective(1400px) rotateZ(-46.00deg) rotateX(-12.0deg) rotateY(16.0deg) scale(1.100)}2.38%{transform:translate(520.2px,-124.0px) perspective(1400px) rotateZ(-44.06deg) rotateX(-11.9deg) rotateY(15.9deg) scale(1.100)}4.76%{transform:translate(482.1px,-118.1px) perspective(1400px) rotateZ(-42.12deg) rotateX(-11.8deg) rotateY(15.7deg) scale(1.099)}7.14%{transform:translate(445.6px,-112.2px) perspective(1400px) rotateZ(-40.19deg) rotateX(-11.5deg) rotateY(15.3deg) scale(1.097)}9.52%{transform:translate(410.8px,-106.3px) perspective(1400px) rotateZ(-38.27deg) rotateX(-11.2deg) rotateY(14.8deg) scale(1.095)}11.90%{transform:translate(377.6px,-100.5px) perspective(1400px) rotateZ(-36.36deg) rotateX(-10.7deg) rotateY(14.2deg) scale(1.093)}14.29%{transform:translate(346.2px,-94.7px) perspective(1400px) rotateZ(-34.45deg) rotateX(-10.2deg) rotateY(13.5deg) scale(1.090)}16.67%{transform:translate(316.5px,-88.9px) perspective(1400px) rotateZ(-32.55deg) rotateX(-9.7deg) rotateY(12.7deg) scale(1.087)}19.05%{transform:translate(288.5px,-83.1px) perspective(1400px) rotateZ(-30.65deg) rotateX(-9.0deg) rotateY(11.8deg) scale(1.083)}21.43%{transform:translate(262.2px,-77.4px) perspective(1400px) rotateZ(-28.76deg) rotateX(-8.4deg) rotateY(10.9deg) scale(1.079)}23.81%{transform:translate(237.7px,-71.7px) perspective(1400px) rotateZ(-26.88deg) rotateX(-7.7deg) rotateY(10.0deg) scale(1.075)}26.19%{transform:translate(215.0px,-66.0px) perspective(1400px) rotateZ(-25.00deg) rotateX(-7.0deg) rotateY(9.0deg) scale(1.070)}28.57%{transform:translate(194.0px,-60.2px) perspective(1400px) rotateZ(-23.10deg) rotateX(-5.9deg) rotateY(7.5deg) scale(1.060)}30.95%{transform:translate(174.6px,-54.3px) perspective(1400px) rotateZ(-21.19deg) rotateX(-4.3deg) rotateY(5.4deg) scale(1.044)}33.33%{transform:translate(156.7px,-48.5px) perspective(1400px) rotateZ(-19.29deg) rotateX(-2.5deg) rotateY(3.2deg) scale(1.026)}35.71%{transform:translate(140.4px,-43.0px) perspective(1400px) rotateZ(-17.44deg) rotateX(-1.0deg) rotateY(1.2deg) scale(1.010)}38.10%{transform:translate(125.5px,-37.9px) perspective(1400px) rotateZ(-15.67deg) rotateX(-0.1deg) rotateY(0.1deg) scale(1.001)}40.48%{transform:translate(111.9px,-33.2px) perspective(1400px) rotateZ(-14.00deg) rotateX(0.0deg) rotateY(0.0deg) scale(1.000)}42.86%{transform:translate(99.0px,-28.5px) perspective(1400px) rotateZ(-12.36deg) rotateX(0.0deg) rotateY(0.0deg) scale(1.000)}45.24%{transform:translate(86.9px,-23.9px) perspective(1400px) rotateZ(-10.75deg) rotateX(0.0deg) rotateY(0.0deg) scale(1.000)}47.62%{transform:translate(75.8px,-19.7px) perspective(1400px) rotateZ(-9.21deg) rotateX(0.0deg) rotateY(0.0deg) scale(1.000)}50.00%{transform:translate(65.8px,-16.2px) perspective(1400px) rotateZ(-7.78deg) rotateX(0.0deg) rotateY(0.0deg) scale(1.000)}52.38%{transform:translate(57.1px,-13.7px) perspective(1400px) rotateZ(-6.48deg) rotateX(0.0deg) rotateY(0.0deg) scale(1.000)}54.76%{transform:translate(49.9px,-12.1px) perspective(1400px) rotateZ(-5.39deg) rotateX(0.0deg) rotateY(0.0deg) scale(1.000)}57.14%{transform:translate(44.2px,-11.1px) perspective(1400px) rotateZ(-4.47deg) rotateX(0.0deg) rotateY(0.0deg) scale(1.000)}59.52%{transform:translate(38.8px,-11.4px) perspective(1400px) rotateZ(-2.95deg) rotateX(0.6deg) rotateY(-0.4deg) scale(1.004)}61.90%{transform:translate(33.6px,-13.1px) perspective(1400px) rotateZ(-0.49deg) rotateX(3.3deg) rotateY(-2.1deg) scale(1.023)}64.29%{transform:translate(28.7px,-15.1px) perspective(1400px) rotateZ(2.13deg) rotateX(6.5deg) rotateY(-4.1deg) scale(1.045)}66.67%{transform:translate(24.0px,-16.0px) perspective(1400px) rotateZ(4.00deg) rotateX(8.0deg) rotateY(-5.0deg) scale(1.055)}69.05%{transform:translate(19.3px,-13.8px) perspective(1400px) rotateZ(5.20deg) rotateX(6.5deg) rotateY(-4.1deg) scale(1.045)}71.43%{transform:translate(14.7px,-9.0px) perspective(1400px) rotateZ(6.23deg) rotateX(3.3deg) rotateY(-2.1deg) scale(1.023)}73.81%{transform:translate(10.8px,-4.4px) perspective(1400px) rotateZ(6.88deg) rotateX(0.6deg) rotateY(-0.4deg) scale(1.004)}76.19%{transform:translate(8.0px,-2.6px) perspective(1400px) rotateZ(6.88deg) rotateX(0.0deg) rotateY(0.0deg) scale(1.000)}78.57%{transform:translate(5.8px,-1.8px) perspective(1400px) rotateZ(5.75deg) rotateX(0.0deg) rotateY(0.0deg) scale(1.000)}80.95%{transform:translate(4.0px,-1.2px) perspective(1400px) rotateZ(4.03deg) rotateX(0.0deg) rotateY(0.0deg) scale(1.000)}83.33%{transform:translate(2.6px,-0.8px) perspective(1400px) rotateZ(2.44deg) rotateX(0.0deg) rotateY(0.0deg) scale(1.000)}85.71%{transform:translate(1.7px,-0.5px) perspective(1400px) rotateZ(1.23deg) rotateX(0.0deg) rotateY(0.0deg) scale(1.000)}88.10%{transform:translate(1.0px,-0.2px) perspective(1400px) rotateZ(0.07deg) rotateX(0.0deg) rotateY(0.0deg) scale(1.000)}90.48%{transform:translate(0.5px,-0.1px) perspective(1400px) rotateZ(-0.45deg) rotateX(0.0deg) rotateY(0.0deg) scale(1.000)}92.86%{transform:translate(0.2px,-0.0px) perspective(1400px) rotateZ(-0.33deg) rotateX(0.0deg) rotateY(0.0deg) scale(1.000)}95.24%{transform:translate(0.1px,-0.0px) perspective(1400px) rotateZ(-0.13deg) rotateX(0.0deg) rotateY(0.0deg) scale(1.000)}97.62%{transform:translate(0.0px,0.0px) perspective(1400px) rotateZ(-0.04deg) rotateX(0.0deg) rotateY(0.0deg) scale(1.000)}100.00%{transform:translate(0.0px,0.0px) perspective(1400px) rotateZ(-0.00deg) rotateX(0.0deg) rotateY(0.0deg) scale(1.000)}}
+@keyframes b2-soff{0.00%{opacity:0.38;transform:translate(30.0px,42.0px)}2.38%{opacity:0.38;transform:translate(29.9px,41.9px)}4.76%{opacity:0.39;transform:translate(29.7px,41.6px)}7.14%{opacity:0.39;transform:translate(29.3px,41.0px)}9.52%{opacity:0.41;transform:translate(28.8px,40.3px)}11.90%{opacity:0.42;transform:translate(28.1px,39.3px)}14.29%{opacity:0.44;transform:translate(27.3px,38.2px)}16.67%{opacity:0.45;transform:translate(26.4px,36.9px)}19.05%{opacity:0.48;transform:translate(25.3px,35.5px)}21.43%{opacity:0.50;transform:translate(24.2px,33.9px)}23.81%{opacity:0.53;transform:translate(22.9px,32.1px)}26.19%{opacity:0.55;transform:translate(21.6px,30.2px)}28.57%{opacity:0.61;transform:translate(18.7px,26.2px)}30.95%{opacity:0.71;transform:translate(13.8px,19.3px)}33.33%{opacity:0.83;transform:translate(8.2px,11.5px)}35.71%{opacity:0.93;transform:translate(3.2px,4.5px)}38.10%{opacity:0.99;transform:translate(0.3px,0.4px)}40.48%{opacity:1.00;transform:translate(0.0px,0.0px)}42.86%{opacity:1.00;transform:translate(0.0px,0.0px)}45.24%{opacity:1.00;transform:translate(0.0px,0.0px)}47.62%{opacity:1.00;transform:translate(0.0px,0.0px)}50.00%{opacity:1.00;transform:translate(0.0px,0.0px)}52.38%{opacity:1.00;transform:translate(0.0px,0.0px)}54.76%{opacity:1.00;transform:translate(0.0px,0.0px)}57.14%{opacity:1.00;transform:translate(0.0px,0.0px)}59.52%{opacity:0.97;transform:translate(1.2px,1.7px)}61.90%{opacity:0.86;transform:translate(6.9px,9.6px)}64.29%{opacity:0.72;transform:translate(13.4px,18.7px)}66.67%{opacity:0.66;transform:translate(16.5px,23.1px)}69.05%{opacity:0.72;transform:translate(13.4px,18.7px)}71.43%{opacity:0.86;transform:translate(6.9px,9.6px)}73.81%{opacity:0.97;transform:translate(1.2px,1.7px)}76.19%{opacity:1.00;transform:translate(0.0px,0.0px)}78.57%{opacity:1.00;transform:translate(0.0px,0.0px)}80.95%{opacity:1.00;transform:translate(0.0px,0.0px)}83.33%{opacity:1.00;transform:translate(0.0px,0.0px)}85.71%{opacity:1.00;transform:translate(0.0px,0.0px)}88.10%{opacity:1.00;transform:translate(0.0px,0.0px)}90.48%{opacity:1.00;transform:translate(0.0px,0.0px)}92.86%{opacity:1.00;transform:translate(0.0px,0.0px)}95.24%{opacity:1.00;transform:translate(0.0px,0.0px)}97.62%{opacity:1.00;transform:translate(0.0px,0.0px)}100.00%{opacity:1.00;transform:translate(0.0px,0.0px)}}
+@keyframes b2-far{0%{transform:translateX(var(--far));animation-timing-function:cubic-bezier(.25,.6,.4,1)}40%{transform:translateX(0)}100%{transform:translateX(0)}}
+@keyframes b2-fshade{0%{opacity:.34}26%{opacity:.14}39%{opacity:0}58%{opacity:0}67%{opacity:.12}75%{opacity:0}100%{opacity:0}}
+@keyframes b2-wipeA{from{transform:translateX(-101%)}to{transform:translateX(0)}}
+@keyframes b2-wipeB{from{transform:translateX(101%)}to{transform:translateX(0)}}
+@keyframes b2-puff{0%{opacity:0;transform:translate(0,0) scale(.35)}20%{opacity:.6}100%{opacity:0;transform:translate(var(--px),var(--py)) scale(1.6)}}
+@keyframes b2-gust{0%{opacity:0;transform:translate(var(--x0),var(--y0))}10%{opacity:var(--o)}50%{transform:translate(var(--x1),var(--y1))}88%{opacity:var(--o)}100%{opacity:0;transform:translate(var(--x2),var(--y2))}}
+@keyframes b2-hint{0%,100%{opacity:.5}50%{opacity:1}}
+@keyframes b2-bundle{0%{transform:translate(0,0) rotate(0deg) scale(1);animation-timing-function:ease-out}14%{transform:translate(0,-3px) rotate(-1.4deg) scale(1.025);animation-timing-function:cubic-bezier(.5,0,.75,.6)}70%{transform:translate(13px,calc(var(--slip) - 11px)) rotate(8.4deg) scale(1);animation-timing-function:cubic-bezier(.2,.6,.4,1)}86%{transform:translate(17px,calc(var(--slip) + 4px)) rotate(10.4deg) scale(1);animation-timing-function:ease-in-out}100%{transform:translate(16px,var(--slip)) rotate(9.6deg) scale(1)}}
+@keyframes b2-bsh{from{opacity:0}to{opacity:.5}}
+@keyframes b2-flapF{0%{transform:rotateX(0deg);opacity:1}99%{opacity:1}100%{transform:rotateX(90deg);opacity:0}}
+@keyframes b2-flapB{0%{transform:rotateX(-90deg);opacity:1}100%{transform:rotateX(0deg);opacity:1}}
+@keyframes b2-glowin{0%{opacity:0}35%{opacity:1}100%{opacity:.5}}
+@keyframes b2-halo{0%{opacity:0;transform:scale(.4)}30%{opacity:.9}100%{opacity:0;transform:scale(1.5)}}
+@keyframes b2-rise{from{transform:translate(0,0) rotate(0deg) scale(var(--c0))}to{transform:translate(0,var(--rise)) rotate(0deg) scale(var(--c0))}}
+@keyframes b2-ztop{from{z-index:3}to{z-index:5}}   /* out of the pocket (6 units clear of its top edge): from here the card passes IN FRONT of the envelope */
+@keyframes b2-settle{from{transform:translate(0,var(--rise)) rotate(0deg) scale(var(--c0))}to{transform:translate(var(--fx),var(--fy)) rotate(var(--unrot)) scale(var(--c1))}}
+@keyframes b2-flip{from{transform:rotateY(0deg)}to{transform:rotateY(180deg)}}
+@keyframes b2-tshA{0%{opacity:0}50%{opacity:.72}100%{opacity:.72}}
+@keyframes b2-tshB{0%{opacity:.8}50%{opacity:.8}100%{opacity:0}}
+@keyframes b2-csha{0%{opacity:0}15%{opacity:1}59%{opacity:1}100%{opacity:0}}
+@keyframes b2-shflip{0%{transform:scaleX(1)}50%{transform:scaleX(.05)}100%{transform:scaleX(1)}}
+@keyframes b2-flick1{from{opacity:.17}to{opacity:.30}}
+@keyframes b2-flick2{from{opacity:.30}to{opacity:.14}}
+@keyframes b2-flick3{from{opacity:.26}to{opacity:.44}}
+@keyframes b2-flare1{0%{opacity:.24;transform:scale(1)}42%{opacity:1;transform:scale(1.75)}100%{opacity:.5;transform:scale(1.5)}}
+@keyframes b2-flare2{0%{opacity:.22;transform:scale(1)}40%{opacity:1;transform:scale(1.9)}100%{opacity:.5;transform:scale(1.55)}}
+@keyframes b2-flare3{0%{opacity:.34;transform:scale(1)}36%{opacity:.8;transform:scale(1.9)}100%{opacity:.5;transform:scale(1.45)}}
+@keyframes b2-calm1{from{opacity:.5}to{opacity:.38}}
+@keyframes b2-calm2{from{opacity:.5}to{opacity:.38}}
+@keyframes b2-calm3{from{opacity:.5}to{opacity:.36}}
+@keyframes b2-calm4{from{opacity:.996}to{opacity:.72}}
+@keyframes b2-calm5{from{opacity:.8}to{opacity:.66}}
+@keyframes b2-glint{0%{opacity:0;transform:scale(.2) rotate(0deg)}9%{opacity:var(--o);transform:scale(1) rotate(18deg)}20%{opacity:0;transform:scale(.3) rotate(36deg)}100%{opacity:0;transform:scale(.3) rotate(36deg)}}
+@media (prefers-reduced-motion:reduce){.hint,.lant i,.lwarm,.glints svg{animation:none!important}#stage.landed:not(.open) .hint{opacity:.9}}   /* no pulsing, but the words 'Tap the envelope to open' are still there */
+/* written-side-only view (buyer's live preview, video engine) */
+html.inside-view,body.inside-view{background:transparent}
+body.inside-view #stage,body.inside-view .backdrop,body.inside-view #controls{display:none}
+body.inside-view #ivwrap{position:absolute;left:50%;top:50%;width:480px;height:672px}
+body.inside-view .iface{box-shadow:0 10px 30px rgba(20,30,60,.25)}
+body.inside-view .itxt{opacity:1}
