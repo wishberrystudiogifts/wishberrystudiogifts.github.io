@@ -6,13 +6,14 @@
      1. ARRIVAL  — the winter wind slides the envelope in over the porch boards from the right: a low flight, it touches,
                    slides, takes one short hop and comes to rest, turned a few degrees; powder snow streams past, a few
                    grains stay on the boards and a little snow is left against its windward edge; then the name appears.
-     2. OPENING  — tap: the jute twine with the wax seal slips off, the flap lifts (paper turning on its fold, the
-                   snowflake liner inside), warm light comes from inside.
+     2. OPENING  — tap: the jute twine with the wax seal slips off and stays lying on the boards below the envelope,
+                   the flap lifts (paper turning on its fold, the snowflake liner inside), warm light comes from inside.
      3. THE CARD — slides up OUT of the pocket: it sits between the inside back and the FRONT POCKET, which is a layer
                    of its own above the card, so the lower part of the card stays hidden until it is out.
-     4. FINALE   — the envelope is gone, the card comes forward and turns over to the written side; the lantern flame
-                   flares and its warm light spreads over the boards, while frost draws crystal ferns on the wood
-                   around the card — everywhere except where the lantern's warmth reaches; ice glints; calm flicker.
+     4. FINALE   — the card comes forward, settles OVER the envelope (which stays on the boards; the seal on its twine is
+                   left peeking out under the card) and turns over to the written side; the lantern flame flares and its
+                   warm light spreads over the boards, while frost grows along the grain of the wood around the card —
+                   everywhere except where the lantern's warmth reaches; ice glints; calm flicker.
    Animation = CSS (transform/opacity only); this file builds the scene and switches the states. */
 (function () {
   'use strict';
@@ -127,11 +128,11 @@
   };
   var LAYOUTS = {
     port: { W: 600, H: 1100, scene: SCENES.tall, sk: 1100 / 2048, sx: -9.375, sy: 0, flame: [54.5, 132.5], lr: 190,
-      env: { e: 0.9, cx: 290, cy: 700, rot: 3, far: 150, dim: 0.76 }, card: { s: 1.05, cx: 300, cy: 560 }, hintY: 944, hintSize: 25,
-      glints: [[586.5,114.4,0.832],[570.0,505.5,0.318],[560.6,202.0,0.491],[580.4,411.3,0.251],[108.7,994.1,0.619],[17.8,663.0,0.22],[588.3,739.7,0.395],[515.7,1035.7,0.442],[25.5,901.1,0.334],[563.1,858.3,0.738],[462.3,34.6,0.782],[38.6,829.8,0.511],[37.2,1000.2,0.688],[525.5,103.1,0.567],[410.6,107.9,0.466],[364.8,988.7,0.6]] },
+      env: { e: 0.9, cx: 290, cy: 700, rot: 3, far: 150, dim: 0.76, slip: 337 }, card: { s: 1.05, cx: 300, cy: 560 }, hintY: 944, hintSize: 25,
+      glints: [[565.8,140.3,0.263],[163.6,975.6,0.96],[77.1,1023.8,0.432],[565.6,275.4,0.448],[577.7,571.0,0.585],[560.7,986.6,0.747],[10.5,646.4,0.529],[532.4,38.9,0.722],[242.0,999.5,0.734],[368.5,1035.0,0.595],[421.8,145.8,0.819],[40.4,956.7,0.467],[36.2,585.3,0.277],[563.6,866.5,0.351],[582.9,709.5,0.4],[568.4,384.7,0.448]] },
     land: { W: 1200, H: 900, scene: SCENES.wide, sk: 1200 / 1728, sx: 0, sy: 0, flame: [239.6, 302.1], lr: 250,
-      env: { e: 0.85, cx: 600, cy: 590, rot: 3, far: 430 }, card: { s: 1.02, cx: 600, cy: 450 }, hintY: 824, hintSize: 22,
-      glints: [[1092.3,620.1,0.708],[851.6,831.8,0.67],[1074.5,107.4,0.761],[1116.8,514.1,0.718],[179.8,834.8,0.705],[256.8,799.1,0.582],[951.5,848.4,0.555],[858.6,13.8,0.397],[61.5,774.7,0.513],[714.6,48.5,0.342],[1026.2,883.4,0.78],[352.0,828.1,0.434],[1081.1,821.1,0.665],[416.2,811.8,0.693],[937.0,83.3,0.624],[1007.0,801.9,0.446]] }
+      env: { e: 0.85, cx: 600, cy: 590, rot: 3, far: 430, slip: 318 }, card: { s: 1.02, cx: 600, cy: 450 }, hintY: 824, hintSize: 22,
+      glints: [[400.3,867.0,0.902],[1120.4,605.4,0.734],[491.7,813.8,0.659],[625.4,886.1,0.216],[693.6,74.6,0.552],[1131.3,546.5,0.595],[1074.5,80.4,0.802],[128.3,819.5,0.585],[1022.0,136.6,0.638],[694.0,820.4,0.651],[780.8,853.7,0.671],[1064.2,730.5,0.83],[869.9,38.6,0.771],[934.2,760.0,0.537],[198.7,871.7,0.75],[1115.0,697.2,0.838]] }
   };
   var FROST_N = 6;
   // needed before the envelope may arrive / needed only after the tap (loaded meanwhile, never block the arrival)
@@ -233,6 +234,12 @@
       envB.style.filter = envF.style.filter = 'brightness(' + L.env.dim + ')';
       drift.style.filter = 'brightness(' + (1 / L.env.dim).toFixed(4) + ')';   // the snow crumbs keep the brightness of the scene they were cut from
     }
+    // the twine with the seal has a twin OUTSIDE the envelope's front: at the tap the twin takes over, slips off the
+    // envelope and STAYS lying on the boards below it (nothing vanishes in a photograph)
+    var envT = el('div', 'envT', null, root), bw = el('div', 'bwrap', null, envT);
+    img(A + 'env-bundle.webp', 'bsh', null, bw);   // its own soft shadow on the boards (the same picture, black and blurred), faded in as it lifts
+    img(A + 'env-bundle.webp', null, null, bw);
+    if (L.env.dim && L.env.dim < 1) envT.style.filter = 'brightness(' + L.env.dim + ')';
     var puff = el('div', 'puff', null, root);
     for (i = 0; i < 22; i++) {   // where it touches down: a fine spray of grains from the leading (left) and lower edges
       var onLeft = r() < 0.6, px = onLeft ? r() * 10 : r() * 180, py = onLeft ? 40 + r() * 380 : 420 + r() * 10, ps = 2.5 + r() * 6, first = r() < 0.4;
@@ -250,6 +257,7 @@
     stageEl.style.setProperty('--fx', (lx - ENV.W / 2 + hgt * sn).toFixed(2) + 'px');
     stageEl.style.setProperty('--fy', (ly - ENV.cardBottom + hgt * cs).toFixed(2) + 'px');
     stageEl.style.setProperty('--unrot', (-L.env.rot) + 'deg');
+    stageEl.style.setProperty('--slip', L.env.slip + 'px');   // how far the twine bundle slips: to the boards just below the envelope
     stageEl.style.setProperty('--far', L.env.far + 'px');   // extra way in from the right, so the first frame is empty
 
     // wind: powder snow streaming from the right, low over the boards (separate flakes; the fast ones show as short streaks)

@@ -68,6 +68,10 @@ html,body{margin:0;height:100%;background:#120e0c;overflow:hidden;font-family:'C
 .cface .tsh{position:absolute;inset:0;border-radius:3px;background:#0a0d1c;opacity:0;pointer-events:none}   /* a side turned away from the light is in shade: the card darkens as it turns edge-on and the written side brightens as it comes round */
 .cface.backside{transform:rotateY(180deg)}
 .envF{position:absolute;inset:0;z-index:4;opacity:0}
+.envT{position:absolute;inset:0;z-index:4;opacity:0}   /* the twine bundle once it has left the envelope (see #stage.open) */
+.bwrap{position:absolute;left:0;top:101.84px;width:312px;height:155.67px;will-change:transform}
+.bwrap img{left:0;top:0;width:312px;height:155.67px}
+.bwrap .bsh{filter:brightness(0) blur(1.6px);opacity:0;transform:translate(1.5px,2.5px)}
 .fr{position:absolute;inset:0}
 .epocket{left:0;top:0;width:312px;height:430px}
 .elabel{position:absolute;left:16px;right:16px;top:279px;height:44px;display:flex;align-items:center;justify-content:center;transform:rotate(-3deg);font-family:'Caveat',cursive;font-weight:700;font-size:30px;line-height:1;color:#4B3524;white-space:nowrap;opacity:.86;mix-blend-mode:multiply}
@@ -129,7 +133,12 @@ html,body{margin:0;height:100%;background:#120e0c;overflow:hidden;font-family:'C
 #stage.open .soff,#stage.open .envB,#stage.open .envF{opacity:1}
 #stage.open .drift{opacity:1;animation:none}
 #stage.open .fbsh{animation:b2-fadein .2s linear .8s both}
-#stage.open .bundle{animation:b2-bundle .55s cubic-bezier(.5,0,.85,.55) 0s both}
+/* the twine with the seal SLIPS OFF and stays lying on the boards just below the envelope (nothing vanishes in a photograph);
+   later the card settles over the envelope and the seal is left peeking out under the card's lower edge */
+#stage.open .envT{opacity:1}
+#stage.open .fr .bundle{opacity:0}   /* the twin (.envT) takes over at the tap: same picture, same place */
+#stage.open .bwrap{animation:b2-bundle .8s linear 0s both}
+#stage.open .bwrap .bsh{animation:b2-bsh .3s ease-out .05s both}
 #stage.open .flapsh{animation:b2-fadeout .3s ease .22s both}
 #stage.open .flap{animation:b2-flapF .32s cubic-bezier(.45,0,1,.9) .25s both}
 #stage.open .flapB{animation:b2-flapB .4s cubic-bezier(0,.1,.3,1) .57s both}
@@ -142,10 +151,12 @@ html,body{margin:0;height:100%;background:#120e0c;overflow:hidden;font-family:'C
 #stage.open .cface.front .tsh{animation:b2-tshA .75s cubic-bezier(.45,0,.3,1) 2.75s both}
 #stage.open .cface.backside .tsh{animation:b2-tshB .75s cubic-bezier(.45,0,.3,1) 2.75s both}
 #stage.open .itxt{animation:b2-fadein .7s ease 3.5s both}
-/* finale: the flame flares, the light spreads (near pool, then the far wash), frost grows, ice glints; then a calm flicker */
-#stage.open .lant .g1{animation:b2-flare1 2.4s ease-out 1.45s both,b2-calm1 2.9s ease-in-out 3.9s infinite alternate}
-#stage.open .lant .g2{animation:b2-flare2 2s ease-out 1.45s both,b2-calm2 1.1s ease-in-out 3.5s infinite alternate}
-#stage.open .lant .core{animation:b2-flare3 1.6s ease-out 1.45s both,b2-calm3 .61s ease-in-out 3.1s infinite alternate}
+/* finale: the flame flares, the light spreads (near pool, then the far wash), frost grows, ice glints; then a calm flicker.
+   The resting flicker (first in each list - the same running animation, not restarted) goes on until the flare takes over,
+   so the lantern does not blink at the tap. */
+#stage.open .lant .g1{animation:b2-flick1 2.3s ease-in-out infinite alternate,b2-flare1 2.4s ease-out 1.45s forwards,b2-calm1 2.9s ease-in-out 3.9s infinite alternate}
+#stage.open .lant .g2{animation:b2-flick2 1.3s ease-in-out infinite alternate,b2-flare2 2s ease-out 1.45s forwards,b2-calm2 1.1s ease-in-out 3.5s infinite alternate}
+#stage.open .lant .core{animation:b2-flick3 .7s ease-in-out infinite alternate,b2-flare3 1.6s ease-out 1.45s forwards,b2-calm3 .61s ease-in-out 3.1s infinite alternate}
 #stage.open .lit.near{animation:b2-fadeto 1s ease-out 1.5s both,b2-calm4 .83s ease-in-out 2.6s infinite alternate}
 #stage.open .lit.far{animation:b2-fadeto 2s ease-in-out 1.9s both,b2-calm5 1.37s ease-in-out 4s infinite alternate}
 #stage.open .cface .warm{animation:b2-warm 1.4s ease 1.7s both}
@@ -169,7 +180,8 @@ html,body{margin:0;height:100%;background:#120e0c;overflow:hidden;font-family:'C
 @keyframes b2-puff{0%{opacity:0;transform:translate(0,0) scale(.35)}20%{opacity:.6}100%{opacity:0;transform:translate(var(--px),var(--py)) scale(1.6)}}
 @keyframes b2-gust{0%{opacity:0;transform:translate(var(--x0),var(--y0))}10%{opacity:var(--o)}50%{transform:translate(var(--x1),var(--y1))}88%{opacity:var(--o)}100%{opacity:0;transform:translate(var(--x2),var(--y2))}}
 @keyframes b2-hint{0%,100%{opacity:.5}50%{opacity:1}}
-@keyframes b2-bundle{0%{opacity:1;transform:translateY(0) rotate(0deg) scale(1)}18%{opacity:1;transform:translateY(-3px) rotate(-1.4deg) scale(1.025)}72%{opacity:1}100%{opacity:0;transform:translateY(300px) rotate(7deg) scale(1)}}
+@keyframes b2-bundle{0%{transform:translate(0,0) rotate(0deg) scale(1);animation-timing-function:ease-out}14%{transform:translate(0,-3px) rotate(-1.4deg) scale(1.025);animation-timing-function:cubic-bezier(.5,0,.75,.6)}70%{transform:translate(13px,calc(var(--slip) - 11px)) rotate(8.4deg) scale(1);animation-timing-function:cubic-bezier(.2,.6,.4,1)}86%{transform:translate(17px,calc(var(--slip) + 4px)) rotate(10.4deg) scale(1);animation-timing-function:ease-in-out}100%{transform:translate(16px,var(--slip)) rotate(9.6deg) scale(1)}}
+@keyframes b2-bsh{from{opacity:0}to{opacity:.5}}
 @keyframes b2-flapF{0%{transform:rotateX(0deg);opacity:1}99%{opacity:1}100%{transform:rotateX(90deg);opacity:0}}
 @keyframes b2-flapB{0%{transform:rotateX(-90deg);opacity:1}100%{transform:rotateX(0deg);opacity:1}}
 @keyframes b2-glowin{0%{opacity:0}35%{opacity:1}100%{opacity:.5}}
@@ -194,7 +206,7 @@ html,body{margin:0;height:100%;background:#120e0c;overflow:hidden;font-family:'C
 @keyframes b2-calm4{from{opacity:.996}to{opacity:.8}}
 @keyframes b2-calm5{from{opacity:.996}to{opacity:.84}}
 @keyframes b2-glint{0%{opacity:0;transform:scale(.2) rotate(0deg)}9%{opacity:var(--o);transform:scale(1) rotate(18deg)}20%{opacity:0;transform:scale(.3) rotate(36deg)}100%{opacity:0;transform:scale(.3) rotate(36deg)}}
-@media (prefers-reduced-motion:reduce){.hint,.lant i,.lwarm,.glints svg{animation:none!important}}
+@media (prefers-reduced-motion:reduce){.hint,.lant i,.lwarm,.glints svg{animation:none!important}#stage.landed:not(.open) .hint{opacity:.9}}   /* no pulsing, but the words 'Tap the envelope to open' are still there */
 /* written-side-only view (buyer's live preview, video engine) */
 html.inside-view,body.inside-view{background:transparent}
 body.inside-view #stage,body.inside-view .backdrop,body.inside-view #controls{display:none}
