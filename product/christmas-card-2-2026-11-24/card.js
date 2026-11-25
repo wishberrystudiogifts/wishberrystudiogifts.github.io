@@ -128,7 +128,7 @@
   };
   var LAYOUTS = {
     port: { W: 600, H: 1100, scene: SCENES.tall, sk: 1100 / 2048, sx: -9.375, sy: 0, flame: [54.5, 132.5], lr: 190,
-      env: { e: 0.9, cx: 290, cy: 700, rot: 3, far: 150, dim: 0.76, slip: 337 }, card: { s: 1.05, cx: 300, cy: 560 }, hintY: 944, hintSize: 25,
+      env: { e: 0.8, cx: 290, cy: 700, rot: 3, far: 150, dim: 0.7, slip: 337 }, card: { s: 1.05, cx: 300, cy: 560 }, hintY: 944, hintSize: 25,
       glints: [[565.8,140.3,0.263],[163.6,975.6,0.96],[77.1,1023.8,0.432],[565.6,275.4,0.448],[577.7,571.0,0.585],[560.7,986.6,0.747],[10.5,646.4,0.529],[532.4,38.9,0.722],[242.0,999.5,0.734],[368.5,1035.0,0.595],[421.8,145.8,0.819],[40.4,956.7,0.467],[36.2,585.3,0.277],[563.6,866.5,0.351],[582.9,709.5,0.4],[568.4,384.7,0.448]] },
     land: { W: 1200, H: 900, scene: SCENES.wide, sk: 1200 / 1728, sx: 0, sy: 0, flame: [239.6, 302.1], lr: 250,
       env: { e: 0.85, cx: 600, cy: 590, rot: 3, far: 430, slip: 318 }, card: { s: 1.02, cx: 600, cy: 450 }, hintY: 824, hintSize: 22,
@@ -138,7 +138,7 @@
   // needed before the envelope may arrive / needed only after the tap (loaded meanwhile, never block the arrival)
   var IMAGES = ['env-pocket.webp', 'env-back.webp', 'env-flap.webp', 'env-flapin.webp', 'env-flapshadow.png',
     'env-bundle.webp', 'env-dropshadow.png', 'env-flapbshadow.png', 'env-drift.webp', 'front.jpg'];
-  var T = { landed: 2100, autoplay: 2300, controls: 4400 };   // ms; all on the 100 ms grid (frame-by-frame video render)
+  var T = { landed: 2100, autoplay: 3300, controls: 5500 };   // 25 Nov: the name is written in full and rests a moment before the envelope opens   // ms; all on the 100 ms grid (frame-by-frame video render)
 
   var stageEl = document.getElementById('stage');
   var ivwrap = document.getElementById('ivwrap');
@@ -204,6 +204,7 @@
     img(A + 'env-flapbshadow.png', 'fbsh', null, root);
     var envB = el('div', 'envB', null, root);
     img(A + 'env-back.webp', 'eback', null, envB);
+    el('div', 'eshade', null, envB);
     el('div', 'inglow', null, envB);
     var fbB = el('div', 'flapBbox', null, envB), flapB = el('div', 'flapB', null, fbB);
     img(A + 'env-flapin.webp', 'flapin', null, flapB);
@@ -228,6 +229,7 @@
     img(A + 'env-flap.webp', 'flap', null, el('div', 'flapFbox', null, fr));
     img(A + 'env-bundle.webp', 'bundle', null, fr);
     var drift = img(A + 'env-drift.webp', 'drift', null, fr);   // a little powder snow left against the windward edge
+    el('div', 'eshade', null, fr);   // light falls off away from the lantern
     el('div', 'lwarm', null, fr);    // the lantern's flicker on the paper
     el('div', 'fshade', null, fr);   // the paper darkens while it is in the air
     if (L.env.dim && L.env.dim < 1) {   // upright scene: the envelope rests far from the lantern, in the blue dusk - paper must not outshine the snow beside it

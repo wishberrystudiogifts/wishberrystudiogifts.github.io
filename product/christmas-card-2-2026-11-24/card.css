@@ -45,7 +45,7 @@ html,body{margin:0;height:100%;background:#120e0c;overflow:hidden;font-family:'C
 .soff,.far,.fly{position:absolute;left:0;top:0;width:312px;height:430px}
 .fly{transform-origin:50% 55%;will-change:transform}
 .soff{opacity:0;z-index:1}
-.gshadow{left:-25px;top:-22px;width:372px;height:490px}
+.gshadow{left:-25px;top:-22px;width:372px;height:490px;filter:blur(5px)}
 .fbsh{left:-20px;top:-201px;width:352px;height:221px;opacity:0;z-index:1}
 .envB{position:absolute;inset:0;z-index:2;opacity:0}
 .eback{left:0;top:0;width:312px;height:136px}
@@ -64,7 +64,7 @@ html,body{margin:0;height:100%;background:#120e0c;overflow:hidden;font-family:'C
 .cface.front{background:#1b2740}
 .cface.front img{left:0;top:0;width:100%;height:100%;object-fit:cover}
 .cface.front .gloss{position:absolute;inset:0;border-radius:3px;background:linear-gradient(118deg,rgba(255,255,255,.08) 0%,rgba(255,255,255,.02) 36%,rgba(255,255,255,0) 58%);box-shadow:inset 0 0 0 1.2px rgba(255,248,228,.42)}   /* a hairline of paper edge */
-.cface .warm{position:absolute;inset:0;border-radius:3px;background:radial-gradient(ellipse 88% 72% at 0% 0%,rgba(255,168,74,.48),rgba(255,170,80,.17) 45%,rgba(255,170,80,0) 76%),linear-gradient(135deg,rgba(10,16,40,0) 55%,rgba(10,16,40,.15) 100%);opacity:.5;pointer-events:none}   /* lantern light on the card's near corner, evening on the far one */
+.cface .warm{position:absolute;inset:0;border-radius:3px;background:radial-gradient(ellipse 88% 72% at 0% 0%,rgba(255,168,74,.48),rgba(255,170,80,.17) 45%,rgba(255,170,80,0) 76%),linear-gradient(135deg,rgba(10,16,40,0) 45%,rgba(10,16,40,.30) 100%);opacity:.5;pointer-events:none}   /* lantern light on the card's near corner, evening on the far one */
 .cface .tsh{position:absolute;inset:0;border-radius:3px;background:#0a0d1c;opacity:0;pointer-events:none}   /* a side turned away from the light is in shade: the card darkens as it turns edge-on and the written side brightens as it comes round */
 .cface.backside{transform:rotateY(180deg)}
 .envF{position:absolute;inset:0;z-index:4;opacity:0}
@@ -78,13 +78,14 @@ html,body{margin:0;height:100%;background:#120e0c;overflow:hidden;font-family:'C
 /* the name is WRITTEN on after the envelope has come to rest (wiped in from the left); the ink sinks into the paper */
 .elabel .lw{display:block;overflow:hidden;padding:7px 0}
 .elabel .lw span{display:block;padding:0 6px;text-shadow:0 0 1.1px rgba(75,53,36,.6)}   /* same width as .lw: the two slides cancel exactly */
+.eshade{position:absolute;left:1px;top:1px;right:1px;bottom:1px;border-radius:3px;pointer-events:none;background:linear-gradient(128deg,rgba(255,196,120,.10) 0%,rgba(255,196,120,0) 30%,rgba(16,20,42,.16) 58%,rgba(12,15,34,.40) 100%)}   /* 25 Nov: paper is lit from the lantern's side and falls into the blue dusk on the far side (was evenly lit) */
 .fshade{position:absolute;left:1px;top:1px;right:1px;bottom:1px;border-radius:3px;background:linear-gradient(120deg,rgba(10,10,26,.9),rgba(10,10,26,.6));opacity:0}
 .lwarm{position:absolute;left:1px;top:1px;right:1px;bottom:1px;border-radius:3px;background:radial-gradient(ellipse at 4% 0%,rgba(255,186,100,.42),rgba(255,178,94,.14) 44%,rgba(255,170,90,0) 72%);opacity:.5;animation:b2-flick2 1.3s ease-in-out infinite alternate}   /* the lantern's flicker reaches the paper */
 .flapsh{left:0;top:0;width:312px;height:205px}
 .flapFbox{position:absolute;left:0;top:0;width:312px;height:181px;perspective:900px;perspective-origin:50% 0%}
 .flap{left:0;top:0;width:312px;height:181px;transform-origin:50% 0%}
-.bundle{left:0;top:101.84px;width:312px;height:155.67px}
-.drift{left:282px;top:-20px;width:70px;height:470px;opacity:0}
+.bundle{left:0;top:101.84px;width:312px;height:155.67px;filter:drop-shadow(2px 3.5px 2.2px rgba(28,16,6,.55))}   /* 25 Nov: seal and sprig stand off the paper */
+.drift{left:282px;top:-20px;width:70px;height:470px;opacity:0;display:none}   /* 25 Nov: removed - the crumbs read as a cut-out */
 .puff{position:absolute;left:0;top:0;width:312px;height:430px;z-index:5}
 .puff i{position:absolute;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.8),rgba(236,243,255,.34) 42%,rgba(230,240,255,0) 68%);opacity:0}
 /* ---------- the written side of the card (also the buyer's live preview and what the video engine reads) ---------- */
@@ -146,11 +147,11 @@ html,body{margin:0;height:100%;background:#120e0c;overflow:hidden;font-family:'C
 #stage.open .halo{animation:b2-halo 1.3s ease-out .5s both}
 #stage.open .cardrig{opacity:1;animation:b2-rise 1.05s cubic-bezier(.3,.05,.2,1) .7s both,b2-settle .8s cubic-bezier(.45,0,.2,1) 1.85s forwards,b2-ztop .01s linear 1.79s both}
 #stage.open .csh.a{animation:b2-csha 1.95s linear .7s both}
-#stage.open .csh.b{animation:b2-fadein .8s ease 1.85s both,b2-shflip .75s cubic-bezier(.45,0,.3,1) 2.75s both}
-#stage.open .card3d{animation:b2-flip .75s cubic-bezier(.45,0,.3,1) 2.75s both}
-#stage.open .cface.front .tsh{animation:b2-tshA .75s cubic-bezier(.45,0,.3,1) 2.75s both}
-#stage.open .cface.backside .tsh{animation:b2-tshB .75s cubic-bezier(.45,0,.3,1) 2.75s both}
-#stage.open .itxt{animation:b2-fadein .7s ease 3.5s both}
+#stage.open .csh.b{animation:b2-fadein .8s ease 1.85s both,b2-shflip .75s cubic-bezier(.45,0,.3,1) 3.85s both}
+#stage.open .card3d{animation:b2-flip .75s cubic-bezier(.45,0,.3,1) 3.85s both}
+#stage.open .cface.front .tsh{animation:b2-tshA .75s cubic-bezier(.45,0,.3,1) 3.85s both}
+#stage.open .cface.backside .tsh{animation:b2-tshB .75s cubic-bezier(.45,0,.3,1) 3.85s both}
+#stage.open .itxt{animation:b2-fadein .7s ease 4.6s both}
 /* finale: the flame flares, the light spreads (near pool, then the far wash), frost grows, ice glints; then a calm flicker.
    The resting flicker (first in each list - the same running animation, not restarted) goes on until the flare takes over,
    so the lantern does not blink at the tap. */
@@ -197,13 +198,13 @@ html,body{margin:0;height:100%;background:#120e0c;overflow:hidden;font-family:'C
 @keyframes b2-flick1{from{opacity:.17}to{opacity:.30}}
 @keyframes b2-flick2{from{opacity:.30}to{opacity:.14}}
 @keyframes b2-flick3{from{opacity:.26}to{opacity:.44}}
-@keyframes b2-flare1{0%{opacity:.24;transform:scale(1)}42%{opacity:1;transform:scale(1.75)}100%{opacity:.74;transform:scale(1.6)}}
-@keyframes b2-flare2{0%{opacity:.22;transform:scale(1)}40%{opacity:1;transform:scale(1.9)}100%{opacity:.8;transform:scale(1.7)}}
-@keyframes b2-flare3{0%{opacity:.34;transform:scale(1)}36%{opacity:1;transform:scale(2.1)}100%{opacity:.85;transform:scale(1.6)}}
-@keyframes b2-calm1{from{opacity:.74}to{opacity:.58}}
-@keyframes b2-calm2{from{opacity:.8}to{opacity:.62}}
-@keyframes b2-calm3{from{opacity:.85}to{opacity:.66}}
-@keyframes b2-calm4{from{opacity:.996}to{opacity:.8}}
+@keyframes b2-flare1{0%{opacity:.24;transform:scale(1)}42%{opacity:1;transform:scale(1.75)}100%{opacity:.5;transform:scale(1.5)}}
+@keyframes b2-flare2{0%{opacity:.22;transform:scale(1)}40%{opacity:1;transform:scale(1.9)}100%{opacity:.5;transform:scale(1.55)}}
+@keyframes b2-flare3{0%{opacity:.34;transform:scale(1)}36%{opacity:.8;transform:scale(1.9)}100%{opacity:.5;transform:scale(1.45)}}
+@keyframes b2-calm1{from{opacity:.5}to{opacity:.38}}
+@keyframes b2-calm2{from{opacity:.5}to{opacity:.38}}
+@keyframes b2-calm3{from{opacity:.5}to{opacity:.36}}
+@keyframes b2-calm4{from{opacity:.996}to{opacity:.72}}
 @keyframes b2-calm5{from{opacity:.996}to{opacity:.84}}
 @keyframes b2-glint{0%{opacity:0;transform:scale(.2) rotate(0deg)}9%{opacity:var(--o);transform:scale(1) rotate(18deg)}20%{opacity:0;transform:scale(.3) rotate(36deg)}100%{opacity:0;transform:scale(.3) rotate(36deg)}}
 @media (prefers-reduced-motion:reduce){.hint,.lant i,.lwarm,.glints svg{animation:none!important}#stage.landed:not(.open) .hint{opacity:.9}}   /* no pulsing, but the words 'Tap the envelope to open' are still there */
