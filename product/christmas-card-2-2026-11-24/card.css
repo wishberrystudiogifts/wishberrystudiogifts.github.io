@@ -29,7 +29,7 @@ html,body{margin:0;height:100%;background:#120e0c;overflow:hidden;font-family:'C
 .lant .g2{background:radial-gradient(circle,rgba(255,214,140,.55),rgba(255,190,104,.2) 42%,rgba(255,180,90,0) 70%);opacity:.22;animation:b2-flick2 1.3s ease-in-out infinite alternate}
 .lant .core{background:radial-gradient(circle,rgba(255,250,228,.95),rgba(255,226,150,.5) 45%,rgba(255,200,110,0) 72%);opacity:.34;animation:b2-flick3 .7s ease-in-out infinite alternate}
 /* frost: six layers by birth time, faded in one after another = it grows from the edges toward the card */
-.frost{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:1;opacity:.62}   /* 25 Nov: frost, not fog */
+.frost{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:1;opacity:.46}   /* 25 Nov: frost, not fog */
 .frost img{left:0;top:0;width:100%;height:100%;opacity:0;will-change:opacity}
 .glints{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:1}
 .glints svg{position:absolute;width:30px;height:30px;margin:-15px 0 0 -15px;opacity:0}
@@ -57,7 +57,7 @@ html,body{margin:0;height:100%;background:#120e0c;overflow:hidden;font-family:'C
 /* the card's shadow: short while it slides out (a little lifted - it passes over the lantern's foot and the fir twigs), long and soft (away from the lantern) once it comes forward */
 .csh{position:absolute;inset:0;border-radius:3px}
 .csh.a{box-shadow:6px 9px 15px rgba(6,8,20,.55);opacity:0}   /* no shadow while the card is still inside the envelope */
-.csh.b{box-shadow:2px 3px 3px rgba(6,4,10,.4),22px 34px 56px rgba(10,8,14,.42);opacity:0}
+.csh.b{box-shadow:2px 3px 4px rgba(6,4,10,.38),16px 12px 34px rgba(10,8,14,.3);opacity:0}
 .cardpersp{position:absolute;inset:0;perspective:1900px}
 .card3d{position:absolute;inset:0;transform-style:preserve-3d;-webkit-transform-style:preserve-3d}
 .cface{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden;border-radius:3px}
@@ -79,6 +79,8 @@ html,body{margin:0;height:100%;background:#120e0c;overflow:hidden;font-family:'C
 .elabel .lw{display:block;overflow:hidden;padding:7px 0}
 .elabel .lw span{display:block;padding:0 6px;text-shadow:0 0 1.1px rgba(75,53,36,.6)}   /* same width as .lw: the two slides cancel exactly */
 .ewarm{position:absolute;left:1px;top:1px;right:1px;bottom:1px;border-radius:3px;pointer-events:none;background:radial-gradient(ellipse 110% 80% at 0% 0%,rgba(255,150,60,.34),rgba(255,150,60,.12) 45%,rgba(255,150,60,0) 75%)}
+.eflare{position:absolute;left:1px;top:1px;right:1px;bottom:1px;border-radius:3px;pointer-events:none;background:linear-gradient(150deg,rgba(255,170,80,.5),rgba(255,160,76,.28) 60%,rgba(255,150,70,.16));mix-blend-mode:soft-light;opacity:0}   /* 25 Nov: when the lantern flares, its light reaches the envelope too */
+#stage.open .eflare{animation:b2-fadeto 1.2s ease-out 1.5s both}
 .contact{position:absolute;left:0;top:0;width:312px;height:430px;border-radius:3px;transform:skew(.5deg,.35deg);transform-origin:0 0;box-shadow:0 0 1.5px 1px rgba(12,7,4,.55),3px 4px 3px rgba(12,7,4,.5),8px 12px 14px rgba(8,6,14,.32);opacity:0}   /* 25 Nov: the paper touches the boards (tight dark contact on the far side from the lantern) */
 #stage.arrive .contact{animation:b2-fadein .2s ease 1.95s both}
 #stage.open .contact,#stage.still .contact,#stage.instant .contact{opacity:1;animation:none}

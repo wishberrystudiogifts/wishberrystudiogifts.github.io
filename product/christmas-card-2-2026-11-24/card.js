@@ -131,7 +131,7 @@
       env: { e: 0.8, cx: 290, cy: 700, rot: 3, far: 150, dim: 0.7, slip: 337 }, frostOp: 0.4, card: { s: 1.05, cx: 300, cy: 560 }, hintY: 944, hintSize: 25,
       glints: [[565.8,140.3,0.263],[163.6,975.6,0.96],[77.1,1023.8,0.432],[565.6,275.4,0.448],[577.7,571.0,0.585],[560.7,986.6,0.747],[10.5,646.4,0.529],[532.4,38.9,0.722],[242.0,999.5,0.734],[368.5,1035.0,0.595],[421.8,145.8,0.819],[40.4,956.7,0.467],[36.2,585.3,0.277],[563.6,866.5,0.351],[582.9,709.5,0.4],[568.4,384.7,0.448]] },
     land: { W: 1200, H: 900, scene: SCENES.wide, sk: 1200 / 1728, sx: 0, sy: 0, flame: [239.6, 302.1], lr: 250,
-      env: { e: 0.85, cx: 600, cy: 590, rot: 3, far: 430, slip: 318 }, card: { s: 0.9, cx: 600, cy: 450 }, hintY: 824, hintSize: 22,
+      env: { e: 0.85, cx: 600, cy: 590, rot: 3, far: 430, slip: 318 }, card: { s: 0.9, cx: 600, cy: 405 }, hintY: 824, hintSize: 22,
       glints: [[400.3,867.0,0.902],[1120.4,605.4,0.734],[491.7,813.8,0.659],[625.4,886.1,0.216],[693.6,74.6,0.552],[1131.3,546.5,0.595],[1074.5,80.4,0.802],[128.3,819.5,0.585],[1022.0,136.6,0.638],[694.0,820.4,0.651],[780.8,853.7,0.671],[1064.2,730.5,0.83],[869.9,38.6,0.771],[934.2,760.0,0.537],[198.7,871.7,0.75],[1115.0,697.2,0.838]] }
   };
   var FROST_N = 6;
@@ -233,6 +233,7 @@
     var drift = img(A + 'env-drift.webp', 'drift', null, fr);   // a little powder snow left against the windward edge
     el('div', 'eshade', null, fr);   // light falls off away from the lantern
     el('div', 'ewarm', null, fr);    // warm cast on the side facing the lantern
+    el('div', 'eflare', null, fr);   // the flare's warm light on the paper
     el('div', 'lwarm', null, fr);    // the lantern's flicker on the paper
     el('div', 'fshade', null, fr);   // the paper darkens while it is in the air
     if (L.env.dim && L.env.dim < 1) {   // upright scene: the envelope rests far from the lantern, in the blue dusk - paper must not outshine the snow beside it
