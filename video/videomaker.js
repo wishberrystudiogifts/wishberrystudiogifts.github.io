@@ -95,11 +95,11 @@
   TEMPLATES['christmas-card-2'] = {
     kind: 'invite', fps: 30, defaultDesign: 'a', bases: { a: 'christmas-card-2-base.mp4' },
     geom: { frame: { W: 1080, H: 1920 }, stage: { W: 600, H: 1100 },
-            card: { cx: 300, bottom: 885.14, s0: 1.01818, s1: 1.01818, ty1: 0 },   // measured on the base video 25 Nov (render-b2.js MEASURE): the card is already at its reading size when the words appear
+            card: { cx: 300, bottom: 896.13, s0: 1.05, s1: 1.05, ty1: 0 },   // measured on the base video 25 Nov (render-b2.js MEASURE; the stage fills the frame: scale 1.8, no side bars): the card is already at its reading size when the words appear
             settle: { at: 0, dur: 1 }, text: { at: 7.9, dur: 0.7 } },   // 25 Nov: the envelope opens at 3.3 s (was 2.3) and the picture is shown longer
     // name on the envelope: centre on the 1080x1920 frame, frame pixels per envelope unit, the page's own fit (30 -> 15 units, 252 wide).
     // The envelope lies turned by +3 degrees and the name is written at -3 degrees on it: level on the screen (rot 0).
-    label: { cx: 516.26, cy: 1341.74, rot: 0, unit: 1.396364, size: 30, min: 15, maxW: 252, weight: 700, family: 'Caveat', color: '#4B3524', alpha: 0.86,
+    label: { cx: 515.52, cy: 1353.67, rot: 0, unit: 1.44, size: 30, min: 15, maxW: 252, weight: 700, family: 'Caveat', color: '#4B3524', alpha: 0.86,
              inAt: 1.95, inDur: 0.6, outAt: 5.475, outDur: 0.02,
              text: function (d) { return d && d.t ? 'For ' + d.t : 'With love'; } }
   };
