@@ -454,7 +454,17 @@ try {
   section('Published pages (old standard) are untouched');
   const names = execFileSync('git', ['-C', REPO, 'status', '--porcelain', '--untracked-files=all'], { encoding: 'utf8' }) + execFileSync('git', ['-C', REPO, 'diff', '--name-status', 'main', 'HEAD'], { encoding: 'utf8' });
   const touched = names.split('\n').filter(Boolean).filter((l) => !/^(A|\?\?)\s/.test(l) || /\s(christmas|birthday|christmas-gift|christmas-party|new-years-eve|video|lab)\//.test(l) || /\sindex\.html$/.test(l));
-  check('(g) git: no existing file is changed or removed; nothing is added inside the old product folders', touched.filter((l) => !/^\s?M\s+(service|shared|product)\/|^\s?M\s+404\.html/.test(l)).length === 0, touched);
+  // A NEW product with "Make it a video" has to put two things outside its own folder (PIPELINE §9 and §16, 25 Nov 2026):
+  // its base video  video/<product>-base.mp4  (a file main does not have) and its own entry in the shared engine
+  // video/videomaker.js — ADDED lines only. Both are allowed here; anything else in video/ is still an error, and the
+  // engine is then probed below: an OLD card must come out the same with the engine of this branch as with the one on main.
+  const onMain = (f) => { try { execFileSync('git', ['-C', REPO, 'cat-file', '-e', 'main:' + f], { stdio: 'ignore' }); return true; } catch (e) { return false; } };
+  const newBaseVideo = (l) => { const m = /^\s?(?:A|M|\?\?)\s+(video\/[a-z0-9-]+-base\.mp4)$/.exec(l); return !!m && !onMain(m[1]); };
+  const engineStat = execFileSync('git', ['-C', REPO, 'diff', '--numstat', 'main', '--', 'video/videomaker.js'], { encoding: 'utf8' }).trim().split(/\s+/);   // "added deleted path" of the working tree against main; empty = unchanged
+  const engineChanged = engineStat.length >= 3;
+  const engineOnlyAdds = engineChanged && engineStat[1] === '0' && Number(engineStat[0]) > 0;
+  const allowed = (l) => /^\s?M\s+(service|shared|product)\/|^\s?M\s+404\.html/.test(l) || newBaseVideo(l) || (engineOnlyAdds && /^\s?M\s+video\/videomaker\.js$/.test(l));
+  check('(g) git: no existing file is changed or removed; nothing is added inside the old product folders (a new product may add its own base video and ADD its entry to video/videomaker.js)', touched.filter((l) => !allowed(l)).length === 0, touched.filter((l) => !allowed(l)));
   const co = await phone(browser, S2.url);
   const oseen = track(co);
   const po = await co.newPage();
@@ -473,6 +483,57 @@ try {
   check('(g) old Christmas card buyer page and recipient page work as before', /\/christmas\/#m=/.test(clink));
   check('(g) the old pages make no request to the service', oseen.service.length === 0, oseen.service);
   await cg.close();
+  if (engineChanged) {
+    // the probe that goes with the allowance above: the old Christmas card makes its video twice — with the engine of this
+    // branch and with the engine of main (served in its place) — and the two must agree: length, picture size, three frames.
+    // The encoder is not byte-for-byte repeatable, so the pictures are compared, not the files. Needs a browser with H.264.
+    let vb = null;
+    try { vb = await pw.chromium.launch({ executablePath: '/usr/bin/google-chrome' }); } catch (e) { vb = null; }
+    const mainEngine = execFileSync('git', ['-C', REPO, 'show', 'main:video/videomaker.js'], { encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 });
+    const oldCardVideo = async (engineText) => {
+      const c = await phone(vb, S2.url);
+      if (engineText) await c.route('**/video/videomaker.js', (r) => r.fulfill({ status: 200, contentType: 'text/javascript; charset=utf-8', body: engineText }));
+      const p = await c.newPage();
+      await p.goto(P1.url + '/christmas/personalize-k7q2.html'); await p.waitForSelector('#send', { state: 'visible' });
+      await p.fill('#to', 'Anna');
+      if (!(await p.evaluate(() => !!(window.WishberryVideo && WishberryVideo.supported())))) { await c.close(); return { unsupported: true }; }
+      await p.click('#mkvid');
+      await p.waitForFunction(() => !document.getElementById('vdone').hidden || !document.getElementById('verr').hidden, null, { timeout: 180000 });
+      const r = await p.evaluate(async () => {
+        if (document.getElementById('vdone').hidden) return { err: document.getElementById('verr').textContent };
+        const v = document.getElementById('vid'); v.pause();
+        if (!(v.duration > 0)) await new Promise((res) => v.addEventListener('loadedmetadata', res, { once: true }));
+        const cv = document.createElement('canvas'); cv.width = 180; cv.height = 320; const g = cv.getContext('2d', { willReadFrequently: true });
+        const frames = [];
+        for (const k of [0.3, 0.55, 0.85]) {
+          await new Promise((res) => { v.addEventListener('seeked', res, { once: true }); v.currentTime = v.duration * k; });
+          await new Promise((res) => setTimeout(res, 120));
+          g.drawImage(v, 0, 0, 180, 320); const d = g.getImageData(0, 0, 180, 320).data; const grey = [];
+          for (let i = 0; i < d.length; i += 4) grey.push(Math.round((d[i] + d[i + 1] + d[i + 2]) / 3));
+          frames.push(grey);
+        }
+        return { duration: +v.duration.toFixed(2), w: v.videoWidth, h: v.videoHeight, frames };
+      });
+      await c.close(); return r;
+    };
+    if (!vb) check('(g) video engine probe: an old card makes the same video with the engine of this branch as with the engine of main', false, 'no Chrome with H.264 on this machine (/usr/bin/google-chrome) — the probe could not run');
+    else {
+      const a = await oldCardVideo(null), b = await oldCardVideo(mainEngine);
+      await vb.close();
+      if (a.unsupported || b.unsupported) check('(g) video engine probe: an old card makes the same video with the engine of this branch as with the engine of main', false, 'this browser cannot encode H.264 — the probe could not run');
+      else if (a.err || b.err) check('(g) video engine probe: an old card makes the same video with the engine of this branch as with the engine of main', false, { branch: a.err || 'ok', main: b.err || 'ok' });
+      else {
+        // each frame pair: mean difference (0-255) and the share of pixels that differ strongly (> 32) — two encodings of the
+        // same pictures differ by a little noise everywhere; a moved, missing or late line of text differs strongly in a few places
+        const far = a.frames.map((f, i) => f.reduce((s, x, j) => s + Math.abs(x - b.frames[i][j]), 0) / f.length);
+        const strong = a.frames.map((f, i) => f.reduce((s, x, j) => s + (Math.abs(x - b.frames[i][j]) > 32 ? 1 : 0), 0) / f.length);
+        const seen = { branch: [a.duration, a.w, a.h], main: [b.duration, b.w, b.h], meanDifference: far.map((x) => +x.toFixed(2)), stronglyDifferentShare: strong.map((x) => +x.toFixed(4)) };
+        console.log('  note  engine probe: ' + JSON.stringify(seen));
+        check('(g) video engine probe: an old card (Christmas) makes the same video with the engine of this branch as with the engine of main — length, picture size, three frames',
+          a.duration === b.duration && a.w === b.w && a.h === b.h && Math.max(...far) < 2.5 && Math.max(...strong) < 0.002, seen);
+      }
+    }
+  }
 } catch (e) {
   check('test run finished without an unexpected error', false, String(e && (e.stack || e)).slice(0, 800));
 } finally {
