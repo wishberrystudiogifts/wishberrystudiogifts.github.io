@@ -44,9 +44,9 @@
       "listingIds": []
     },
     "christmas-card-2": {
-      "_note": "Christmas Card 2 - Snowy Cabin (built 24 Nov 2026). listingIds is EMPTY ON PURPOSE until the listing is published (planned 26 Nov 2026): write the Etsy listing ID here right after publishing. While it is empty, any paid order of the shop unlocks this product from its own page (launch grace).",
+      "_note": "Christmas Card 2 - Snowy Cabin (built 24 Nov 2026, published on Etsy 26 Nov 2026 at 11:52 as listing 4626093140).",
       "name": "Christmas Card 2 - Snowy Cabin",
-      "listingIds": []
+      "listingIds": [4626093140]
     }
   },
 

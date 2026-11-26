@@ -133,8 +133,12 @@ try {
   fs.writeFileSync(path.join(tmpTwo, 'evil.html'), '<!doctype html><meta charset="utf-8"><script>window.__WB_SESSION={product:"lab-party-1",hash:"AAAAAAAAAAAAAAAAAAAAAA"};window.ProductLink={state:"maker"};</script><iframe id="f" style="width:390px;height:700px"></iframe><script>document.getElementById("f").src="http://127.0.0.1:8083' + LAB + 'index.html#view=face&m="+location.hash.slice(1);</script>');
   fs.writeFileSync(path.join(tmpTwo, 'frame.html'), '<!doctype html><meta charset="utf-8"><p>another website</p><iframe id="f" style="width:390px;height:600px"></iframe><script>document.getElementById("f").src="http://127.0.0.1:8081/"+location.hash.slice(1);</script>');
   P3 = await startPages(8083, tmpTwo, S1.url);
-  // the site exactly as it is in the repository: shared/keys.js still empty (the state before the first release)
-  P5 = await startPages(8085, REPO, null);
+  // the site as it was before the first release: shared/keys.js empty (since 26 Nov 2026 the repository holds the
+  // production key, so this copy empties it - the check below is about the empty-list path, not about the real key)
+  const tmpNoKeys = fs.mkdtempSync(path.join(os.tmpdir(), 'site-nokeys-'));
+  for (const f of ['404.html', 'index.html', 'shared', 'product', 'video']) if (fs.existsSync(path.join(REPO, f))) fs.cpSync(path.join(REPO, f), path.join(tmpNoKeys, f), { recursive: true });
+  fs.writeFileSync(path.join(tmpNoKeys, 'shared', 'keys.js'), 'window.WB_KEYS = [];\n');
+  P5 = await startPages(8085, tmpNoKeys, null);
   // two broken copies: the product is missing from shared/config.js · the shared code is missing altogether
   tmpNoProd = fs.mkdtempSync(path.join(os.tmpdir(), 'site-noprod-'));
   for (const f of ['404.html', 'shared', 'product']) fs.cpSync(path.join(REPO, f), path.join(tmpNoProd, f), { recursive: true });
