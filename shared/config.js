@@ -25,6 +25,13 @@ window.WB_CONFIG = {
       kind: 'card',
       allowBare: true   // the bare page address shows the sample card (no personal words), as the older cards do
     },
+    'christmas-party-1': {
+      mode: 'hash',   // SWITCH of the Christmas Party invitation "The party's behind this door" — this ONE line: 'hash' or 'direct'
+      folder: 'product/christmas-party-invitation-1-2026-11-26',
+      entry: 'personalize-w6kd.html',
+      name: 'Christmas Party invitation',
+      kind: 'invitation'
+    },
     'lab-party-1': {
       mode: 'hash',   // <-- THE SWITCH for this product: 'hash' or 'direct'
       folder: 'product/lab-party-1-2026-11-24',

@@ -104,6 +104,19 @@
              text: function (d) { return d && d.t ? 'For ' + d.t : 'With love'; } }
   };
 
+  /* Christmas Party invitation "The party's behind this door" (26 Nov 2026): the base video is the guest page itself, rendered
+     frame by frame (project/tools/render-party-door.js, FILL=1.8: the stage fills the 1080 x 1920 frame) WITHOUT the party
+     details and without the buttons, one base video per design. The envelope ARRIVES first (out of the letter slot, 2.7 s),
+     the tap is at 2.967 s, the invitation reaches its reading size at 6.967 s and the details fade in right then (CSS ease,
+     0.9 s) - so the card does not move while the words appear (s0 = s1). Geometry measured on every frame (MEASURE). */
+  TEMPLATES['christmas-party-1'] = {
+    kind: 'invite', fps: 30, defaultDesign: 'b',
+    bases: { a: 'christmas-party-1-a-base.mp4', b: 'christmas-party-1-b-base.mp4', c: 'christmas-party-1-c-base.mp4' },
+    geom: { frame: { W: 1080, H: 1920 }, stage: { W: 600, H: 1100 },
+            card: { cx: 300, bottom: 974.874, s0: 1.155, s1: 1.155, ty1: 0 },
+            settle: { at: 0, dur: 1 }, text: { at: 6.9667, dur: 0.9 } }
+  };
+
   /* ---------- CSS-identical easing ---------- */
   function bezier(x1, y1, x2, y2) {
     function A(p1, p2) { return 1 - 3 * p2 + 3 * p1; }

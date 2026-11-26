@@ -47,6 +47,11 @@
       "_note": "Christmas Card 2 - Snowy Cabin (built 24 Nov 2026, published on Etsy 26 Nov 2026 at 11:52 as listing 4626093140).",
       "name": "Christmas Card 2 - Snowy Cabin",
       "listingIds": [4626093140]
+    },
+    "christmas-party-1": {
+      "_note": "Christmas Party invitation, 3 designs - new version 'The party's behind this door' (built 26 Nov 2026). The listing was published on 23 Nov 2026 as 4623977490 with the old pages (/christmas-party/, still working); it had no buyers when it moved to the product link.",
+      "name": "Christmas Party invitation - The party's behind this door",
+      "listingIds": [4623977490]
     }
   },
 
@@ -63,6 +68,8 @@
       "1000000005": { "status": "paid", "products": ["lab-party-1"] },
       "1000000201": { "status": "paid", "products": ["christmas-card-2"] },
       "1000000202": { "status": "paid", "products": ["christmas-card-2"] },
+      "1000000301": { "status": "paid", "products": ["christmas-party-1"] },
+      "1000000302": { "status": "paid", "products": ["christmas-party-1"] },
       "1000000402": { "status": "unpaid" },
       "1000000404": { "status": "not_found" },
       "1000000500": { "status": "error" },
