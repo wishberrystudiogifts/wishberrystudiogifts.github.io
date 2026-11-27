@@ -13,3 +13,13 @@
 - 14:25 NA SAJTU: commit 7d51c36 na main (push uspeo). Testovi: site 142+82+11, e2e 13/13. Lični video sa stranice radi (12 s). Sledi provera uživo + link Nikoli; zatim slike listinga.
 - 14:32 GOTOVO: 12 slika (scripts/make_listing_nye.py, render_faces_nye.js, listing_shots_nye.js → nye/final/1-listing), listing video i 05 (0 skokova), 01 PDF, listing-tekst.txt (opis 4682 znaka, SHA 9f020d7d…), PROCITAJ.md. Računar: staro u 3-izvor\arhiva\do-dorade-27-nov (12), novo u 1-listing / novi-recept / 3-izvor (22). Uživo provereno (12 fajlova SHA, lična stranica L73gOEAKKCapcWOSMa_HjM sa probnim brojem 3999000401, potpisan link, gost). Nikoli poslati linkovi u 14:30.
 - OSTAJE (za nastavak u 17:00 ako ne stignem): kanvas (alati *-midnight* + PIPELINE §21), Galerija (NYE unos: 12 slika, video, link), PRAVILA 0 (pravilo 'svaka objava bolja'), eRank provera naslova/tagova NYE (brojač se obnavlja oko 07:30 — sutra), posle objave 2. dec ID listinga u service/config.json. Nikolin pregled na telefonu se čeka.
+- 14:51 NIKOLA ODOBRIO NYE na telefonu („Provereno preko telefona. Ovo je u redu“). Upisano u Dnevnik. U nastavku (17:00): STANJE i PROIZVODI → „odobreno 27. nov u 14:51“, zatim kanvas, Galerija, PRAVILA 0. Lica se ne diraju (nije odgovorio).
+
+## 27. nov 15:02 — ODOBRENO, kanvas i Galerija gotovi
+- Nikola (14:51): „Provereno preko telefona. Ovo je u redu“ — NYE „Ponoć“ odobrena.
+- Galerija objavljena (verzija 1795787625-1c01): NYE 12 slika + video; Božić/Rođendan/žurka označeni kao nova verzija na Etsy-ju.
+- Kanvas objavljen (verzija 1795787874-a10b): 15 alata `*-midnight*`, PIPELINE §21, folder proizvoda 06 (1-listing, novi-recept 01 i 05, 3-izvor/dorada-ponoc).
+- Dokumenti: STANJE, PROIZVODI, PRAVILA 0 (§8, §9, §10), DORADA NYE stanje rada, Dnevnik (rev 412, poslednja stavka mf743jc3083.491778).
+- Kanvas je na oko 246 od 256 MB (451 od 512 fajlova) — čeka Nikolinu reč o skidanju `project/site-branch/*.bundle.b64*.txt` (33 MB).
+- OSTAJE: eRank (sub 28. nov ujutru), objava (plan 2. dec 09:30), ID listinga u service/config.json posle objave.
+- Potrošnja 15:00: sesija 70 %, nedelja 44 %, Fable 84 %.
