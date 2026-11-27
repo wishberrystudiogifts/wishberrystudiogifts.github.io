@@ -33,6 +33,14 @@ window.WB_CONFIG = {
       kind: 'card',
       allowBare: true   // the bare page address shows the sample card (no personal words), as the older cards do
     },
+    'birthday-card-1': {
+      mode: 'hash',   // SWITCH of the birthday card "Gold Drip Cake" (new version "Make a wish") — this ONE line: 'hash' or 'direct'
+      folder: 'product/birthday-card-1-2026-11-27',
+      entry: 'personalize-m4wk.html',
+      name: 'Birthday card “Gold Drip Cake”',
+      kind: 'card',
+      allowBare: true   // the bare page address shows the sample card (no personal words), as the older cards do
+    },
     'christmas-party-1': {
       mode: 'hash',   // SWITCH of the Christmas Party invitation "The party's behind this door" — this ONE line: 'hash' or 'direct'
       folder: 'product/christmas-party-invitation-1-2026-11-26',
