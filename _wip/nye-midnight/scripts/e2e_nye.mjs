@@ -1,0 +1,61 @@
+// End-to-end check of the New Year's Eve invitation "Midnight" in mode 'hash' against a local service (mock verifier):
+// order number -> personal page /<hash> -> party details -> signed invitation link -> guest page opens; unsigned link refused.
+import { startService, check, section, summary, sleep } from '/home/claude/site/service/test/helpers.mjs';
+import { spawn } from 'node:child_process';
+import { createRequire } from 'node:module';
+const { chromium } = createRequire(import.meta.url)('/opt/npm-tools/node_modules/playwright');
+const REPO = '/home/claude/site', F = '/product/new-years-eve-invitation-1-2026-11-27/';
+let S, P, b;
+try {
+  S = await startService({ port: 8795, vars: { VERIFIER: 'mock', STAGE: 'e2e-nye' } });
+  P = spawn('node', [REPO + '/service/tools/pages-server.mjs', '--port=8085', '--root=' + REPO, '--keys=' + S.url], { stdio: 'ignore' });
+  await sleep(1500);
+  b = await chromium.launch({ executablePath: '/usr/bin/google-chrome' });
+  const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
+  await ctx.addInitScript((u) => { try { localStorage.setItem('wb.serviceUrl', u); } catch (e) {} }, S.url);
+  const page = await ctx.newPage(); const errs = []; page.on('pageerror', e => errs.push(e.message));
+  section('buyer');
+  await page.goto('http://127.0.0.1:8085' + F + 'personalize-t8nz.html');
+  await page.waitForSelector('#wb-gate input');
+  check('the entry address asks for the Etsy order number', /order number/i.test(await page.textContent('#wb-gate')));
+  await page.fill('#wb-order', '1000000001'); await page.click('#wb-gate button[type=submit]');
+  await page.waitForFunction(() => document.querySelector('.wb-err') && document.querySelector('.wb-err').textContent.trim().length > 0, null, { timeout: 10000 }).catch(() => {});
+  check('an order of ANOTHER product does not open this one', await page.locator('#wb-gate input').count() === 1, await page.textContent('.wb-err').catch(() => ''));
+  await page.fill('#wb-order', '1000000701'); await page.click('#wb-gate button[type=submit]');
+  await page.waitForURL(/^http:\/\/127\.0\.0\.1:8085\/[A-Za-z0-9_-]{22}$/, { timeout: 15000 });
+  await page.waitForSelector('.wb-status');
+  check('personal page opens under /<hash> with the status line', /works until .+ · opened 1 of 300/.test(await page.textContent('.wb-status')), await page.textContent('.wb-status'));
+  await page.waitForFunction(() => [...document.querySelectorAll('.dz img')].every(i => i.complete && i.naturalWidth > 0));
+  await page.click('.dz[data-v="a"]');
+  await page.fill('#h', 'The Millers'); await page.fill('#d', '2026-12-31'); await page.fill('#tm', '21:00'); await page.fill('#p', '24 Holly Lane, Springfield'); await page.fill('#c', '+1 555 014 2233');
+  await page.waitForFunction(() => { const f = document.getElementById('pv'); try { return f.contentDocument.querySelector('.iface.d-a') && /Holly Lane/.test(f.contentDocument.body.textContent); } catch (e) { return false; } }, null, { timeout: 15000 });
+  check('live preview shows the chosen design and the details', true);
+  await page.evaluate(() => { navigator.share = undefined; });
+  await page.click('#send'); await page.waitForFunction(() => !document.getElementById('sendbox').hidden, null, { timeout: 15000 });
+  const link = await page.inputValue('#link');
+  check('the invitation link is signed and points to the new folder', new RegExp('^http://127\\.0\\.0\\.1:8085' + F + '#m=[A-Za-z0-9_-]+&s=[A-Za-z0-9_-]{86}$').test(link), link);
+  await page.click('#see'); await sleep(800);
+  const fr = page.frames().find(f => /autoplay=1/.test(f.url()));
+  await fr.waitForFunction(() => document.getElementById('stage').classList.contains('arrive'), null, { timeout: 15000 });
+  check('"Watch it open" plays the buyer\'s own preview (arrival starts)', true);
+  section('guest');
+  const g = await (await b.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true })).newPage(); const gerr = []; g.on('pageerror', e => gerr.push(e.message));
+  const svc = []; g.on('request', r => { if (r.url().startsWith(S.url)) svc.push(r.url()); });
+  await g.goto(link);
+  await g.waitForFunction(() => document.getElementById('stage').classList.contains('landed'), null, { timeout: 20000 });
+  check('guest: the signed link opens, the envelope arrives', true);
+  check('guest: no request to the service (the key is in shared/keys.js)', svc.length === 0, svc);
+  await g.click('#stage'); await g.waitForFunction(() => document.getElementById('stage').classList.contains('done'), null, { timeout: 15000 });
+  const txt = await g.evaluate(() => document.querySelector('#stage .iface').textContent);
+  check('guest: the invitation shows the party details and the buttons', /Holly Lane/.test(txt) && await g.locator('#controls .cbtn.yes').count() === 1, txt);
+  check('guest: hint says Tap on a phone', /^Tap /.test(await g.textContent('.hint')));
+  const bad = await (await b.newContext()).newPage();
+  await bad.goto(link.replace(/&s=.*/, '')); await sleep(2500);
+  check('guest: the same link WITHOUT the signature is refused', await bad.locator('#stage *').count() === 0 && /isn.t complete|not complete|can.t be shown|invitation/i.test(await bad.evaluate(() => document.body.innerText)), (await bad.evaluate(() => document.body.innerText)).slice(0, 120));
+  const tam = await (await b.newContext()).newPage();
+  const mm = link.match(/#m=([^&]+)&s=(.+)$/); await tam.goto('http://127.0.0.1:8085' + F + '#m=' + mm[1].slice(0, -2) + 'AA&s=' + mm[2]); await sleep(2500);
+  check('guest: changed details with the old signature are refused', await tam.locator('#stage *').count() === 0);
+  check('no page errors', errs.length === 0 && gerr.length === 0, errs.concat(gerr));
+} catch (e) { console.error(e); check('test ran to the end', false, String(e)); }
+finally { if (b) await b.close(); if (P) P.kill(); if (S) await S.stop(); }
+process.exit(summary() ? 0 : 1);

@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Make your New Year's Eve party invitation</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:#FBF7EE;color:#2A2620;font:18px/1.5 'Segoe UI',Roboto,Helvetica,Arial,sans-serif}
+.top{background:#16213F;color:#F4ECDD;padding:14px 20px;text-align:center;font-family:'Fraunces',Georgia,serif;letter-spacing:.2em;text-transform:uppercase;font-size:14px}
+main{max-width:1040px;margin:0 auto;padding:24px 18px 40px}
+h1{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:34px;line-height:1.15;margin:4px 0 6px;color:#16213F;text-align:center}
+.lead{text-align:center;margin:0 0 22px;color:#5B5248;font-size:19px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr);gap:22px}
+@media (min-width:860px){.grid{grid-template-columns:380px minmax(0,1fr);gap:40px;align-items:start}.pv{position:sticky;top:20px}}
+.pv{display:flex;flex-direction:column;align-items:center;gap:12px}
+.pvcard{width:100%;max-width:300px;aspect-ratio:480/672;border-radius:6px;overflow:hidden;box-shadow:0 14px 34px rgba(31,51,38,.2);background:#F3EEE3}
+@media (min-width:860px){.pvcard{max-width:380px}}
+.pvcard iframe{width:100%;height:100%;border:0;display:block;background:transparent}
+.step{display:flex;gap:14px;background:#fff;border:2px solid #EADFCB;border-radius:16px;padding:18px 18px 16px;margin-bottom:14px}
+.num{flex:none;width:40px;height:40px;border-radius:50%;background:#16213F;color:#F4ECDD;font:700 20px/40px 'Fraunces',Georgia,serif;text-align:center}
+.body{flex:1;min-width:0}
+.stitle{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:22px;color:#16213F;margin:3px 0 10px}
+label{display:block;font-weight:700;font-size:18px;margin:12px 0 6px;color:#2A2620}
+label:first-of-type{margin-top:0}
+.opt{font-weight:400;color:#6B6157;font-size:16px}
+input{width:100%;min-width:0;font:inherit;font-size:19px;color:#2A2620;background:#FFFDF8;border:2px solid #CDBFA6;border-radius:12px;padding:12px 14px;outline:none;min-height:52px}
+input:focus{border-color:#16213F;box-shadow:0 0 0 4px rgba(31,51,38,.15)}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+@media (max-width:520px){.two{grid-template-columns:minmax(0,1fr);gap:0}}
+.two label{margin-top:12px}
+.help{margin:6px 0 0;font-size:16px;color:#6B6157}
+.err{color:#9B1C1C;font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.chip{font:inherit;font-size:16px;background:#EEF1F7;border:2px solid #CFD6E4;border-radius:999px;padding:7px 13px;cursor:pointer;color:#16213F}
+.chip:hover,.chip:focus{border-color:#16213F}
+details{margin-top:12px}
+summary{cursor:pointer;color:#16213F;font-size:16px;font-weight:600}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font:700 19px/1.2 'Segoe UI',Roboto,Arial,sans-serif;border-radius:14px;padding:16px 22px;min-height:58px;cursor:pointer;text-decoration:none;border:2px solid transparent}
+.primary{width:100%;background:#8B6A24;color:#fff;font-size:21px;min-height:64px;box-shadow:0 8px 20px rgba(122,31,43,.28)}
+.primary:hover{background:#6E531B}
+.ghost{background:#fff;color:#16213F;border-color:#16213F;width:100%;max-width:300px}
+.sendbox{background:#fff;border:2px solid #B8893B;border-radius:16px;padding:18px;margin-top:14px}
+.ok{margin:0 0 12px;font-weight:700;font-size:20px;color:#2E6B3A}
+.sendbtns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.app{background:#F6EEDF;color:#2A2620;border-color:#E5D6BC;font-size:18px}
+.app.wa{background:#1F7A4D;color:#fff;border-color:#1F7A4D}
+.app[hidden]{display:none}
+#share{grid-column:1 / -1}
+.small{font-size:16px;font-weight:600;margin-top:4px}
+#link{font-size:15px;color:#5B5248;min-height:44px}
+.note{font-size:16px;color:#6B6157;margin:14px 2px 0;text-align:center}
+#overlay{position:fixed;inset:0;background:#000;z-index:50;display:flex;flex-direction:column}
+#overlay[hidden]{display:none}
+#overlay iframe{flex:1;border:0;width:100%}
+.closebtn{position:absolute;top:max(12px,env(safe-area-inset-top));left:12px;background:rgba(255,255,255,.92);color:#16213F;border-color:#fff;min-height:50px;font-size:17px;padding:10px 16px}
+.or{display:flex;align-items:center;gap:12px;margin:18px 2px 12px;color:#8A7F72;font-size:16px}
+.or:before,.or:after{content:"";flex:1;height:2px;background:#E5D6BC}
+.vbtn{width:100%;background:#fff;color:#16213F;border-color:#16213F;font-size:20px;min-height:60px}
+.vbtn:hover{background:#F4F6FA}
+.vbtn:disabled{opacity:.6;cursor:default}
+.vhelp{text-align:center;margin:8px 6px 0}
+.vphone{display:none;text-align:center;margin:6px 6px 0;font-size:15px;color:#8A7F72}
+@media (min-width:700px) and (hover:hover) and (pointer:fine){.vphone{display:block}} /* computers only: the video is vertical, made for phones */
+.pbar{height:12px;background:#EFE5D3;border-radius:6px;overflow:hidden;margin:4px 0 10px}
+.pbar>div{height:100%;width:0;background:#8B6A24;transition:width .2s}
+#vid{display:block;width:100%;max-width:270px;aspect-ratio:9/16;margin:0 auto 14px;border-radius:12px;background:#000;box-shadow:0 10px 26px rgba(0,0,0,.18)}
+.printbox{background:#fff;border:2px solid #EADFCB;border-radius:16px;padding:16px 18px}
+.printbox .stitle{margin-bottom:6px}
+.pbtns{display:grid;grid-template-columns:1fr;gap:10px;margin-top:10px}
+@media (min-width:520px){.pbtns{grid-template-columns:1fr 1fr 1fr}}
+.pb{background:#fff;color:#16213F;border-color:#16213F;font-size:17px;min-height:54px;padding:12px 10px}
+.pb:hover{background:#F4F6FA}
+.designs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.dz{position:relative;min-width:0;display:flex;flex-direction:column;align-items:center;gap:7px;padding:6px 6px 9px;background:#FFFDF8;border:3px solid #E5D6BC;border-radius:14px;cursor:pointer;font:600 15px/1.2 'Segoe UI',Roboto,Arial,sans-serif;color:#2A2620;text-align:center}
+.dz img{display:block;width:100%;height:auto;aspect-ratio:300/420;border-radius:7px;box-shadow:0 3px 10px rgba(31,51,38,.18)}
+.dz:hover,.dz:focus-visible{border-color:#B8A27A;outline:none}
+.dz[aria-checked="true"]{border-color:#8B6A24;background:#FFF6F1}
+.dz[aria-checked="true"]::after{content:"\2713";position:absolute;top:-10px;right:-10px;width:30px;height:30px;border-radius:50%;background:#8B6A24;color:#fff;font:700 17px/30px 'Segoe UI',Arial,sans-serif;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+@media (max-width:420px){.dz{font-size:13.5px;padding:4px 4px 7px}.designs{gap:8px}}
+.linkerr{margin:12px 0 0;font-size:17px;font-weight:700;color:#9B1C1C}
+.keep{margin:10px 0 0;font-size:16px;color:#5B5248}
+</style>
+<!-- NEW STANDARD (product link, Nov 2026): three shared files + one line that names the product.
+     mode 'direct' in /shared/config.js -> this page is the maker, as before.
+     mode 'hash'   -> opened at this address it asks for the Etsy order number; the maker itself opens under /<hash>. -->
+<link rel="stylesheet" href="/shared/product-link.css?v=20261124">
+<script src="/shared/config.js?v=20261127n"></script>
+<script src="/shared/keys.js?v=20261126"></script>
+<script src="/shared/product-link.js?v=20261124"></script>
+<script>ProductLink.entry({ product: 'new-years-eve-1' });</script>
+</head>
+<body>
+<div class="top">New Year's Eve Party Invitation</div>
+<main>
+  <h1>Make your party invitation</h1>
+  <p class="lead">Fill in your party details &middot; about two minutes</p>
+  <div class="grid">
+    <section class="pv" aria-label="Preview">
+      <div class="pvcard"><iframe id="pv" title="Your invitation"></iframe></div>
+      <button id="see" class="btn ghost" type="button">&#9654;&nbsp; Watch it open</button>
+    </section>
+    <section>
+      <div class="step"><div class="num">1</div><div class="body">
+        <div class="stitle">Choose your design</div>
+        <div class="designs" role="radiogroup" aria-label="Design">
+          <button class="dz" type="button" role="radio" aria-checked="false" data-v="a"><img src="assets/thumb-a.jpg" alt="Midnight Silver design" width="300" height="420">Midnight Silver</button>
+          <button class="dz" type="button" role="radio" aria-checked="true" data-v="b"><img src="assets/thumb-b.jpg" alt="Gold Countdown design" width="300" height="420">Gold Countdown</button>
+          <button class="dz" type="button" role="radio" aria-checked="false" data-v="c"><img src="assets/thumb-c.jpg" alt="Ivory Confetti design" width="300" height="420">Ivory Confetti</button>
+        </div>
+        <p class="help">All three designs are included &mdash; switch any time.</p>
+      </div></div>
+      <div class="step"><div class="num">2</div><div class="body">
+        <div class="stitle">Your party</div>
+        <label for="t">Name of the party</label>
+        <input id="t" maxlength="40" placeholder="New Year's Eve Party" autocomplete="off">
+        <div class="chips">
+          <button class="chip" type="button" data-for="t">New Year's Eve Party</button>
+          <button class="chip" type="button" data-for="t">New Year's Party</button>
+          <button class="chip" type="button" data-for="t">Countdown Party</button>
+          <button class="chip" type="button" data-for="t">New Year's Eve Dinner</button>
+          <button class="chip" type="button" data-for="t">Midnight Celebration</button>
+        </div>
+        <label for="h">Hosted by <span class="opt">(optional)</span></label>
+        <input id="h" maxlength="50" placeholder="For example: The Millers" autocomplete="off">
+        <details><summary>Change the first line (&ldquo;You&rsquo;re invited to our&rdquo;)</summary>
+          <label for="k" style="margin-top:10px">First line</label>
+          <input id="k" maxlength="40" placeholder="You&rsquo;re invited to our" autocomplete="off">
+          <div class="chips">
+            <button class="chip" type="button" data-for="k">You&rsquo;re invited to our</button>
+            <button class="chip" type="button" data-for="k">Please join us for a</button>
+            <button class="chip" type="button" data-for="k">Join us for our</button>
+          </div>
+        </details>
+      </div></div>
+      <div class="step"><div class="num">3</div><div class="body">
+        <div class="stitle">When and where</div>
+        <div class="two">
+          <div><label for="d">Date</label><input id="d" type="date"></div>
+          <div><label for="tm">Time <span class="opt">(optional)</span></label><input id="tm" type="time"></div>
+        </div>
+        <p id="needd" class="help err" hidden>Please choose the date of your party.</p>
+        <label for="p">Place</label>
+        <input id="p" maxlength="120" placeholder="For example: 18 Harbor View Drive, Springfield" autocomplete="off">
+        <p class="help">Guests get a &ldquo;Directions&rdquo; button that opens this address in their maps.</p>
+        <p id="needp" class="help err" hidden>Please write where the party is.</p>
+        <label for="n">A short note <span class="opt">(optional)</span></label>
+        <input id="n" maxlength="80" placeholder="For example: Dress to sparkle!" autocomplete="off">
+      </div></div>
+      <div class="step"><div class="num">4</div><div class="body">
+        <div class="stitle">RSVP <span class="opt">(optional)</span></div>
+        <label for="r">Who collects the replies?</label>
+        <input id="r" maxlength="40" placeholder="For example: Anna" autocomplete="off">
+        <label for="c">Phone or email for replies</label>
+        <input id="c" maxlength="60" placeholder="For example: +1 555 014 2233" autocomplete="off" inputmode="email">
+        <p class="help">Guests tap &ldquo;I&rsquo;ll be there&rdquo; and a ready reply opens in their Messages, WhatsApp or email &mdash; to you. For WhatsApp, write the number with the country code (+1 &hellip;).</p>
+        <label for="rd">Reply by <span class="opt">(optional)</span></label>
+        <input id="rd" type="date">
+      </div></div>
+      <button id="send" class="btn primary" type="button">Send my invitation &nbsp;&#10148;</button>
+      <div id="sendbox" class="sendbox" hidden>
+        <p class="ok">&#10003; Your invitation is ready! How do you want to send it?</p>
+        <p class="help" style="margin:-4px 0 12px">Send the same link to all your guests &mdash; they tap the envelope to open it.</p>
+        <div class="sendbtns">
+          <button id="share" class="btn app wa" type="button" hidden>Send with my phone&hellip;</button>
+          <a id="wa" class="btn app wa" target="_blank" rel="noopener">WhatsApp</a>
+          <a id="sms" class="btn app" hidden>Text message</a>
+          <a id="mail" class="btn app">Email app</a>
+          <a id="gmail" class="btn app" target="_blank" rel="noopener" hidden>Gmail</a>
+          <button id="copy" class="btn app" type="button">Copy link</button>
+        </div>
+        <label class="small" for="link">Your invitation link</label>
+        <input id="link" readonly>
+        <p class="help">Want to change something? Edit it above and tap &ldquo;Send my invitation&rdquo; again &mdash; you get a new link.</p>
+        <p class="keep">Send this link to your guests &mdash; not the address of the page you are on. That one is your personal page.</p>
+      </div>
+      <p id="linkerr" class="linkerr" role="alert" hidden></p>
+      <div class="or" aria-hidden="true">or</div>
+      <button id="mkvid" class="btn vbtn" type="button">&#127916;&nbsp; Make it a video</button>
+      <p class="help vhelp">Get a 12-second video of your invitation opening with your party details &mdash; to send in any chat or save on your phone.</p>
+      <p class="help vphone">&#128241;&nbsp; Made for phones &mdash; looks best when your guests open it on a phone</p>
+      <div id="videobox" class="sendbox" hidden>
+        <div id="vwork">
+          <p class="ok" id="vptext">Making your video&hellip; 0%</p>
+          <div class="pbar"><div id="vpbar"></div></div>
+          <p class="help" style="margin:0">It takes a few seconds. Please keep this page open.</p>
+        </div>
+        <div id="vdone" hidden>
+          <p class="ok">&#10003; Your video is ready!</p>
+          <video id="vid" playsinline muted loop controls></video>
+          <div class="sendbtns">
+            <button id="vshare" class="btn app wa" type="button" hidden>Send the video&hellip;</button>
+            <a id="vsave" class="btn app" download="new-years-eve-video-invitation.mp4">Save the video</a>
+          </div>
+          <p id="vhint" class="help" style="margin:0" hidden>On iPhone: tap &ldquo;Send the video&hellip;&rdquo;, then &ldquo;Save Video&rdquo; to keep it in Photos.</p>
+        </div>
+        <p id="verr" class="help" style="color:#9B1C1C;font-weight:700;margin:0" hidden></p>
+      </div>
+      <div class="or" aria-hidden="true">or</div>
+      <div class="printbox">
+        <div class="stitle">&#128424;&nbsp; Print it with your details</div>
+        <p class="help" style="margin:0">Opens your invitation ready to print or save as a PDF.</p>
+        <div class="pbtns">
+          <button class="btn pb" type="button" data-size="5x7">5 &times; 7 card</button>
+          <button class="btn pb" type="button" data-size="letter">US Letter</button>
+          <button class="btn pb" type="button" data-size="a4">A4</button>
+        </div>
+        <p class="help">5&times;7 is for a print shop or 5&times;7 card stock. Letter and A4 print the 5&times;7 invitation with corner marks for cutting.</p>
+      </div>
+      <p class="note">&#128274; Your details are saved only inside your link. We never see them.</p>
+      <p class="note">Need help? Message us on Etsy &mdash; we reply within 24 hours.</p>
+    </section>
+  </div>
+</main>
+<div id="overlay" hidden>
+  <iframe id="full" title="Your invitation opening"></iframe>
+  <button id="close" class="btn closebtn" type="button">&larr; Back to editing</button>
+</div>
+<script src="invite.js?v=20261127n"></script>
+<script src="/video/videomaker.js?v=20261127n"></script>
+<script>
+ProductLink.ready(function (session) {
+  var C = window.InviteCodec, KEY = 'inviteDraft-new-years-eve-1';
+  var $ = function (id) { return document.getElementById(id); };
+  var F = ['k', 't', 'h', 'd', 'tm', 'p', 'n', 'r', 'c', 'rd'];
+  var pv = $('pv');
+  var SHARE_TEXT = 'You’re invited! 🥂 Tap to open your invitation:';
+  function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
+  var saved = null; try { saved = JSON.parse(store(KEY) || 'null'); } catch (e) {}
+  F.forEach(function (f) { $(f).value = saved && saved[f] || ''; });
+  if (!$('d').value) $('d').value = new Date().getFullYear() + '-12-31'; // New Year's Eve: the date is almost always December 31
+  var design = saved && C.designs.hasOwnProperty(saved.v) ? saved.v : C.defaultDesign;
+  var dzs = Array.prototype.slice.call(document.querySelectorAll('.dz'));
+  function showDesign() { dzs.forEach(function (b) { var on = b.getAttribute('data-v') === design; b.setAttribute('aria-checked', on ? 'true' : 'false'); b.tabIndex = on ? 0 : -1; }); }
+  dzs.forEach(function (b, i) {
+    b.addEventListener('click', function () { design = b.getAttribute('data-v'); showDesign(); refresh(); });
+    b.addEventListener('keydown', function (e) { // arrow keys move the choice, like radio buttons
+      var k = e.key, j = k === 'ArrowRight' || k === 'ArrowDown' ? i + 1 : k === 'ArrowLeft' || k === 'ArrowUp' ? i - 1 : null;
+      if (j === null) return;
+      e.preventDefault(); var nb = dzs[(j + dzs.length) % dzs.length]; nb.focus(); nb.click();
+    });
+  });
+  showDesign();
+  function data() { var o = { v: design }; F.forEach(function (f) { o[f] = $(f).value; }); return C.clean(o); }
+  function packed() { var d = data(), o = { v: d.v || C.defaultDesign }; F.forEach(function (f) { if (d[f]) o[f] = d[f]; }); return C.encode(o); }
+  var tmr;
+  function refresh() {
+    clearTimeout(tmr);
+    tmr = setTimeout(function () {
+      pv.src = 'index.html#view=face&m=' + packed();
+      store(KEY, JSON.stringify(data()));
+    }, 150);
+    $('sendbox').hidden = true;
+    $('videobox').hidden = true;
+    if ($('d').value) $('needd').hidden = true;
+    if ($('p').value.trim()) $('needp').hidden = true;
+  }
+  F.forEach(function (f) { $(f).addEventListener('input', refresh); $(f).addEventListener('change', refresh); });
+  Array.prototype.forEach.call(document.querySelectorAll('.chip'), function (b) {
+    b.addEventListener('click', function () { var t = $(b.getAttribute('data-for')); t.value = b.textContent; refresh(); t.focus(); });
+  });
+  refresh();
+  $('see').addEventListener('click', function () {
+    $('full').src = 'index.html#autoplay=1&r=' + Date.now() + '&m=' + packed();
+    $('overlay').hidden = false;
+  });
+  $('close').addEventListener('click', function () { $('overlay').hidden = true; $('full').src = 'about:blank'; });
+  function check() {
+    if (!$('d').value) { $('needd').hidden = false; $('d').focus(); return false; }
+    if (!$('p').value.trim()) { $('needp').hidden = false; $('p').focus(); return false; }
+    return true;
+  }
+  var sending = false;
+  $('send').addEventListener('click', function () {
+    if (sending || !check()) return;
+    var btn = $('send'), label = btn.innerHTML;
+    sending = true; btn.disabled = true; btn.textContent = 'Making your link\u2026'; $('linkerr').hidden = true;
+    // mode 'direct': the link is ready at once. mode 'hash': the service signs it (only while the product link is valid).
+    ProductLink.invitationLink(packed()).then(showLink, function (err) {
+      $('linkerr').textContent = ProductLink.linkErrorText(err); $('linkerr').hidden = false;
+    }).then(function () { sending = false; btn.disabled = false; btn.innerHTML = label; });
+  });
+  function showLink(link) {
+    var text = SHARE_TEXT + ' ' + link;
+    var subject = 'You’re invited: ' + C.full(data()).t;
+    $('link').value = link;
+    $('wa').href = 'https://wa.me/?text=' + encodeURIComponent(text);
+    $('sms').href = 'sms:?&body=' + encodeURIComponent(text);
+    $('mail').href = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(text);
+    $('gmail').href = 'https://mail.google.com/mail/?view=cm&fs=1&su=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(text);
+    var touch = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+    var canShare = !!(touch && navigator.share);
+    $('share').hidden = !canShare;   // phones: one button opens the phone's own list (WhatsApp, Messages, Mail, Messenger...)
+    $('sms').hidden = !touch;         // text messages only exist on phones
+    $('gmail').hidden = touch;        // computers: Gmail in the browser works without a mail program
+    $('sendbox').hidden = false;
+    $('sendbox').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (canShare) openShare(link);
+  }
+  function openShare(link) {
+    navigator.share({ title: 'You’re invited!', text: SHARE_TEXT, url: link }).catch(function () {});
+  }
+  $('share').addEventListener('click', function () { openShare($('link').value); });
+  $('copy').addEventListener('click', function () {
+    var l = $('link'), done = function () { $('copy').textContent = 'Copied ✓'; setTimeout(function () { $('copy').textContent = 'Copy link'; }, 2200); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(l.value).then(done, fallback); else fallback();
+    function fallback() { l.focus(); l.select(); try { document.execCommand('copy'); done(); } catch (e) {} }
+  });
+  // Make it a video (24 Nov 2026): the buyer's own phone or computer makes a 12-second MP4 of the invitation
+  // opening, with these party details in the chosen design (../video/videomaker.js; nothing is uploaded)
+  var VT = 'new-years-eve-1', VFILE = 'new-years-eve-video-invitation.mp4', VTITLE = 'You\u2019re invited!';
+  var vfile = null, vurl = null, vbusy = false;
+  var NOVIDEO = 'This browser can\u2019t make the video. On iPhone, open this page in Safari (iOS 16.4 or newer); on Android or a computer, use Chrome. You can still send your invitation with \u201cSend my invitation\u201d above.';
+  $('mkvid').addEventListener('click', function () {
+    if (vbusy) return;
+    if (!check()) return;
+    var box = $('videobox');
+    box.hidden = false; $('verr').hidden = true; $('vdone').hidden = true;
+    if (!window.WishberryVideo || !WishberryVideo.supported()) {
+      $('vwork').hidden = true; $('verr').textContent = NOVIDEO; $('verr').hidden = false;
+      box.scrollIntoView({ behavior: 'smooth', block: 'center' }); return;
+    }
+    vbusy = true; $('mkvid').disabled = true; $('vwork').hidden = false;
+    $('vpbar').style.width = '0%'; $('vptext').textContent = 'Making your video\u2026 0%';
+    box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    WishberryVideo.make({ template: VT, root: '/video/', face: 'index.html#view=face&m=' + packed(), design: data().v || C.defaultDesign }, function (p) {
+      var pct = Math.round(p * 100);
+      $('vpbar').style.width = pct + '%'; $('vptext').textContent = 'Making your video\u2026 ' + pct + '%';
+    }).then(function (res) {
+      if (vurl) URL.revokeObjectURL(vurl);
+      vurl = URL.createObjectURL(res.blob);
+      vfile = new File([res.blob], VFILE, { type: 'video/mp4' });
+      $('vid').src = vurl; $('vsave').href = vurl;
+      var can = false; try { can = !!(navigator.canShare && navigator.canShare({ files: [vfile] })); } catch (e) { can = false; }
+      $('vshare').hidden = !can; $('vhint').hidden = !can; $('vsave').style.gridColumn = can ? '' : '1 / -1';
+      $('vwork').hidden = true; $('vdone').hidden = false;
+      var pl = $('vid').play(); if (pl && pl.catch) pl.catch(function () {});
+    }).catch(function (err) {
+      $('vwork').hidden = true;
+      $('verr').textContent = err && err.message === 'unsupported' ? NOVIDEO : 'Sorry, the video could not be made on this device. Please try again in Chrome or Safari \u2014 or send your invitation with \u201cSend my invitation\u201d above.';
+      $('verr').hidden = false;
+    }).then(function () { vbusy = false; $('mkvid').disabled = false; });
+  });
+  $('vshare').addEventListener('click', function () {
+    if (vfile) navigator.share({ files: [vfile], title: VTITLE }).catch(function () {});
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('.pb'), function (b) {
+    b.addEventListener('click', function () {
+      if (!check()) return;
+      window.open('index.html#view=print&size=' + b.getAttribute('data-size') + '&m=' + packed(), '_blank');
+    });
+  });
+});
+</script>
+</body>
+</html>

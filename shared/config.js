@@ -48,6 +48,13 @@ window.WB_CONFIG = {
       name: 'Christmas Party invitation',
       kind: 'invitation'
     },
+    'new-years-eve-1': {
+      mode: 'hash',   // SWITCH of the New Year's Eve Party invitation "Midnight" — this ONE line: 'hash' or 'direct'
+      folder: 'product/new-years-eve-invitation-1-2026-11-27',
+      entry: 'personalize-t8nz.html',
+      name: 'New Year’s Eve Party invitation',
+      kind: 'invitation'
+    },
     'lab-party-1': {
       mode: 'hash',   // <-- THE SWITCH for this product: 'hash' or 'direct'
       folder: 'product/lab-party-1-2026-11-24',
