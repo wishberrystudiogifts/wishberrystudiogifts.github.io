@@ -162,7 +162,7 @@
       fin: { s: 1.1, cx: 300, bottom: 962 }, hintY: 762, hintSize: 19, fwy: 0.86,
       fw: [[300, 330, 430, 'gold', 0.7], [120, 640, 360, 'silver', 1.25], [455, 800, 380, 'blue', 1.75], [150, 960, 400, 'gold', 2.35], [430, 120, 340, 'silver', 2.9], [300, 1010, 360, 'blue', 3.6]] },
     land: { W: 1200, H: 900, scene: SCENES.wide, sk: 0.764, sx: -60, sy: -45,
-      env: { e: 0.72, cx: 490, cy: 452, rot: -3, tilt: 26 }, from: { x: -36, y: -650, rot: 24, s: 0.82 }, lead: 1,
+      env: { e: 0.74, cx: 494, cy: 456, rot: -3, tilt: 39 }, from: { x: -8, y: -640, rot: 13, s: 0.72 }, lead: 1,
       fin: { s: 0.95, cx: 600, bottom: 772 }, hintY: 842, hintSize: 16, fwy: 0.6,
       fw: [[560, 300, 520, 'gold', 0.7], [240, 420, 420, 'silver', 1.25], [930, 420, 440, 'blue', 1.75], [330, 720, 460, 'gold', 2.35], [1010, 160, 380, 'silver', 2.9], [700, 760, 420, 'blue', 3.6]] }
   };
@@ -316,8 +316,8 @@
     // a few pieces pass close to the lens, out of focus, in front of the invitation
     var near = el('div', 'near', null, stageEl);
     for (i = 0; i < (port ? 4 : 6); i++) {
-      var nz = 64 + r() * 60, nx = r() * 0.24 * L.W;     // down the two sides, so they never sit on the words
-      img(A + 'disc-far.webp', 'nf', 'left:' + (i % 2 ? L.W - nz - nx : nx - nz * 0.4).toFixed(0) + 'px;top:-180px;width:' + nz.toFixed(0) + 'px;height:' + nz.toFixed(0) + 'px;--sw:' + px((r() - 0.5) * 70) +
+      var nz = 64 + r() * 60, nx = r() * (port ? 0.05 : 0.2) * L.W;     // down the two edges, half out of the picture, so they never sit on the words
+      img(A + 'disc-far.webp', 'nf', 'left:' + (i % 2 ? L.W - nz * 0.5 - nx : nx - nz * 0.5).toFixed(0) + 'px;top:-180px;width:' + nz.toFixed(0) + 'px;height:' + nz.toFixed(0) + 'px;--sw:' + px((r() - 0.5) * 30) +
         ';--fall:' + (L.H + 380) + 'px;--dl:' + (2.4 + r() * 1.5).toFixed(2) + 's;--du:' + (2.0 + r() * 0.8).toFixed(2) + 's;--o:' + (0.34 + r() * 0.2).toFixed(2), near);
     }
 
@@ -481,7 +481,7 @@
     var kind = contactKind(d.c);
     if (kind) {
       var r1 = el('div', 'crow', null, rows);
-      var y = el('button', 'cbtn yes', null, r1); y.type = 'button'; y.textContent = '\u2713 I\u2019ll be there'; y.addEventListener('click', function () { rsvp(true); });
+      var y = el('button', 'cbtn yes', null, r1); y.type = 'button'; y.textContent = 'I\u2019ll be there'; y.addEventListener('click', function () { rsvp(true); });
       var no = el('button', 'cbtn', null, r1); no.type = 'button'; no.textContent = 'Can\u2019t make it'; no.addEventListener('click', function () { rsvp(false); });
     }
     var r2 = el('div', 'crow', null, rows);

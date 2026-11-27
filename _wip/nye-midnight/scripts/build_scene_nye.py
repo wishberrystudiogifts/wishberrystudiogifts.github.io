@@ -29,8 +29,10 @@ soft(wide, 9, 0.80).save(os.path.join(OUT, 'bg-blur-land.jpg'), quality=80, opti
 def save(rgba, name, q=88):
     Image.fromarray(np.clip(rgba, 0, 255).astype(np.uint8), 'RGBA').save(os.path.join(OUT, name), 'WEBP', quality=q, method=6, alpha_quality=95)
 T = np.asarray(tall).astype(np.float32)
-def disc(cx, cy, r, name, size=96, blur=0.0, gain=1.0):
+def disc(cx, cy, r, name, size=96, blur=0.0, gain=1.0, silver=False):
     p = int(r + 6); c = T[cy - p:cy + p, cx - p:cx + p].copy()
+    if silver:                                        # the dull bronze disc of the photo becomes silver foil (on pearl paper bronze read as a stain)
+        g = c.mean(2, keepdims=True); c = np.clip((g - g.mean()) * 1.6 + 132, 50, 226) * np.array([0.98, 0.99, 1.03], np.float32)
     yy, xx = np.mgrid[0:2 * p, 0:2 * p].astype(np.float32); d = np.hypot(xx - p + .5, yy - p + .5)
     al = np.clip((r - 1.5 - d) / 1.6 + .5, 0, 1)
     rgba = np.dstack([c * gain, al * 255])
@@ -45,7 +47,7 @@ def disc(cx, cy, r, name, size=96, blur=0.0, gain=1.0):
     save(rgba, name)
 disc(172, 1323, 44, 'disc-a.webp', gain=1.12)
 disc(248, 1858, 48, 'disc-b.webp', gain=1.12)
-disc(130, 1643, 46, 'disc-s.webp', gain=1.3)
+disc(130, 1643, 46, 'disc-s.webp', gain=1.3, silver=True)
 def bokeh(name, n=160):                               # a disc close to the lens: an even, bright circle with a soft rim (out of focus), not a smudge
     yy, xx = np.mgrid[0:n, 0:n].astype(np.float32); d = np.hypot(xx - n / 2 + .5, yy - n / 2 + .5) / (n / 2)
     a = np.clip((0.86 - d) / 0.16, 0, 1) * (0.62 + 0.38 * np.clip((d - 0.55) / 0.3, 0, 1))

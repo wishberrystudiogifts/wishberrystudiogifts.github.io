@@ -152,12 +152,12 @@ ba = aa(bd)
 v = (yy - BT) / (BB - BT)
 nap = cv2.GaussianBlur(np.random.default_rng(31).standard_normal(xx.shape).astype(np.float32), (0, 0), sigmaX=0.5, sigmaY=5 * S); nap /= nap.std() + 1e-6
 fine = noise(xx.shape, 0.7, 32)
-sheen = 0.55 * np.exp(-((v - 0.30) / 0.20) ** 2) + 0.16 * np.exp(-((v - 0.82) / 0.10) ** 2)
+sheen = 0.78 * np.exp(-((v - 0.30) / 0.18) ** 2) + 0.2 * np.exp(-((v - 0.82) / 0.10) ** 2)
 velvet = np.array([24, 33, 78], np.float32)[None, None] * (0.72 + sheen + 0.10 * nap + 0.07 * fine)[..., None]
 velvet *= (1 - 0.55 * np.exp(-np.minimum(xx, W - xx) / 4.5))[..., None]                    # it turns round the edges
 velvet *= (0.75 + 0.35 * u)[..., None] * (1 - u[..., None] * np.array([0.0, 0.06, 0.22], np.float32))
 velvet += 26 * (np.exp(-np.abs(yy - BT - 0.9) / 0.5) + 0.6 * np.exp(-np.abs(yy - BB + 0.9) / 0.5))[..., None] * np.array([0.6, 0.7, 1.0], np.float32)   # stitched edges
-bsh = (blur(np.roll(np.roll(ba, round(2.6 * S), 0), round(-1.6 * S), 1), 2.2) * 0.42 + blur(ba, 0.7) * 0.25) * aa(BODY) * (1 - ba)
+bsh = (blur(np.roll(np.roll(ba, round(3.0 * S), 0), round(-1.8 * S), 1), 2.4) * 0.6 + blur(ba, 0.7) * 0.3) * aa(BODY) * (1 - ba)
 save(velvet * ba[..., None], np.maximum(ba, np.clip(bsh, 0, 1)), 'env-band.webp')
 
 # ---------- SEAL: a small silver clock (bezel, ivory dial, batons, hour hand at twelve)

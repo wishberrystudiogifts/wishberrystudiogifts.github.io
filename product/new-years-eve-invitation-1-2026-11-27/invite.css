@@ -44,7 +44,7 @@ html,body{margin:0;height:100%;background:#09080a;overflow:hidden;font-family:'C
 .envroot.rb{z-index:2}.envroot.rc{z-index:3}.envroot.rf{z-index:4}
 .slide{position:absolute;inset:0;transform-origin:50% 50%}
 .eg{position:absolute;inset:0}
-.tl{transform-origin:50% 50%;transform:perspective(1400px) rotateX(var(--tilt))}
+.tl{transform-origin:50% 50%;transform:perspective(1100px) rotateX(var(--tilt))}
 .eg img.full{position:absolute;left:0;top:0;width:312px;height:430px;display:block}
 .eshadow{position:absolute;left:-34px;top:-34px;width:380px;height:498px;display:block}
 .flapBbox{position:absolute;left:-12px;top:-128px;width:336px;height:128px;perspective:1100px;perspective-origin:50% 100%}
@@ -127,7 +127,7 @@ html,body{margin:0;height:100%;background:#09080a;overflow:hidden;font-family:'C
 @keyframes cardout{0%{transform:translate(0px,0px)}100%{transform:translate(0px,var(--out))}}
 @keyframes cardfin{0%{transform:translate(0px,var(--out))}100%{transform:translate(var(--fx),var(--fy))}}
 @keyframes cardgrow{0%{transform:rotate(0deg) scale(var(--c0))}100%{transform:rotate(var(--unrot)) scale(var(--c1))}}
-@keyframes cardflat{0%{transform:perspective(1400px) rotateX(var(--tilt))}100%{transform:perspective(1400px) rotateX(0deg)}}
+@keyframes cardflat{0%{transform:perspective(1100px) rotateX(var(--tilt))}100%{transform:perspective(1100px) rotateX(0deg)}}
 @keyframes rcup{from{z-index:3}to{z-index:7}}
 @keyframes veilin{from{opacity:0}to{opacity:.4}}
 @keyframes fwpop{0%{transform:scale(.3,calc(.3 * var(--fwy)));opacity:0}12%{opacity:.78}45%{opacity:.5}100%{transform:scale(1.15,calc(1.15 * var(--fwy)));opacity:0}}
@@ -178,8 +178,8 @@ body.inside-view #stage,body.inside-view .backdrop,body.inside-view #controls{di
 .iface.d-a .time{font-weight:600;font-size:2.15em;letter-spacing:.04em}
 .iface.d-a .place{font-weight:500;font-size:2.2em}
 .iface.d-a .note{font-style:italic;font-weight:500;font-size:2.05em}
-.iface.d-a .rsvp{font-style:italic;font-weight:500;font-size:2em;color:#E3E9F4}
-.iface.d-a .contact{font-weight:600;font-size:2em;letter-spacing:.03em;color:#E3E9F4}
+.iface.d-a .rsvp{font-style:italic;font-weight:500;font-size:2em;color:#EEF2F8}
+.iface.d-a .contact{font-weight:600;font-size:2em;letter-spacing:.03em;color:#EEF2F8}
 /* B Gold Countdown: black and gold art deco, balloons and fireworks — Limelight + Poiret One + Josefin Sans, gold on black */
 .iface.d-b{background:#0C0B09}
 .iface.d-b .itxt{top:222px;height:372px;left:62px;right:62px}
@@ -210,7 +210,7 @@ body.inside-view #stage,body.inside-view .backdrop,body.inside-view #controls{di
 .iface.d-c .time{font-weight:400;font-size:1.75em}
 .iface.d-c .place{font-weight:400;font-size:1.85em}
 .iface.d-c .note{font-style:italic;font-weight:400;font-size:1.75em}
-.iface.d-c .rsvp{font-family:'Josefin Sans',Arial,sans-serif;font-style:normal;font-weight:600;font-size:1.32em;letter-spacing:.16em;text-transform:uppercase;color:#A8792E;margin-top:1.4em}
+.iface.d-c .rsvp{font-family:'Josefin Sans',Arial,sans-serif;font-style:normal;font-weight:600;font-size:1.2em;letter-spacing:.1em;text-transform:uppercase;color:#A8792E;margin-top:1.4em;text-wrap:balance}
 .iface.d-c .contact{font-weight:400;font-size:1.7em;color:#3A2E20}
 .itxt{will-change:opacity} /* own layer from the start: no one-frame re-raster flicker when the fade ends */
 
@@ -266,3 +266,4 @@ body.print-view .pbar button{font:700 18px/1 'Segoe UI',Roboto,Arial,sans-serif;
 #controls:not(.wide) .crow>.cbtn:only-child{grid-column:1/-1}
 .cbtn.again,.cbtn.shop{background:transparent;border-color:transparent;-webkit-backdrop-filter:none;backdrop-filter:none;font-size:16px;padding:8px 12px;color:#D9CFB4;text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(217,207,180,.45)}
 .cbtn.again{text-decoration:none}
+#controls:not(.wide) .again .lbl{display:inline}

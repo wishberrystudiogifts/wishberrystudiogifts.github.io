@@ -22,6 +22,7 @@ rep("rp.addEventListener('click', function () { reset(); requestAnimationFrame(f
 rep("c.textContent = '\\uD83D\\uDCC5 Add to calendar';", "c.textContent = 'Add to calendar';")
 rep("m.textContent = '\\uD83D\\uDCCD Directions';", "m.textContent = 'Directions';")
 rep("s.textContent = '\\uD83C\\uDF81 Send an invitation like this';", "s.textContent = 'Send an invitation like this';")
+rep("y.textContent = '\\u2713 I\\u2019ll be there';", "y.textContent = 'I\\u2019ll be there';")   # the tick read as 'already answered'
 open(out_dir + '/invite.js', 'w').write(out); print('invite.js', len(out))
 
 # ---------------- stylesheet ----------------
@@ -47,13 +48,13 @@ rr(".iface.d-b .date{font-weight:600;font-size:1.35em;letter-spacing:.26em}", ".
 rr("font-size:1.45em;letter-spacing:.3em;color:#E3C37E}", "font-size:1.6em;letter-spacing:.28em;color:#E3C37E}")
 rr(".iface.d-c .date{font-weight:600;font-size:1.4em;letter-spacing:.16em}", ".iface.d-c .date{font-weight:600;font-size:1.6em;letter-spacing:.14em}")
 rr("font-weight:600;font-size:1.15em;letter-spacing:.3em;color:#A8792E}", "font-weight:600;font-size:1.4em;letter-spacing:.28em;color:#A8792E}")
-rr(".iface.d-a .rsvp{font-style:italic;font-weight:500;font-size:1.7em;color:#B9C6DD}", ".iface.d-a .rsvp{font-style:italic;font-weight:500;font-size:2em;color:#E3E9F4}")
-rr(".iface.d-a .contact{font-weight:600;font-size:1.6em;letter-spacing:.03em;color:#B9C6DD}", ".iface.d-a .contact{font-weight:600;font-size:2em;letter-spacing:.03em;color:#E3E9F4}")
+rr(".iface.d-a .rsvp{font-style:italic;font-weight:500;font-size:1.7em;color:#B9C6DD}", ".iface.d-a .rsvp{font-style:italic;font-weight:500;font-size:2em;color:#EEF2F8}")
+rr(".iface.d-a .contact{font-weight:600;font-size:1.6em;letter-spacing:.03em;color:#B9C6DD}", ".iface.d-a .contact{font-weight:600;font-size:2em;letter-spacing:.03em;color:#EEF2F8}")
 rr(".iface.d-b .note{font-family:'Poiret One',Arial,sans-serif;font-style:normal;font-size:1.65em}", ".iface.d-b .note{font-family:'Poiret One',Arial,sans-serif;font-style:normal;font-size:1.8em}")
 rr(".iface.d-b .rsvp{font-family:'Poiret One',Arial,sans-serif;font-style:normal;font-size:1.6em;color:#E3C37E}", ".iface.d-b .rsvp{font-family:'Poiret One',Arial,sans-serif;font-style:normal;font-size:1.8em;color:#E3C37E}")
 rr(".iface.d-b .contact{font-weight:400;font-size:1.4em;color:#E3C37E}", ".iface.d-b .contact{font-weight:400;font-size:1.65em;color:#E3C37E}")
 rr(".iface.d-c .note{font-style:italic;font-weight:400;font-size:1.65em}", ".iface.d-c .note{font-style:italic;font-weight:400;font-size:1.75em}")
-rr("font-size:1.2em;letter-spacing:.16em;text-transform:uppercase;color:#A8792E;margin-top:1.4em}", "font-size:1.32em;letter-spacing:.16em;text-transform:uppercase;color:#A8792E;margin-top:1.4em}")
+rr("font-size:1.2em;letter-spacing:.16em;text-transform:uppercase;color:#A8792E;margin-top:1.4em}", "font-size:1.2em;letter-spacing:.1em;text-transform:uppercase;color:#A8792E;margin-top:1.4em;text-wrap:balance}")
 rr(".iface.d-c .contact{font-weight:400;font-size:1.5em;color:#3A2E20}", ".iface.d-c .contact{font-weight:400;font-size:1.7em;color:#3A2E20}")
 rr("font:600 16px/1 'Fraunces',Georgia,serif;padding:13px 18px;border-radius:999px;border:1px solid rgba(255,255,255,.45);background:rgba(25,8,8,.66)", "font:600 16px/1 'Cormorant Garamond',Georgia,serif;font-size:18px;padding:12px 18px;border-radius:999px;border:1px solid rgba(214,222,238,.45);background:rgba(9,11,22,.74)")
 rr(".cbtn.shop{background:rgba(203,168,76,.92);color:#2a1408;border-color:rgba(255,255,255,.2)}", ".cbtn.shop{background:rgba(9,11,22,.5);color:#E9D9A8;border-color:rgba(233,217,168,.45);font-weight:500;font-size:16.5px}")
@@ -120,7 +121,7 @@ html,body{margin:0;height:100%;background:#09080a;overflow:hidden;font-family:'C
 .envroot.rb{z-index:2}.envroot.rc{z-index:3}.envroot.rf{z-index:4}
 .slide{position:absolute;inset:0;transform-origin:50% 50%}
 .eg{position:absolute;inset:0}
-.tl{transform-origin:50% 50%;transform:perspective(1400px) rotateX(var(--tilt))}
+.tl{transform-origin:50% 50%;transform:perspective(1100px) rotateX(var(--tilt))}
 .eg img.full{position:absolute;left:0;top:0;width:312px;height:430px;display:block}
 .eshadow{position:absolute;left:-34px;top:-34px;width:380px;height:498px;display:block}
 .flapBbox{position:absolute;left:-12px;top:-128px;width:336px;height:128px;perspective:1100px;perspective-origin:50% 100%}
@@ -194,7 +195,7 @@ html,body{margin:0;height:100%;background:#09080a;overflow:hidden;font-family:'C
 @keyframes cardout{0%{transform:translate(0px,0px)}100%{transform:translate(0px,var(--out))}}
 @keyframes cardfin{0%{transform:translate(0px,var(--out))}100%{transform:translate(var(--fx),var(--fy))}}
 @keyframes cardgrow{0%{transform:rotate(0deg) scale(var(--c0))}100%{transform:rotate(var(--unrot)) scale(var(--c1))}}
-@keyframes cardflat{0%{transform:perspective(1400px) rotateX(var(--tilt))}100%{transform:perspective(1400px) rotateX(0deg)}}
+@keyframes cardflat{0%{transform:perspective(1100px) rotateX(var(--tilt))}100%{transform:perspective(1100px) rotateX(0deg)}}
 @keyframes rcup{from{z-index:3}to{z-index:7}}
 @keyframes veilin{from{opacity:0}to{opacity:.4}}
 @keyframes fwpop{0%{transform:scale(.3,calc(.3 * var(--fwy)));opacity:0}12%{opacity:.78}45%{opacity:.5}100%{transform:scale(1.15,calc(1.15 * var(--fwy)));opacity:0}}
@@ -222,5 +223,6 @@ rest += '''
 #controls:not(.wide) .crow>.cbtn:only-child{grid-column:1/-1}
 .cbtn.again,.cbtn.shop{background:transparent;border-color:transparent;-webkit-backdrop-filter:none;backdrop-filter:none;font-size:16px;padding:8px 12px;color:#D9CFB4;text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(217,207,180,.45)}
 .cbtn.again{text-decoration:none}
+#controls:not(.wide) .again .lbl{display:inline}
 '''
 open(out_dir + '/invite.css', 'w').write(top + rest); print('invite.css', len(top + rest))
