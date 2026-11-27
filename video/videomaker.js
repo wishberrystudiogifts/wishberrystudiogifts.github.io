@@ -104,6 +104,23 @@
              text: function (d) { return d && d.t ? 'For ' + d.t : 'With love'; } }
   };
 
+  /* Christmas card "A light in the window" (Gold Lantern, new version 27 Nov 2026): the base video is the recipient page
+     itself, rendered frame by frame (project/tools/render-party-door.js, FILL=1.8) with the written side empty, WITHOUT the
+     name on the glass and without the buttons. 0.3 s: a finger writes the name on the misted glass (drawn here, `glass`);
+     1.82 s: we lean in over the envelope; the tap is at 2.9 s; 4.5-5.9 s: we lean back and the card comes forward; from 6.7 s
+     the mist clears (the name goes with it, 7.2-8.1 s) and the town lights up; 8.9-9.8 s: the card turns over - the words
+     are drawn as the written side comes round (9.57 s). Geometry measured on every frame of the base video (MEASURE). */
+  TEMPLATES['christmas-card-1'] = {
+    kind: 'invite', fps: 30, defaultDesign: 'a', bases: { a: 'christmas-card-1-base.mp4' },
+    geom: { frame: { W: 1080, H: 1920 }, stage: { W: 600, H: 1100 },
+            card: { cx: 300, bottom: 985.187, s0: 0.8869, s1: 0.8869, ty1: 0 },
+            settle: { at: 0, dur: 1 }, text: { at: 9.5667, dur: 0.45 } },
+    glass: { cx: 345, cy: 196, rot: 3, size: 84, min: 26, maxW: 300, fill: 1.8, family: "'Patrick Hand'",
+             inAt: 0.3, inDur: 1, outAt: 7.2, outDur: 0.9, drips: [[0.22, 34, 1.2], [0.57, 58, 1.4], [0.84, 26, 1.55]],
+             cam: { o: [252, 612], z: 2.15, tx: 48, ty: -22, inAt: 1.82, inDur: 0.78, outAt: 4.5, outDur: 1.4 },
+             text: function (d) { return d && d.t ? d.t : 'For you'; } }
+  };
+
   /* Christmas Party invitation "The party's behind this door" (26 Nov 2026): the base video is the guest page itself, rendered
      frame by frame (project/tools/render-party-door.js, FILL=1.8: the stage fills the 1080 x 1920 frame) WITHOUT the party
      details and without the buttons, one base video per design. The envelope ARRIVES first (out of the letter slot, 2.7 s),
@@ -666,6 +683,64 @@
     else { ctx.textBaseline = 'alphabetic'; ctx.fillText(Lb.text, 0, Lb.dy); }
     ctx.restore();
   }
+  /* a name written with a finger on misted glass (templates with `glass`; Christmas card "A light in the window", 27 Nov 2026):
+     the same font, fit, place, drops and fades as on the recipient page, and it follows the page's camera (we lean in over the
+     envelope and back). Numbers are in the page's stage units; fill = frame pixels per stage unit of the base video. */
+  function glassRot(i) { return (((i * 37 + 11) % 9) - 4) * 0.9; }
+  function glassDy(i, size) { return (((i * 53 + 7) % 5) - 2) * 0.018 * size; }
+  function prepareGlass(G, data) {
+    var c = document.createElement('canvas').getContext('2d'), text = G.text(data), size = G.size;
+    function f(sz) { return '400 ' + sz + 'px ' + G.family + ', cursive'; }
+    c.font = f(size);
+    while (c.measureText(text).width + 28 > G.maxW && size > G.min) { size -= 2; c.font = f(size); }
+    var chars = Array.from(text), adv = chars.map(function (ch) { return c.measureText(ch).width; });
+    var w = c.measureText(text).width, sum = adv.reduce(function (a, b) { return a + b; }, 0), fix = sum > 0 ? w / sum : 1;
+    // the writing is drawn once, opaque, on two layers (the wet edge and the cleared stroke) and reused on every frame
+    var R = 4, lineH = 1.05 * size, pad = 0.2 * size, W = Math.ceil((w + 28 + 2 * pad) * R), H = Math.ceil((lineH + 2 * pad) * R);
+    function layer(lw) {
+      var cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+      var x = cv.getContext('2d'); x.scale(R, R); x.translate(pad + 14, pad + 0.8 * size);
+      x.font = f(size); x.textAlign = 'left'; x.textBaseline = 'alphabetic'; x.lineJoin = 'round'; x.lineCap = 'round';
+      x.strokeStyle = '#172a50'; x.fillStyle = '#172a50'; x.lineWidth = lw * size;
+      var px = 0;
+      chars.forEach(function (ch, i) {
+        x.save(); x.translate(px, glassDy(i, size)); x.rotate(glassRot(i) * Math.PI / 180); x.fillText(ch, 0, 0); x.strokeText(ch, 0, 0); x.restore();
+        px += adv[i] * fix;
+      });
+      return cv;
+    }
+    return { text: text, size: size, w: w, pad: pad, R: R, halo: layer(0.12), ink: layer(0.056) };
+  }
+  var GLASS_WIPE = bezier(0.35, 0, 0.65, 1), GLASS_DRIP = bezier(0.3, 0, 0.5, 1), GLASS_OUT = bezier(0.42, 0, 1, 1), GLASS_CAMIN = bezier(0.5, 0, 0.2, 1);
+  function drawGlass(ctx, P, G, t, F) {
+    var a = t > G.outAt ? 1 - GLASS_OUT(Math.min(1, (t - G.outAt) / G.outDur)) : 1;
+    var p = t < G.inAt ? 0 : GLASS_WIPE(Math.min(1, (t - G.inAt) / G.inDur));
+    if (p <= 0 || a <= 0) return;
+    var C = G.cam, q = 0;
+    if (t >= C.outAt) q = 1 - SETTLE(Math.min(1, (t - C.outAt) / C.outDur));
+    else if (t >= C.inAt) q = GLASS_CAMIN(Math.min(1, (t - C.inAt) / C.inDur));
+    var z = 1 + (C.z - 1) * q, k = G.fill, lineH = 1.05 * P.size, spanW = P.w + 28;
+    ctx.save();
+    ctx.translate(F.W / 2 - F.stageW / 2 * k, F.H / 2 - F.stageH / 2 * k); ctx.scale(k, k);                 // stage units from here on
+    ctx.translate(C.o[0] + C.tx * q, C.o[1] + C.ty * q); ctx.scale(z, z); ctx.translate(-C.o[0], -C.o[1]);   // the camera
+    ctx.translate(G.cx, G.cy - 32 + 0.525 * P.size); ctx.rotate(G.rot * Math.PI / 180);                     // the name's own tilt, about the middle of its box
+    var top = -38 - lineH / 2;                                                                              // top of the line of writing
+    ctx.beginPath(); ctx.rect(-spanW / 2, top - 10, spanW * p, lineH + 96); ctx.clip();
+    var dw = P.halo.width / P.R, dh = P.halo.height / P.R;
+    ctx.globalAlpha = a * 0.16; ctx.drawImage(P.halo, -spanW / 2 - P.pad, top - P.pad, dw, dh);
+    ctx.globalAlpha = a * 0.62; ctx.drawImage(P.ink, -spanW / 2 - P.pad, top - P.pad, dw, dh);
+    ctx.globalAlpha = a;
+    G.drips.forEach(function (d) {                                                                          // a drop or two runs down from the letters
+      var g = t < d[2] ? 0 : GLASS_DRIP(Math.min(1, (t - d[2]) / 1.6));
+      if (g <= 0) return;
+      var x = -spanW / 2 + d[0] * spanW, y0 = top + 0.82 * P.size, h = d[1] * g;
+      var gr = ctx.createLinearGradient(0, y0, 0, y0 + h);
+      gr.addColorStop(0, 'rgba(20,34,64,0.55)'); gr.addColorStop(0.7, 'rgba(20,34,64,0.34)'); gr.addColorStop(1, 'rgba(20,34,64,0)');
+      ctx.fillStyle = gr; ctx.fillRect(x, y0, 5, h);
+      ctx.fillStyle = 'rgba(20,34,64,0.5)'; ctx.beginPath(); ctx.ellipse(x + 2.5, y0 + h - 1.5 * g, 4, 4.5 * g, 0, 0, Math.PI * 2); ctx.fill();
+    });
+    ctx.restore();
+  }
   function drawInvite(c, L, k) { // c is already in face units; k = face unit -> frame pixel (shadows are in frame pixels)
     L.ops.forEach(function (op) {
       c.save();
@@ -780,13 +855,16 @@
     return measureInvite(opts.face)
       .then(function (L) { lay = L; return ensureInviteFonts(L); })
       .then(function () { return tpl.label ? document.fonts.load(tpl.label.weight + ' 40px ' + tpl.label.family, tpl.label.text(opts.data || {})).catch(function () { return null; }) : null; })
+      .then(function () { return tpl.glass ? document.fonts.load('400 40px ' + tpl.glass.family, tpl.glass.text(opts.data || {})).catch(function () { return null; }) : null; })
       .then(function () { return fetch(root + tpl.bases[design]); })
       .then(function (r) { if (!r.ok) throw new Error('base video ' + r.status); return r.arrayBuffer(); })
       .then(function (buf) {
         var layer = null, lctx = null, lastKey = '';
         var lab = tpl.label ? prepareLabel(tpl.label, opts.data || {}) : null;
+        var gls = tpl.glass ? prepareGlass(tpl.glass, opts.data || {}) : null;
         return encodeVideo(buf, tpl.fps, opts, function (ctx, t, W, H) {
           if (lab) drawLabel(ctx, lab, tpl.label, t);
+          if (gls) drawGlass(ctx, gls, tpl.glass, t, { W: W, H: H, stageW: G.stage.W, stageH: G.stage.H });
           var a = detailsAlpha(G, t);
           if (a <= 0) return;
           var M = faceMatrix(G, t), key = M.map(function (v) { return v.toFixed(4); }).join(',');
