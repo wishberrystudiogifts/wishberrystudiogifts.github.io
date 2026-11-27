@@ -159,6 +159,19 @@
             settle: { at: 0, dur: 1 }, text: { at: 6.9667, dur: 0.9 } }
   };
 
+  /* New Year's Eve invitation "Midnight" (27 Nov 2026): the base videos are the guest page itself, rendered frame by frame
+     (project/tools/render-midnight.js, FILL=1.8) WITHOUT the party details and without the buttons, one per design. The
+     envelope slides in first (2.3 s), the tap is at 2.967 s, the invitation reaches its reading size at 7.367 s and the
+     details start to fade in at 7.267 s (CSS ease, 0.9 s; the card moves less than 1 px after that, so s0 = s1).
+     Geometry measured on every frame (MEASURE): card 950.402 x 1330.563 px at (64.804, 371.035). */
+  TEMPLATES['new-years-eve-1'] = {
+    kind: 'invite', fps: 30, defaultDesign: 'b',
+    bases: { a: 'new-years-eve-1-a-base.mp4', b: 'new-years-eve-1-b-base.mp4', c: 'new-years-eve-1-c-base.mp4' },
+    geom: { frame: { W: 1080, H: 1920 }, stage: { W: 600, H: 1100 },
+            card: { cx: 300, bottom: 962, s0: 1.1, s1: 1.1, ty1: 0 },
+            settle: { at: 0, dur: 1 }, text: { at: 7.2667, dur: 0.9 } }
+  };
+
   /* ---------- CSS-identical easing ---------- */
   function bezier(x1, y1, x2, y2) {
     function A(p1, p2) { return 1 - 3 * p2 + 3 * p1; }

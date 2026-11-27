@@ -58,6 +58,11 @@
       "name": "Birthday card - Gold Drip Cake (Make a wish)",
       "listingIds": [4621155452]
     },
+    "new-years-eve-1": {
+      "_note": "New Year's Eve Party invitation, 3 designs - 'Midnight' (built 27 Nov 2026). NOT published on Etsy yet: listingIds stays empty until the listing exists (launch grace), then the listing ID goes here. The first version of this invitation (/new-years-eve/, 21 Nov 2026) was never sold.",
+      "name": "New Year's Eve Party invitation - Midnight",
+      "listingIds": []
+    },
     "christmas-party-1": {
       "_note": "Christmas Party invitation, 3 designs - new version 'The party's behind this door' (built 26 Nov 2026). The listing was published on 23 Nov 2026 as 4623977490 with the old pages (/christmas-party/, still working); it had no buyers when it moved to the product link.",
       "name": "Christmas Party invitation - The party's behind this door",
@@ -81,6 +86,8 @@
       "1000000101": { "status": "paid", "products": ["christmas-card-1"] },
       "1000000102": { "status": "paid", "products": ["christmas-card-1"] },
       "1000000601": { "status": "paid", "products": ["birthday-card-1"] },
+      "1000000701": { "status": "paid", "products": ["new-years-eve-1"] },
+      "1000000702": { "status": "paid", "products": ["new-years-eve-1"] },
       "1000000602": { "status": "paid", "products": ["birthday-card-1"] },
       "1000000301": { "status": "paid", "products": ["christmas-party-1"] },
       "1000000302": { "status": "paid", "products": ["christmas-party-1"] },
