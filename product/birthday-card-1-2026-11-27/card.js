@@ -5,9 +5,9 @@
      the card's picture is a three-tier cake with gold drips and THREE lit candles; the scene is a party table seen
      from above: a linen cloth, a gift in dark green paper with a powder-pink satin bow, plates and gold forks,
      a box of matches and spare candles, a pink napkin.
-     1. ARRIVAL  — the pink envelope is tucked under the bow of the gift (the bow is a layer of its own ABOVE the
-                   envelope, cut from the same picture); it slips out and slides onto the cloth; we lean in over it
-                   and their name is written on it.
+     1. ARRIVAL  — the pink envelope is tossed onto the party table: it comes down from near us (large, turning),
+                   lands flat on the cloth with a short skid, its shadow gathering under it; a handful of paper
+                   confetti flutters down after it and stays around it; we lean in and their name is written on it.
      2. OPENING  — tap: the round gold sticker with the candle peels off, the flap lifts (ivory liner with gold
                    icing drips inside).
      3. THE CARD — slides up OUT of the pocket (it sits between the inside back and the FRONT POCKET, a layer of its
@@ -143,15 +143,15 @@
   };
   var LAYOUTS = {
     port: { W: 600, H: 1100, scene: SCENES.tall, sk: 1100 / 2048, sx: -9.375, sy: 0,
-      env: { e: 0.42, cx: 300, cy: 604, rot: -6 }, tuck: { cx: 262, cy: 156, r: -36, s: 1 }, cam: { z: 1.85, x: 300, y: 590 }, push: { z: 1.42, x: 300, y: 470 },
-      fin: { s: 0.86, cx: 300, bottom: 972 }, hintY: 930, hintSize: 21, rise: 430 },
+      env: { e: 0.42, cx: 300, cy: 604, rot: -6 }, toss: { x: 330, y: 780, s: 2.5, r: 38 }, cam: { z: 1.85, x: 300, y: 590 }, push: { z: 1.42, x: 300, y: 470 },
+      fin: { s: 0.86, cx: 300, bottom: 972 }, hintY: 930, hintSize: 21, rise: 430, conf: { r: 250, kx: 0.72, box: [40, 350, 560, 905] } },
     land: { W: 1200, H: 900, scene: SCENES.wide, sk: 900 / 1296, sx: 0, sy: 0,
-      env: { e: 0.42, cx: 520, cy: 590, rot: -5 }, tuck: { cx: 389, cy: 222, r: -34, s: 1 }, cam: { z: 1.75, x: 600, y: 450 }, push: { z: 1.3, x: 800, y: 330 },
-      fin: { s: 0.92, cx: 884, bottom: 806 }, hintY: 838, hintSize: 17, rise: 300 }
+      env: { e: 0.42, cx: 520, cy: 590, rot: -5 }, toss: { x: 420, y: 640, s: 2.4, r: 34 }, cam: { z: 1.75, x: 600, y: 450 }, push: { z: 1.3, x: 800, y: 330 },
+      fin: { s: 0.92, cx: 884, bottom: 806 }, hintY: 838, hintSize: 17, rise: 300, conf: { r: 250, kx: 1.15, box: [215, 330, 835, 800] } }
   };
   // needed before the arrival may start / needed only after the tap (loaded meanwhile, never block the arrival)
-  var IMAGES = ['env-dropshadow.png', 'env-pocket.webp', 'env-back.webp', 'env-flap.webp', 'env-flapshadow.png', 'env-seal.webp', 'front.jpg', 'flame-1.webp', 'flame-2.webp', 'flame-3.webp'];
-  var LATE = ['env-flapin.webp', 'paper.jpg', 'smoke-1.webp', 'smoke-2.webp', 'smoke-3.webp'];
+  var IMAGES = ['env-dropshadow.png', 'env-airshadow.png', 'env-pocket.webp', 'env-back.webp', 'env-flap.webp', 'env-flapshadow.png', 'env-seal.webp', 'front.jpg', 'flame-1.webp', 'flame-2.webp', 'flame-3.webp'];
+  var LATE = ['env-flapin.webp', 'paper.jpg', 'dim.webp', 'glow.webp', 'smoke-1.webp', 'smoke-2.webp', 'smoke-3.webp'];
   var T = { landed: 2600, autoplay: 2900, controls: 7400 };   // ms; all on the 100 ms grid (frame-by-frame video render)
 
   var stageEl = document.getElementById('stage');
@@ -181,10 +181,27 @@
     var sc = el('div', 'scene', sceneT, cam);
     img(A + 'bg' + sfx + '.jpg', 'bg', 'width:' + S.w + 'px;height:' + S.h + 'px', sc);
 
+    // ---- paper confetti that flutters down after the envelope and stays on the cloth around it (under the envelope and the dimness)
+    var cfb = el('div', 'cfbox', null, cam), q = rnd(7), CF = L.conf, cfn = 0, guard = 0;
+    var GOLD = 'linear-gradient(118deg,#a97a25 0%,#f6e2a0 44%,#c59636 72%,#a8792a 100%)', PINK = 'linear-gradient(124deg,#e3a2ad 0%,#f8d4da 52%,#e9b0ba 100%)';
+    var COL = [GOLD, GOLD, GOLD, PINK, PINK, 'linear-gradient(124deg,#eadcc6 0%,#fffaf0 50%,#ecdfca 100%)', 'linear-gradient(124deg,#234a39 0%,#3d7460 52%,#27503f 100%)'];
+    while (cfn < 26 && guard++ < 400) {
+      var a = q() * 6.2832, d = 74 + Math.pow(q(), 2) * CF.r, x = L.env.cx + Math.cos(a) * d * CF.kx, y = L.env.cy + 6 + Math.sin(a) * d;
+      if (x < CF.box[0] || x > CF.box[2] || y < CF.box[1] || y > CF.box[3]) continue;
+      if (Math.abs(x - L.env.cx) < 0.5 * ENV.W * e + 13 && Math.abs(y - L.env.cy) < 0.5 * ENV.H * e + 13) continue;
+      var kind = q(), big = q() < 0.4 ? 1.35 : 1, w = (kind < 0.22 ? 9 + q() * 3 : 12 + q() * 6) * big, h = kind < 0.22 ? w : (5.5 + q() * 3) * big, dl = 0.86 + q() * 0.85, du = 0.8 + q() * 0.5, te = Math.round(q() * 40);
+      var c = el('div', 'cf', 'left:' + px(x - w / 2) + ';top:' + px(y - h / 2) + ';width:' + px(w) + ';height:' + px(h) + ';--ox:' + px(L.toss.x * (0.18 + q() * 0.5)) + ';--oy:' + px(L.toss.y * (0.3 + q() * 0.45)) + ';--dl:' + dl.toFixed(2) + 's;--du:' + du.toFixed(2) + 's;--rz:' + Math.round(q() * 360) + 'deg', cfb);
+      var ci = Math.floor(q() * COL.length); if (kind < 0.22 && ci === 6) ci = 0;                    // no flat green dots
+      el('i', null, 'background:' + COL[ci] + (kind < 0.22 ? ';border-radius:50%' : '') + ';--ax:' + (0.3 + q() * 0.7).toFixed(2) + ';--ay:' + (q() * 0.9).toFixed(2) + ';--te:' + te + 'deg;--tn:' + (Math.round(2 + q() * 3) * 360 + te) + 'deg', c);
+      cfn++;
+    }
+
     // ---- envelope: inside back -> card -> FRONT POCKET -> flap, sticker; then the room's dimness and the candles' glow (under the card)
     var root = el('div', 'envroot', 'left:' + (L.env.cx - ENV.W / 2) + 'px;top:' + (L.env.cy - ENV.H / 2) + 'px;transform:rotate(' + L.env.rot + 'deg) scale(' + e + ')', cam);
-    img(A + 'env-dropshadow.png', 'eshadow', null, root);
-    var lean = el('div', 'lean', null, root);
+    var shw = el('div', 'shw', null, root);                                                // the shadows follow its way across the table; how far they stand off = how high it is
+    img(A + 'env-airshadow.png', 'eshadow eair', null, shw);                               // its wide, soft shadow while it is in the air
+    img(A + 'env-dropshadow.png', 'eshadow econ', null, shw);                              // the close shadow once it lies on the cloth
+    var toss = el('div', 'toss', null, root), lean = el('div', 'lean', null, toss);        // toss: its way across the table; lean: its size (height) and turn
     var envB = el('div', 'eg envB', null, lean);
     img(A + 'env-back.webp', 'full', null, envB);
     img(A + 'env-flapin.webp', 'flapin', null, el('div', 'flapBbox', null, envB));
@@ -217,20 +234,20 @@
     img(A + 'env-flap.webp', 'full flapF', null, el('div', 'flapFbox', null, envF));
     img(A + 'env-seal.webp', 'full flapF', null, el('div', 'flapFbox', null, envF));       // the sticker holds the flap: it lets go of the pocket and lifts with the flap
     el('div', 'elight', null, envF);
-    var dimEl = el('div', 'dim', null, lean);
+    el('div', 'etone', null, envF);                                                     // the room's light on the paper: a little duller and grainier, like the napkin beside it
 
     // ---- numbers for the CSS
     var F = L.fin;
     var ax = (ENV.cardX - ENV.W / 2) * e, ay = (ENV.cardBottom - ENV.H / 2) * e;
     var bx = L.env.cx + ax * cs - ay * sn, by = L.env.cy + ax * sn + ay * cs;        // the card's bottom centre while it is in the envelope (stage)
     var dx = (F.cx - bx) / e, dy = (F.bottom - by) / e;
-    var tk = toLocal(L.tuck.cx - L.env.cx, L.tuck.cy - L.env.cy);
+    var tk = toLocal(L.toss.x, L.toss.y), tu = Math.sqrt(L.toss.x * L.toss.x + L.toss.y * L.toss.y), sk = toLocal(L.toss.x / tu * 17, L.toss.y / tu * 17);
     var vars = {
       '--fx': px(dx * cs + dy * sn), '--fy': px(-dx * sn + dy * cs), '--c0': ENV.cardS.toFixed(5), '--c1': (F.s / e).toFixed(5),
       '--unrot': (-L.env.rot) + 'deg', '--out': ENV.out + 'px',
       '--camo': px(L.env.cx) + ' ' + px(L.env.cy), '--camz': L.cam.z, '--camx': px(L.cam.x - L.env.cx), '--camy': px(L.cam.y - L.env.cy),
-      '--lx': px(tk[0]), '--ly': px(tk[1]), '--lr': (L.tuck.r - L.env.rot) + 'deg', '--ls': L.tuck.s,
-      '--ox': px(-tk[0] * 0.022), '--oy': px(-tk[1] * 0.022)
+      '--lx': px(tk[0]), '--ly': px(tk[1]), '--lr': L.toss.r + 'deg', '--ls': L.toss.s,
+      '--kx': px(sk[0]), '--ky': px(sk[1])
     };
     // the wish: we lean in over the candles (pz) so that the middle wick comes to (push.x, push.y)
     var mw = [F.cx + (FLAMES[1].wick[0] - 0.5) * 480 * F.s, F.bottom - (1 - FLAMES[1].wick[1]) * 672 * F.s], P = L.push;
@@ -241,12 +258,9 @@
     // the candles' light on the room, around the flames (inside the envelope's group, above the dimness, under the card)
     var gc = toEnv(wicks[1][0], wicks[1][1] - 20 * F.s), gr = 640 / e;
     var dc = toEnv(F.cx, F.bottom - 672 * F.s * 0.62);
-    dimEl.style.setProperty('--gx', px(dc[0] + 4200)); dimEl.style.setProperty('--gy', px(dc[1] + 4200)); dimEl.style.setProperty('--gr', px(900 / e));
-    el('div', 'lglow', 'left:' + (gc[0] - gr) + 'px;top:' + (gc[1] - gr) + 'px;width:' + (2 * gr) + 'px;height:' + (2 * gr) + 'px', lean);
-
-    // ---- the bow of the gift, above the envelope while it is tucked under it (the same pixels as the picture below)
-    var sc2 = el('div', 'scene scene2', sceneT, cam), B = S.bow;
-    img(A + 'bow' + sfx + '.webp', 'bow', 'left:' + B[0] + 'px;top:' + B[1] + 'px;width:' + B[2] + 'px;height:' + B[3] + 'px', sc2);
+    // both are small pictures drawn large (one texture each) — very large CSS gradients were re-drawn while the camera moved
+    img(A + 'dim.webp', 'dim', 'left:' + (dc[0] - 4356) + 'px;top:' + (dc[1] - 4356) + 'px;width:8712px;height:8712px', lean);
+    img(A + 'glow.webp', 'lglow', 'left:' + (gc[0] - gr) + 'px;top:' + (gc[1] - gr) + 'px;width:' + (2 * gr) + 'px;height:' + (2 * gr) + 'px', lean);
 
     // ---- smoke from the three wicks, then the stars it turns into
     var fxb = el('div', 'fx', null, cam);
@@ -318,7 +332,7 @@
     });
   }
   function preload() {  // the arrival never starts with a half-loaded scene or envelope; the finale's pictures load meanwhile
-    var sfx = state.L.scene.sfx, first = IMAGES.concat(['bg' + sfx + '.jpg', 'bow' + sfx + '.webp']);
+    var sfx = state.L.scene.sfx, first = IMAGES.concat(['bg' + sfx + '.jpg']);
     var late = LATE.slice();
     late.forEach(loadOne);
     var fonts = new Promise(function (res) { whenFonts(res); });

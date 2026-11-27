@@ -44,8 +44,14 @@ html,body{margin:0;height:100%;background:#120f0e;overflow:hidden;font-family:'E
 
 /* ---------- envelope (312 x 430 units): inside back -> card -> FRONT POCKET -> flap with the seal, the orange slice ---------- */
 .envroot{position:absolute;width:312px;height:430px;transform-origin:50% 50%;pointer-events:none}
-.lean{position:absolute;inset:0;transform-origin:50% 0}
-.eshadow{left:0;top:0;width:312px;height:430px;transform-origin:50% 0;transform:translate(5px,8px) scale(1.01);opacity:0}
+.lean{position:absolute;inset:0}
+.envB,.envF{transform-origin:156px 430px;transform:perspective(1400px) rotateX(9deg)}   /* it leans back on the frame: its upper edge is a little farther from us */
+.eshadow{left:-90px;top:-90px;width:492px;height:610px;transform-origin:246px 520px;transform:translate(24px,9px);opacity:0}
+/* the envelope STANDS on the sill, behind the scarf's edge, leaning on the window frame: the dark line where its lower edge
+   touches the wood, the scarf's shadow on its lower left corner, and the scarf's edge itself above it (.occ, stage units) */
+.econtact{position:absolute;left:-12px;top:402px;width:408px;height:54px;background:radial-gradient(ellipse 50% 50% at 45% 50%,rgba(18,8,3,.8) 0,rgba(18,8,3,.38) 42%,rgba(18,8,3,0) 100%);opacity:0;pointer-events:none}
+.eshade{position:absolute;inset:3px;pointer-events:none;background:radial-gradient(ellipse 52% 84% at 0% 100%,rgba(44,9,8,.44) 0,rgba(44,9,8,0) 100%),linear-gradient(to bottom,rgba(52,24,10,0) 48%,rgba(52,24,10,.2) 100%),linear-gradient(rgba(104,54,14,.2),rgba(104,54,14,.2))}
+.occ{position:absolute;left:156px;top:215px;width:0;height:0;transform-origin:0 0;z-index:3;pointer-events:none}
 .eg{position:absolute;inset:0}
 .envB{z-index:1}.cardrig{z-index:2}.envF{z-index:3}
 .eg img.full{position:absolute;left:0;top:0;width:312px;height:430px;display:block}
@@ -54,7 +60,7 @@ html,body{margin:0;height:100%;background:#120f0e;overflow:hidden;font-family:'E
 .flapFbox{position:absolute;left:0;top:0;width:312px;height:430px;perspective:1100px;perspective-origin:50% 0}
 .flapF{transform-origin:50% 0}
 .elight{position:absolute;inset:2px;border-radius:3px;pointer-events:none;background:linear-gradient(100deg,rgba(255,206,140,.17) 0%,rgba(255,206,140,0) 36%),linear-gradient(196deg,rgba(24,34,70,0) 46%,rgba(24,34,70,.2) 100%),linear-gradient(118deg,rgba(70,20,24,0) 28%,rgba(70,20,24,.07) 36%,rgba(70,20,24,0) 45%,rgba(70,20,24,0) 61%,rgba(70,20,24,.06) 70%,rgba(70,20,24,0) 79%)}
-.cardrig{position:absolute;left:156px;top:424px;width:0;height:0}
+.cardrig{position:absolute;left:156px;top:424px;width:0;height:0;transform-origin:0 6px;transform:perspective(1400px) rotateX(9deg)}
 .card{position:absolute;left:-240px;bottom:0;width:480px;height:672px;transform-origin:50% 100%;transform:scale(var(--c0))}
 .card::before{content:"";position:absolute;inset:0;border-radius:3px;box-shadow:0 30px 70px rgba(3,2,4,.62),0 6px 16px rgba(3,2,4,.5);opacity:0}
 .cardpersp{position:absolute;inset:0;perspective:1900px}
@@ -104,25 +110,35 @@ html.inside-view,body.inside-view{background:#FBF5E6}
 .arrive .gname .lw{animation:lw-wipeA 1s cubic-bezier(.35,0,.65,1) .3s both}
 .arrive .gname .lw>span{animation:lw-wipeB 1s cubic-bezier(.35,0,.65,1) .3s both}
 .arrive .gname b{animation:lw-drip 1.6s cubic-bezier(.3,0,.5,1) var(--dl) both}
-.arrive .lean{animation:lw-lean 2.6s linear both}
+.arrive .envB,.arrive .cardrig,.arrive .envF{animation:lw-drop 2.6s linear both}
 .arrive .eshadow{animation:lw-esh 2.6s linear both}
+.arrive .econtact{animation:lw-ect 2.6s linear both}
 .arrive .cam{animation:lw-camin 2.6s linear both}
 .arrive .shade{animation:lw-fadein .7s ease-in-out 1.9s both}
 .still .cam,.landed .cam{transform:translate(var(--camx),var(--camy)) scale(var(--camz))}
-.still .eshadow,.landed .eshadow{opacity:.6}
+.still .eshadow,.landed .eshadow{opacity:.8}
+.still .econtact,.landed .econtact{opacity:1}
 .still .shade,.landed .shade{opacity:1}
 .still .gname b,.landed .gname b{transform:scaleY(1)}
 @keyframes lw-wipeA{from{transform:translateX(-100%)}to{transform:translateX(0)}}
 @keyframes lw-wipeB{from{transform:translateX(100%)}to{transform:translateX(0)}}
 @keyframes lw-drip{0%{transform:scaleY(0)}100%{transform:scaleY(1)}}
-@keyframes lw-lean{
- 0%{transform:perspective(900px) translate(var(--lx),var(--ly)) rotate(var(--lr)) rotateX(-56deg)}
- 54%{transform:perspective(900px) translate(var(--lx),var(--ly)) rotate(var(--lr)) rotateX(-56deg);animation-timing-function:cubic-bezier(.55,0,.9,.55)}
- 71%{transform:perspective(900px) translate(0px,6px) rotate(0deg) rotateX(-7deg);animation-timing-function:ease-out}
- 75%{transform:perspective(900px) translate(0px,0px) rotate(0deg) rotateX(0deg)}
- 78%{transform:perspective(900px) translate(0px,-2px) rotate(0deg) rotateX(-2.2deg)}
- 82%,100%{transform:perspective(900px) translate(0px,0px) rotate(0deg) rotateX(0deg)}}
-@keyframes lw-esh{0%,55%{opacity:.5;transform:translate(var(--lx),calc(var(--ly) + 232px)) rotate(var(--lr)) scale(1.02,.12)}75%,100%{opacity:.6;transform:translate(5px,8px) scale(1.01)}}
+/* the envelope drops in from above (gravity), lands on its lower edge with a small bounce and comes to rest; it turns about the middle of that edge */
+@keyframes lw-drop{
+ 0%,44%{transform:perspective(1400px) translate(-70px,var(--dy)) rotate(-7deg) rotateX(9deg) scale(1.16);animation-timing-function:cubic-bezier(.42,0,1,.62)}
+ 60%{transform:perspective(1400px) translate(0px,0px) rotate(-2.4deg) rotateX(9deg) scale(1);animation-timing-function:cubic-bezier(.2,.6,.45,1)}
+ 64.5%{transform:perspective(1400px) translate(0px,-17px) rotate(2deg) rotateX(6deg) scale(1);animation-timing-function:cubic-bezier(.55,0,.8,.4)}
+ 69%{transform:perspective(1400px) translate(0px,0px) rotate(1.2deg) rotateX(10deg) scale(1);animation-timing-function:cubic-bezier(.2,.6,.45,1)}
+ 71.5%{transform:perspective(1400px) translate(0px,-4px) rotate(-.5deg) rotateX(8.4deg) scale(1);animation-timing-function:cubic-bezier(.55,0,.8,.4)}
+ 74%,100%{transform:perspective(1400px) translate(0px,0px) rotate(0deg) rotateX(9deg) scale(1)}}
+/* its shadow on the window behind it travels with it (soft and faint while it falls a hand's width in front of the glass) and gathers as it leans back */
+@keyframes lw-esh{
+ 0%,44%{opacity:0;transform:translate(-18px,calc(var(--dy) + 16px)) rotate(-7deg) scale(1.18);animation-timing-function:cubic-bezier(.42,0,1,.62)}
+ 47%{opacity:.36}
+ 60%{opacity:.8;transform:translate(24px,9px) rotate(-2.4deg) scale(1);animation-timing-function:cubic-bezier(.2,.6,.45,1)}
+ 64.5%{opacity:.6;transform:translate(29px,-5px) rotate(2deg) scale(1.02);animation-timing-function:cubic-bezier(.55,0,.8,.4)}
+ 69%,100%{opacity:.8;transform:translate(24px,9px) rotate(0deg) scale(1)}}
+@keyframes lw-ect{0%,53%{opacity:0;animation-timing-function:ease-in}60%{opacity:1}64.5%{opacity:.45}69%{opacity:1}71.5%{opacity:.85}74%,100%{opacity:1}}
 @keyframes lw-camin{0%{transform:translate(0px,0px) scale(1)}70%{transform:translate(0px,0px) scale(1);animation-timing-function:cubic-bezier(.5,0,.2,1)}100%{transform:translate(var(--camx),var(--camy)) scale(var(--camz))}}
 @keyframes lw-fadein{from{opacity:0}to{opacity:1}}
 @keyframes lw-fadeout{from{opacity:1}to{opacity:0}}
@@ -151,8 +167,8 @@ html.inside-view,body.inside-view{background:#FBF5E6}
 .open .cface.backside .tsh{animation:lw-tshB .9s linear 6s both}
 @keyframes lw-flapA{0%{transform:rotateX(0deg);opacity:1}99%{opacity:1}100%{transform:rotateX(90deg);opacity:0}}
 @keyframes lw-flapB{0%{transform:rotateX(-90deg);opacity:1}100%{transform:rotateX(0deg);opacity:1}}
-@keyframes lw-cardup{0%{transform:translate(0px,0px)}100%{transform:translate(0px,calc(var(--out) * -1))}}
-@keyframes lw-cardfin{0%{transform:translate(0px,calc(var(--out) * -1))}100%{transform:translate(var(--fx),var(--fy))}}
+@keyframes lw-cardup{0%{transform:perspective(1400px) rotateX(9deg) translate(0px,0px)}100%{transform:perspective(1400px) rotateX(9deg) translate(0px,calc(var(--out) * -1))}}
+@keyframes lw-cardfin{0%{transform:perspective(1400px) rotateX(9deg) translate(0px,calc(var(--out) * -1))}100%{transform:perspective(1400px) rotateX(0deg) translate(var(--fx),var(--fy))}}
 @keyframes lw-ztop{from{z-index:2}to{z-index:4}}
 @keyframes lw-cardgrow{0%{transform:rotate(0deg) scale(var(--c0))}100%{transform:rotate(var(--unrot)) scale(var(--c1))}}
 @keyframes lw-camout{0%{transform:translate(var(--camx),var(--camy)) scale(var(--camz))}100%{transform:translate(0px,0px) scale(1)}}

@@ -24,7 +24,10 @@ html,body{margin:0;height:100%;background:#17120f;overflow:hidden;font-family:'N
 .scene{position:absolute;left:0;top:0;transform-origin:0 0}
 .scene .bg{left:0;top:0}
 .scene2{pointer-events:none}
-.bow{opacity:0}
+/* paper confetti on the cloth (stage units, inside the camera, under the envelope) */
+.cfbox{position:absolute;inset:0;pointer-events:none;visibility:hidden}
+.cf{position:absolute;transform:rotate(var(--rz))}
+.cf i{position:absolute;inset:0;border-radius:1px;box-shadow:-.7px 1.3px 1.8px rgba(64,40,20,.46);transform:rotate3d(var(--ax),var(--ay),0,var(--te))}
 /* their name on the envelope, in the script of icing (deep green ink) */
 .ename{position:absolute;display:flex;justify-content:center;white-space:nowrap;pointer-events:none;line-height:1.05}
 .ename .lw{display:block;overflow:hidden;padding:10px 0 86px}
@@ -32,8 +35,8 @@ html,body{margin:0;height:100%;background:#17120f;overflow:hidden;font-family:'N
 .gsvg{display:block;overflow:visible}
 .gsvg text{font-family:'Cookie',cursive;font-weight:400;fill:#24553F;opacity:.9}
 /* the room goes down to candlelight: a dark veil over the table and the envelope (the card is above it), and the candles' glow */
-.dim{position:absolute;left:-4200px;top:-4200px;width:8712px;height:8830px;background:radial-gradient(circle var(--gr,2100px) at var(--gx,50%) var(--gy,50%),rgba(40,19,6,.44) 0,rgba(30,14,5,.74) 45%,rgba(15,7,3,.97) 100%);opacity:0;pointer-events:none;z-index:3}
-.lglow{position:absolute;border-radius:50%;background:radial-gradient(circle,rgba(255,196,116,.54) 0,rgba(255,178,96,.3) 26%,rgba(255,164,86,.1) 52%,rgba(255,164,86,0) 72%);opacity:0;pointer-events:none;z-index:3}
+.dim{opacity:0;pointer-events:none;z-index:3}
+.lglow{opacity:0;pointer-events:none;z-index:3}
 .shade{position:absolute;inset:0;background:radial-gradient(ellipse 80% 70% at 50% 58%,rgba(30,18,10,0) 42%,rgba(30,18,10,.36) 100%);opacity:0;pointer-events:none}
 .fx{position:absolute;inset:0;pointer-events:none}
 .smoke{opacity:0;transform-origin:50% 100%}
@@ -41,8 +44,11 @@ html,body{margin:0;height:100%;background:#17120f;overflow:hidden;font-family:'N
 
 /* ---------- envelope (312 x 430 units): inside back -> card -> FRONT POCKET -> flap, round gold sticker ---------- */
 .envroot{position:absolute;width:312px;height:430px;transform-origin:50% 50%;pointer-events:none}
+.toss{position:absolute;inset:0}
 .lean{position:absolute;inset:0;transform-origin:50% 50%}
-.eshadow{left:0;top:0;width:312px;height:430px;transform-origin:50% 50%;transform:translate(4px,6px) scale(1.015);opacity:0}
+.shw{position:absolute;inset:0}
+.eshadow{left:-90px;top:-90px;width:492px;height:610px;transform-origin:50% 50%;transform:translate(-3px,7px);opacity:0}
+.etone{position:absolute;inset:2px;border-radius:3px;pointer-events:none;background:url(assets/grain.png) 0 0/64px 64px,linear-gradient(rgba(150,118,104,.17),rgba(150,118,104,.17));opacity:.9}
 .eg{position:absolute;inset:0}
 .envB{z-index:1}.cardrig{z-index:2}.envF{z-index:3}
 .eg img.full{position:absolute;left:0;top:0;width:312px;height:430px;display:block}
@@ -68,7 +74,7 @@ html,body{margin:0;height:100%;background:#17120f;overflow:hidden;font-family:'N
 .cface.backside{transform:rotateY(180deg)}
 .cface .tsh{position:absolute;inset:0;border-radius:3px;background:#120c0a;opacity:0;pointer-events:none}
 .envroot{visibility:hidden}
-.arrive .envroot,.landed .envroot,.still .envroot{visibility:visible}
+.arrive .envroot,.landed .envroot,.still .envroot,.arrive .cfbox,.landed .cfbox,.still .cfbox{visibility:visible}
 
 /* ---------- the written side of the card ---------- */
 .iface{position:absolute;inset:0;overflow:hidden;background:#FBF5E6}
@@ -99,29 +105,38 @@ html.inside-view,body.inside-view{background:#FBF5E6}
 #controls a{background:rgba(20,15,13,.5);border-color:rgba(255,255,255,.28);color:rgba(255,244,220,.86)}
 
 /* ---------- 1. ARRIVAL (2.6 s): the envelope slips out from under the bow and slides onto the cloth; we lean in; their name is written on it ---------- */
-.arrive .lean{animation:mw-slide 2.6s linear both}
-.arrive .eshadow{animation:mw-esh 2.6s linear both}
-.arrive .bow{animation:mw-bow 2.6s linear both}
+.arrive .toss,.arrive .shw{animation:mw-toss 2.6s linear both}
+.arrive .lean{animation:mw-fall 2.6s linear both}
+.arrive .eair{animation:mw-eair 2.6s linear both}
+.arrive .econ{animation:mw-econ 2.6s linear both}
+.arrive .cf{animation:mw-cfall var(--du) cubic-bezier(.12,.5,.38,1) var(--dl) both}
+.arrive .cf i{animation:mw-cflip var(--du) linear var(--dl) both}
 .arrive .cam{animation:mw-camin 2.6s linear both}
 .arrive .ename .lw{animation:mw-wipeA .75s cubic-bezier(.35,0,.65,1) 1.75s both}
 .arrive .ename .lw>span{animation:mw-wipeB .75s cubic-bezier(.35,0,.65,1) 1.75s both}
 .arrive .shade{animation:mw-fadein .7s ease-in-out 1.9s both}
 .still .cam,.landed .cam{transform:translate(var(--camx),var(--camy)) scale(var(--camz))}
-.still .eshadow,.landed .eshadow{opacity:.62}
+.still .econ,.landed .econ{opacity:.86}
 .still .shade,.landed .shade{opacity:1}
 @keyframes mw-wipeA{from{transform:translateX(-100%)}to{transform:translateX(0)}}
 @keyframes mw-wipeB{from{transform:translateX(100%)}to{transform:translateX(0)}}
-@keyframes mw-slide{
- 0%{transform:translate(var(--lx),var(--ly)) rotate(var(--lr)) scale(var(--ls))}
- 9%{transform:translate(var(--lx),var(--ly)) rotate(var(--lr)) scale(var(--ls));animation-timing-function:ease-in-out}
- 15%{transform:translate(var(--lx),var(--ly)) rotate(calc(var(--lr) - 2.5deg)) scale(var(--ls));animation-timing-function:cubic-bezier(.5,0,.25,1)}
- 56%{transform:translate(var(--ox),var(--oy)) rotate(1.2deg) scale(1);animation-timing-function:ease-in-out}
- 66%,100%{transform:translate(0px,0px) rotate(0deg) scale(1)}}
-@keyframes mw-esh{
- 0%,15%{opacity:.62;transform:translate(calc(var(--lx) + 9px),calc(var(--ly) + 13px)) rotate(var(--lr)) scale(1.03);animation-timing-function:cubic-bezier(.5,0,.25,1)}
- 56%{opacity:.62;transform:translate(calc(var(--ox) + 4px),calc(var(--oy) + 6px)) rotate(1.2deg) scale(1.015);animation-timing-function:ease-in-out}
- 66%,100%{opacity:.62;transform:translate(4px,6px) scale(1.015)}}
-@keyframes mw-bow{0%,60%{opacity:1}68%,100%{opacity:0}}
+/* the envelope is tossed onto the table: it comes from near us (large, turning, a little tilted), falls away to the cloth,
+   lands flat and skids a finger's width; .toss = its way across the table, .lean = its height (size) and turn */
+@keyframes mw-toss{
+ 0%,6%{transform:translate(var(--lx),var(--ly));animation-timing-function:cubic-bezier(.16,.52,.42,1)}
+ 31%{transform:translate(var(--kx),var(--ky));animation-timing-function:cubic-bezier(.1,.7,.3,1)}
+ 44%,100%{transform:translate(0px,0px)}}
+@keyframes mw-fall{
+ 0%,6%{transform:perspective(1000px) scale(var(--ls)) rotate(var(--lr)) rotateX(30deg) rotateY(-22deg);animation-timing-function:cubic-bezier(.5,0,.85,.55)}
+ 31%{transform:perspective(1000px) scale(1) rotate(5.5deg) rotateX(-3deg) rotateY(2deg);animation-timing-function:cubic-bezier(.15,.7,.3,1)}
+ 44%{transform:perspective(1000px) scale(1) rotate(-1.1deg) rotateX(0deg) rotateY(0deg);animation-timing-function:ease-in-out}
+ 50%,100%{transform:perspective(1000px) scale(1) rotate(0deg) rotateX(0deg) rotateY(0deg)}}
+/* its shadow on the cloth: wide and faint while it is high, gathering under it as it comes down */
+@keyframes mw-eair{0%,6%{opacity:0;transform:translate(-300px,430px) scale(1.6);animation-timing-function:cubic-bezier(.5,0,.85,.55)}11%{opacity:.8}31%{opacity:.66;transform:translate(-8px,14px) scale(1.02)}36%,100%{opacity:0;transform:translate(-3px,7px) scale(1)}}
+@keyframes mw-econ{0%,23%{opacity:0;transform:translate(-14px,24px) scale(1.06)}31%{opacity:.8;transform:translate(-3px,7px) scale(1)}44%,100%{opacity:.86;transform:translate(-3px,7px) scale(1)}}
+/* confetti: each piece comes down from near us, tumbling at a steady rate, and lies flat where it lands */
+@keyframes mw-cfall{0%{opacity:0;transform:translate(var(--ox),var(--oy)) rotate(var(--rz)) scale(2.7)}10%{opacity:1}100%{opacity:1;transform:translate(0px,0px) rotate(var(--rz)) scale(1)}}
+@keyframes mw-cflip{0%{transform:rotate3d(var(--ax),var(--ay),0,var(--tn))}100%{transform:rotate3d(var(--ax),var(--ay),0,var(--te))}}
 @keyframes mw-camin{0%{transform:translate(0px,0px) scale(1)}70%{transform:translate(0px,0px) scale(1);animation-timing-function:cubic-bezier(.5,0,.2,1)}100%{transform:translate(var(--camx),var(--camy)) scale(var(--camz))}}
 @keyframes mw-fadein{from{opacity:0}to{opacity:1}}
 @keyframes mw-fadeout{from{opacity:1}to{opacity:0}}

@@ -4,8 +4,9 @@
    ONE story — "your light has arrived" (all of it belongs to this product only):
      the card's picture is a golden lantern; the scene is a window sill on a winter evening, seen steeply from above:
      a mug of cocoa, dried orange, a red scarf, and behind the misted glass a snowy town.
-     1. ARRIVAL  — a finger writes the name on the misted glass (a drop or two runs down); the envelope that stood
-                   leaning by the mug slips down and settles on the scarf; we lean in over it.
+     1. ARRIVAL  — a finger writes the name on the misted glass (a drop or two runs down); the envelope drops in
+                   from above, lands on its lower edge on the sill behind the scarf's edge (a small bounce) and
+                   comes to rest leaning on the window frame; we lean in to it.
      2. OPENING  — tap: the flap lifts with its gold wax seal, the slice of dried orange and the star anise
                    (the green liner with gold lanterns inside).
      3. THE CARD — slides up OUT of the pocket (it sits between the inside back and the FRONT POCKET, a layer of its
@@ -135,17 +136,17 @@
   var ENV = { W: 312, H: 430, cardS: 297 / 480, cardX: 156, cardBottom: 424, out: 436 };
   var FLAME = [0.5122, 0.6032];
   var SCENES = {
-    tall: { sfx: '', w: 1152, h: 2048, glass: [[226, 0], [1096, 0], [951, 905], [316, 756]], box: [226, 0, 871, 906],
+    tall: { sfx: '', w: 1152, h: 2048, occ: [740, 875, 153, 354], glass: [[226, 0], [1096, 0], [951, 905], [316, 756]], box: [226, 0, 871, 906],
       lit: [[367, 521, 645, 158], [269, 331, 476, 183], [651, 206, 293, 151], [586, 181, 433, 103], [251, 143, 815, 134], [530, 49, 412, 131]] },
-    wide: { sfx: '-land', w: 1728, h: 1296, glass: [[214, 0], [1491, 0], [1392, 598], [340, 610]], box: [214, 0, 1278, 611],
+    wide: { sfx: '-land', w: 1728, h: 1296, occ: [821, 634, 216, 302], glass: [[214, 0], [1491, 0], [1392, 598], [340, 610]], box: [214, 0, 1278, 611],
       lit: [[620, 558, 585, 52], [321, 481, 1087, 132], [1049, 363, 205, 127], [259, 143, 1059, 208], [532, 62, 936, 157], [212, 0, 502, 190]] }
   };
   var LAYOUTS = {
     port: { W: 600, H: 1100, scene: SCENES.tall, sk: 1100 / 2048, sx: -9.375, sy: 0,
-      env: { e: 0.42, cx: 252, cy: 612, rot: -7 }, lean: { x: -26, y: -40, r: 5 }, cam: { z: 2.15, x: 300, y: 590 },
+      env: { e: 0.42, cx: 474, cy: 522, rot: 8 }, cam: { z: 2.15, x: 325, y: 590 },
       fin: { s: 0.86, cx: 300, bottom: 972 }, name: { cx: 345, cy: 196, max: 300, size: 84, rot: 3 }, hintY: 930, hintSize: 21 },
     land: { W: 1200, H: 900, scene: SCENES.wide, sk: 900 / 1296, sx: 0, sy: 0,
-      env: { e: 0.42, cx: 452, cy: 632, rot: -6 }, lean: { x: -150, y: -36, r: 5 }, cam: { z: 2.0, x: 470, y: 440 },
+      env: { e: 0.5, cx: 700, cy: 508, rot: 1 }, cam: { z: 2.0, x: 520, y: 450 },
       fin: { s: 0.92, cx: 884, bottom: 806 }, name: { cx: 436, cy: 186, max: 430, size: 96, rot: 1 }, hintY: 838, hintSize: 17 }
   };
   var NFOG = 5, NLIT = 6;
@@ -201,6 +202,7 @@
     // ---- envelope: inside back -> card -> FRONT POCKET -> flap, orange slice, seal
     var root = el('div', 'envroot', 'left:' + (L.env.cx - ENV.W / 2) + 'px;top:' + (L.env.cy - ENV.H / 2) + 'px;transform:rotate(' + L.env.rot + 'deg) scale(' + e + ')', cam);
     img(A + 'env-dropshadow.png', 'eshadow', null, root);
+    el('div', 'econtact', null, root);                                                  // where its lower edge touches the sill
     var lean = el('div', 'lean', null, root);
     var envB = el('div', 'eg envB', null, lean);
     img(A + 'env-back.webp', 'full', null, envB);
@@ -222,6 +224,11 @@
     img(A + 'env-flap.webp', 'full flapF', null, el('div', 'flapFbox', null, envF));
     img(A + 'env-seal.webp', 'full flapF', null, el('div', 'flapFbox', null, envF));   // the seal, the orange slice and the anise sit on the flap and turn with it
     el('div', 'elight', null, envF);
+    el('div', 'eshade', null, envF);                                                    // the scarf's shadow on its lower left corner
+    // the scarf's edge, a layer of its own ABOVE the envelope (the same pixels as the picture below): the envelope
+    // stands on the sill BEHIND the scarf. In stage units, so the envelope's own turn and size are undone here.
+    var O = S.occ, occ = el('div', 'occ', 'transform:scale(' + (1 / e) + ') rotate(' + (-L.env.rot) + 'deg)', root);
+    img(A + 'occ' + sfx + '.webp', null, 'left:' + (O[0] * L.sk + L.sx - L.env.cx) + 'px;top:' + (O[1] * L.sk + L.sy - L.env.cy) + 'px;width:' + (O[2] * L.sk) + 'px;height:' + (O[3] * L.sk) + 'px', occ);
 
     // ---- numbers for the CSS
     var F = L.fin;
@@ -232,7 +239,7 @@
       '--fx': px(dx * cs + dy * sn), '--fy': px(-dx * sn + dy * cs), '--c0': ENV.cardS.toFixed(5), '--c1': (F.s / e).toFixed(5),
       '--unrot': (-L.env.rot) + 'deg', '--out': ENV.out + 'px',
       '--camo': px(L.env.cx) + ' ' + px(L.env.cy), '--camz': L.cam.z, '--camx': px(L.cam.x - L.env.cx), '--camy': px(L.cam.y - L.env.cy),
-      '--lx': L.lean.x + 'px', '--ly': L.lean.y + 'px', '--lr': L.lean.r + 'deg'
+      '--dy': px(-(L.env.cy + ENV.H * e / 2 + 40) / e)
     };
     Object.keys(vars).forEach(function (k) { stageEl.style.setProperty(k, vars[k]); });
     // the lantern's light on the room, around the flame of the settled card
@@ -294,7 +301,7 @@
     });
   }
   function preload() {  // the arrival never starts with a half-loaded scene or envelope; the finale's pictures load meanwhile
-    var sfx = state.L.scene.sfx, first = IMAGES.concat(['bg' + sfx + '.jpg']), k;
+    var sfx = state.L.scene.sfx, first = IMAGES.concat(['bg' + sfx + '.jpg', 'occ' + sfx + '.webp']), k;
     for (k = 1; k <= NFOG; k++) first.push('fog' + sfx + '-' + k + '.webp');
     var late = LATE.slice(); for (k = 1; k <= NLIT; k++) late.push('lit' + sfx + '-' + k + '.webp');
     late.forEach(loadOne);

@@ -120,6 +120,9 @@
              cam: { o: [252, 612], z: 2.15, tx: 48, ty: -22, inAt: 1.82, inDur: 0.78, outAt: 4.5, outDur: 1.4 },
              text: function (d) { return d && d.t ? d.t : 'For you'; } }
   };
+  // 27 Nov 2026, v3 of the arrival: the envelope now stands on the sill behind the scarf's edge, so the page camera leans in to another point
+  TEMPLATES['christmas-card-1'].glass.cam = { o: [474, 522], z: 2.15, tx: -149, ty: 68, inAt: 1.82, inDur: 0.78, outAt: 4.5, outDur: 1.4 };
+  TEMPLATES['christmas-card-1'].bases = { a: 'christmas-card-1-v3-base.mp4' };   // a new file name, so no phone plays a stored copy of the earlier arrival
 
   /* Birthday card "Make a wish" (Gold Drip Cake, new version 27 Nov 2026): the base video is the recipient page itself,
      rendered frame by frame (FILL=1.8) with the written side empty, WITHOUT the name on the envelope and without the buttons.
@@ -140,6 +143,8 @@
              cam: { o: [300, 604], z: 1.85, tx: 0, ty: -14, inAt: 1.82, inDur: 0.78, outAt: 4.5, outDur: 1.4 },
              text: function (d) { return d && d.t ? d.t : 'For you'; } }
   };
+  // 27 Nov 2026, v3 of the arrival (the envelope is tossed onto the table, confetti): a new base video under a new file name
+  TEMPLATES['birthday-card-1'].bases = { a: 'birthday-card-1-v3-base.mp4' };
 
   /* Christmas Party invitation "The party's behind this door" (26 Nov 2026): the base video is the guest page itself, rendered
      frame by frame (project/tools/render-party-door.js, FILL=1.8: the stage fills the 1080 x 1920 frame) WITHOUT the party
