@@ -44,9 +44,9 @@
       "listingIds": []
     },
     "christmas-card-2": {
-      "_note": "Christmas Card 2 - Snowy Cabin (built 24 Nov 2026, published on Etsy 26 Nov 2026 at 11:52 as listing 4626093140).",
+      "_note": "Christmas Card 2 - Snowy Cabin (built 24 Nov 2026, published on Etsy 26 Nov 2026 at 11:52 as listing 4626090348). Until 28 Nov 2026 this entry held a wrong number (4626093140); corrected from the address of the listing's edit page and Etsy's fee statement.",
       "name": "Christmas Card 2 - Snowy Cabin",
-      "listingIds": [4626093140]
+      "listingIds": [4626090348]
     },
     "christmas-card-1": {
       "_note": "Christmas card - Gold Lantern, new version 'A light in the window' (built 27 Nov 2026). The listing was published on 18 Nov 2026 as 4620404413 with the old pages (/christmas/, still working); it had no buyers when it moved to the product link.",
@@ -59,9 +59,9 @@
       "listingIds": [4621155452]
     },
     "new-years-eve-1": {
-      "_note": "New Year's Eve Party invitation, 3 designs - 'Midnight' (built 27 Nov 2026). NOT published on Etsy yet: listingIds stays empty until the listing exists (launch grace), then the listing ID goes here. The first version of this invitation (/new-years-eve/, 21 Nov 2026) was never sold.",
+      "_note": "New Year's Eve Party invitation, 3 designs - 'Midnight' (built 27 Nov 2026, published on Etsy 28 Nov 2026 at about 20:41 as listing 4627736333). The first version of this invitation (/new-years-eve/, 21 Nov 2026) was never sold.",
       "name": "New Year's Eve Party invitation - Midnight",
-      "listingIds": []
+      "listingIds": [4627736333]
     },
     "christmas-party-1": {
       "_note": "Christmas Party invitation, 3 designs - new version 'The party's behind this door' (built 26 Nov 2026). The listing was published on 23 Nov 2026 as 4623977490 with the old pages (/christmas-party/, still working); it had no buyers when it moved to the product link.",
